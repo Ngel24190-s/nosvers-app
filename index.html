@@ -1387,7 +1387,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const user  = sessionStorage.getItem('nv_user');
   if (token && user) {
     const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
-    document.getElementById('userBadge').style.display = 'block';
+    const ub3 = document.getElementById('userBadge'); if(ub3) ub3.style.display = 'block';
     document.getElementById('userBadgeName').textContent = user;
     initApp();
   }
