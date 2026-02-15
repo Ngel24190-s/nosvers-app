@@ -2115,7 +2115,7 @@ function saveEtat() {
   });
   localStorage.setItem('nv_etat', JSON.stringify(data));
   const btn = document.getElementById('etatSaveBtn');
-  if (btn) { btn.textContent = '✓ Sauvegardé !'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder l'état de la ferme'; btn.classList.remove('saved'); }, 2000); }
+  if (btn) { btn.textContent = '✓ Sauvegardé !'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder letat de la ferme'; btn.classList.remove('saved'); }, 2000); }
   updateContextBadge();
 }
 
