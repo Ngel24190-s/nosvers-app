@@ -1504,7 +1504,11 @@ Génère les ordres de travail détaillés pour aujourd'hui. Format : liste d'ac
     throw new Error(`HTTP ${resp.status} – ${errBody}`);
   }
   const data = await resp.json();
-  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  if (data.error) {
+    const msg = (typeof data.error === 'object') ? (data.error.message || JSON.stringify(data.error)) : data.error;
+    throw new Error(msg);
+  }
+  if (!data.content) throw new Error('Respuesta vacía del servidor');
   return data.content.map(b => b.text || '').join('');
 }
 
