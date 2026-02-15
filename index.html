@@ -1331,9 +1331,9 @@ async function doLogin() {
     if (data.ok) {
       sessionStorage.setItem('nv_token', data.token);
       sessionStorage.setItem('nv_user', data.user);
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('userBadge').style.display = 'block';
-      document.getElementById('userBadgeName').textContent = data.user;
+      const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
+      const ub = document.getElementById('userBadge'); if(ub) ub.style.display = 'block';
+      const un = document.getElementById('userBadgeName'); if(un) un.textContent = data.user;
       initApp();
     } else {
       errEl.textContent = data.error || 'Error de acceso';
@@ -1347,7 +1347,7 @@ function logout() {
   sessionStorage.removeItem('nv_token');
   sessionStorage.removeItem('nv_user');
   document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('userBadge').style.display = 'none';
+  const ub2 = document.getElementById('userBadge'); if(ub2) ub2.style.display = 'none';
 }
 
 async function initApp() {
@@ -1386,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = sessionStorage.getItem('nv_token');
   const user  = sessionStorage.getItem('nv_user');
   if (token && user) {
-    document.getElementById('loginScreen').style.display = 'none';
+    const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
     document.getElementById('userBadge').style.display = 'block';
     document.getElementById('userBadgeName').textContent = user;
     initApp();
@@ -1489,9 +1489,10 @@ Génère les ordres de travail du jour : contrôles, alimentation, humidité, pH
 Génère les ordres de travail détaillés pour aujourd'hui. Format : liste d'actions avec horaires (HH:MM), paramètres mesurables (températures, volumes, poids, durées), et critères de validation pour chaque tâche. Sois direct et pragmatique, comme un cahier de consignes professionnel.`;
 
   // Llamada al proxy PHP (la API key está segura en el servidor)
+  const token = sessionStorage.getItem('nv_token') || '';
   const resp = await fetch(API_URL + '?action=agente', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-App-Token': token },
     body: JSON.stringify({
       system: systemPrompts[domain],
       user: userMsg
