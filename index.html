@@ -881,9 +881,129 @@ body::before {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
+
+/* ============ LOGIN ============ */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--sol);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.login-box {
+  background: var(--crème);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 92%;
+  max-width: 360px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.login-logo {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--sol);
+  margin-bottom: 0.3rem;
+}
+
+.login-sub {
+  font-size: 0.78rem;
+  color: var(--texte-doux);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.login-field {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--sable);
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  background: white;
+  margin-bottom: 0.8rem;
+  transition: border-color 0.2s;
+}
+
+.login-field:focus {
+  outline: none;
+  border-color: var(--sol-light);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--sol);
+  color: var(--crème);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 0.4rem;
+}
+
+.login-btn:hover { background: var(--sol-mid); }
+
+.login-error {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 0.6rem;
+  min-height: 1.2em;
+}
+
+.login-user-badge {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: var(--sol);
+  color: var(--crème);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  z-index: 100;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.login-user-badge:hover { opacity: 1; }
+
 </style>
 </head>
 <body>
+
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🌱</div>
+    <div class="login-title">NosVers</div>
+    <div class="login-sub">Gestion Agroécologique · Dordogne</div>
+    <input class="login-field" type="text" id="loginUser" placeholder="Usuario" autocomplete="username"
+      onkeydown="if(event.key==='Enter') doLogin()">
+    <input class="login-field" type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div class="login-user-badge" id="userBadge" style="display:none" onclick="logout()">
+  👤 <span id="userBadgeName"></span> · Salir
+</div>
 
 <div class="motto-band">« Une passion pour le sol, un engagement pour la vie »</div>
 
@@ -1185,11 +1305,67 @@ let checkState = {};
 // Helper API
 async function api(action, body = null) {
   const url = API_URL + '?action=' + action;
-  const opts = { headers: { 'Content-Type': 'application/json' } };
+  const token = sessionStorage.getItem('nv_token') || '';
+  const opts = { headers: { 'Content-Type': 'application/json', 'X-App-Token': token } };
   if (body) { opts.method = 'POST'; opts.body = JSON.stringify(body); }
   const r = await fetch(url, opts);
+  if (r.status === 401) { logout(); return null; }
   if (!r.ok) throw new Error('API ' + action + ' → HTTP ' + r.status);
   return r.json();
+}
+
+// Auth
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!user || !pass) { errEl.textContent = 'Completa usuario y contraseña'; return; }
+  try {
+    const r = await fetch(API_URL + '?action=login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user, pass })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      sessionStorage.setItem('nv_token', data.token);
+      sessionStorage.setItem('nv_user', data.user);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('userBadge').style.display = 'block';
+      document.getElementById('userBadgeName').textContent = data.user;
+      initApp();
+    } else {
+      errEl.textContent = data.error || 'Error de acceso';
+    }
+  } catch(e) {
+    errEl.textContent = 'Error de conexión: ' + e.message;
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('nv_token');
+  sessionStorage.removeItem('nv_user');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('userBadge').style.display = 'none';
+}
+
+async function initApp() {
+  try {
+    const [inv, chk, jrn] = await Promise.all([
+      api('inventaire_get'),
+      api('checklist_get'),
+      api('journal_get')
+    ]);
+    if (inv && typeof inv === 'object' && !inv.error) inventory = { ...inventory, ...inv };
+    if (chk && typeof chk === 'object' && !chk.error) checkState = chk;
+    if (Array.isArray(jrn)) journal = jrn;
+  } catch(e) {
+    console.warn('API error:', e.message);
+  }
+  renderChecklist();
+  renderInventory();
+  renderJournal();
 }
 
 const domainColors = {
@@ -1203,24 +1379,18 @@ const domainLabels = {
 };
 
 // ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   updateClock();
   setInterval(updateClock, 30000);
-  try {
-    const [inv, chk, jrn] = await Promise.all([
-      api('inventaire_get'),
-      api('checklist_get'),
-      api('journal_get')
-    ]);
-    if (inv && typeof inv === 'object' && !inv.error) inventory = { ...inventory, ...inv };
-    if (chk && typeof chk === 'object' && !chk.error) checkState = chk;
-    if (Array.isArray(jrn)) journal = jrn;
-  } catch(e) {
-    console.warn('API no disponible, modo local:', e.message);
+  // Si ya hay token en sesión, entrar directamente
+  const token = sessionStorage.getItem('nv_token');
+  const user  = sessionStorage.getItem('nv_user');
+  if (token && user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('userBadge').style.display = 'block';
+    document.getElementById('userBadgeName').textContent = user;
+    initApp();
   }
-  renderChecklist();
-  renderInventory();
-  renderJournal();
 });
 
 function updateClock() {
