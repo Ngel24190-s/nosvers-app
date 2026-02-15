@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NosVers · Gestion Agroécologique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sol: #1a3a1e;
+  --sol-mid: #2d5c35;
+  --sol-light: #4a7c59;
+  --terre: #3d2b1f;
+  --terre-mid: #6b4423;
+  --humus: #8b6014;
+  --humus-light: #c49a3c;
+  --crème: #f4efe3;
+  --sable: #e8dcc4;
+  --ver: #5d4037;
+  --ver-light: #8d6e63;
+  --blanc: #fdfaf4;
+  --texte: #1c1510;
+  --texte-doux: #5a4e42;
+  --compost-col: #c45c00;
+  --animaux-col: #7b3f00;
+  --huerto-col: #2e6b30;
+  --vers-col: #6b3a2a;
+  --r: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--crème);
+  color: var(--texte);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BG texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a7c59' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============ HEADER ============ */
+.header {
+  background: var(--sol);
+  color: var(--crème);
+  padding: 0 2rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 4px 30px rgba(26,58,30,0.3);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--sol-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+.logo-sub {
+  font-size: 0.65rem;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  display: block;
+  margin-top: -2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-date {
+  font-size: 0.78rem;
+  opacity: 0.55;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(74,124,89,0.2);
+  border: 1px solid rgba(74,124,89,0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.dot-live {
+  width: 7px; height: 7px;
+  background: #6db070;
+  border-radius: 50%;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ============ NAV TABS ============ */
+.nav-tabs {
+  background: var(--terre);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 2px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 64px;
+  z-index: 190;
+}
+
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 0 1.5rem;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(244,239,227,0.5);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid transparent;
+  background: none;
+  border-left: none;
+  border-right: none;
+}
+
+.nav-tab:hover { color: var(--crème); }
+
+.nav-tab.active {
+  color: var(--crème);
+  border-bottom-color: var(--sol-light);
+  background: rgba(74,124,89,0.1);
+}
+
+/* ============ MAIN LAYOUT ============ */
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+/* ============ SECTIONS ============ */
+.section { display: none; }
+.section.active { display: block; animation: fadeUp 0.4s ease; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ SECTION HEADER ============ */
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--sol);
+  line-height: 1.15;
+}
+
+.section-title em {
+  font-style: italic;
+  color: var(--sol-light);
+}
+
+.section-sub {
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+  font-weight: 400;
+}
+
+/* ============ CARDS GRID ============ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-agent {
+  background: var(--blanc);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(26,58,30,0.06);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.card-agent:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(26,58,30,0.14);
+}
+
+.card-agent.selected {
+  border-color: var(--sol-light);
+  box-shadow: 0 0 0 4px rgba(74,124,89,0.15);
+}
+
+.card-agent.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.card-top {
+  padding: 1.3rem 1.3rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.card-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.card-info { flex: 1; }
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--texte);
+  line-height: 1.2;
+}
+
+.card-desc {
+  font-size: 0.73rem;
+  color: var(--texte-doux);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.card-bar {
+  height: 4px;
+  width: 100%;
+}
+
+/* couleurs par domaine */
+.domain-compost .card-icon { background: rgba(196,92,0,0.12); color: var(--compost-col); }
+.domain-compost .card-bar { background: var(--compost-col); }
+.domain-compost.selected { border-color: var(--compost-col); }
+
+.domain-animaux .card-icon { background: rgba(123,63,0,0.12); color: var(--animaux-col); }
+.domain-animaux .card-bar { background: var(--animaux-col); }
+.domain-animaux.selected { border-color: var(--animaux-col); }
+
+.domain-huerto .card-icon { background: rgba(46,107,48,0.1); color: var(--huerto-col); }
+.domain-huerto .card-bar { background: var(--huerto-col); }
+.domain-huerto.selected { border-color: var(--huerto-col); }
+
+.domain-vers .card-icon { background: rgba(107,58,42,0.1); color: var(--vers-col); }
+.domain-vers .card-bar { background: var(--vers-col); }
+.domain-vers.selected { border-color: var(--vers-col); }
+
+/* ============ INPUT ZONE ============ */
+.query-zone {
+  background: var(--blanc);
+  border-radius: var(--r);
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(26,58,30,0.05);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.query-input {
+  flex: 1;
+  border: 2px solid var(--sable);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  background: var(--crème);
+  transition: all 0.22s;
+  color: var(--texte);
+}
+
+.query-input:focus {
+  outline: none;
+  border-color: var(--sol-light);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(74,124,89,0.1);
+}
+
+.query-input::placeholder { color: #bbb0a0; }
+
+.btn-query {
+  padding: 0.75rem 1.5rem;
+  background: var(--sol);
+  color: var(--crème);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s;
+  white-space: nowrap;
+}
+
+.btn-query:hover { background: var(--sol-mid); transform: translateY(-1px); }
+.btn-query:disabled { opacity: 0.5; pointer-events: none; }
+
+/* ============ RESPONSE PANEL ============ */
+.response-panel {
+  display: none;
+  background: var(--blanc);
+  border-radius: var(--r);
+  box-shadow: 0 2px 24px rgba(26,58,30,0.08);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.response-panel.visible {
+  display: block;
+  animation: slideUp 0.35s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.resp-header {
+  padding: 1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--sable);
+}
+
+.resp-domain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.resp-domain-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+}
+
+.resp-meta {
+  font-size: 0.7rem;
+  color: var(--texte-doux);
+  opacity: 0.6;
+}
+
+.resp-body {
+  padding: 1.4rem;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--texte);
+  max-height: 520px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.resp-body::-webkit-scrollbar { width: 5px; }
+.resp-body::-webkit-scrollbar-track { background: var(--sable); }
+.resp-body::-webkit-scrollbar-thumb { background: var(--sol-light); border-radius: 4px; }
+
+.resp-footer {
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid var(--sable);
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-action {
+  padding: 0.5rem 1.1rem;
+  border-radius: 7px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.btn-primary {
+  background: var(--sol);
+  color: var(--crème);
+  border: 2px solid var(--sol);
+}
+.btn-primary:hover { background: var(--sol-mid); }
+.btn-primary.done {
+  background: var(--sol-light);
+  border-color: var(--sol-light);
+  pointer-events: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--texte-doux);
+  border: 2px solid var(--sable);
+}
+.btn-secondary:hover { border-color: var(--sol-light); color: var(--sol); }
+
+/* Loading spinner inside card */
+.spin {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(26,58,30,0.15);
+  border-top-color: var(--sol);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ JOURNAL / REGISTROS ============ */
+.log-section {
+  margin-top: 2rem;
+}
+
+.log-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--sol);
+  margin-bottom: 1rem;
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-entry {
+  background: var(--blanc);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  box-shadow: 0 1px 6px rgba(26,58,30,0.04);
+  transition: all 0.2s;
+  animation: fadeUp 0.3s ease;
+}
+
+.log-entry:hover {
+  transform: translateX(3px);
+  box-shadow: 0 2px 12px rgba(26,58,30,0.09);
+}
+
+.log-domain-tag {
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: white;
+}
+
+.log-text { color: var(--texte-doux); }
+.log-time { opacity: 0.45; white-space: nowrap; }
+
+.log-empty {
+  text-align: center;
+  padding: 2.5rem;
+  color: var(--texte-doux);
+  opacity: 0.5;
+  font-size: 0.85rem;
+  background: var(--blanc);
+  border-radius: var(--r);
+}
+
+/* ============ FICHES SECTION ============ */
+.fiches-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.fiche {
+  background: var(--blanc);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(26,58,30,0.06);
+}
+
+.fiche-head {
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 3px solid;
+}
+
+.fiche-head h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.fiche-head p {
+  font-size: 0.73rem;
+  opacity: 0.6;
+  margin-top: 3px;
+}
+
+.fiche-body {
+  padding: 1rem 1.2rem;
+}
+
+.fiche-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--sable);
+  font-size: 0.82rem;
+}
+
+.fiche-row:last-child { border: none; }
+
+.fiche-label { color: var(--texte-doux); }
+.fiche-val { font-weight: 600; color: var(--texte); }
+
+.fiche-val.good { color: var(--huerto-col); }
+.fiche-val.warn { color: var(--humus); }
+.fiche-val.alert { color: #c0392b; }
+
+.param-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  background: rgba(74,124,89,0.1);
+  color: var(--sol-mid);
+  margin: 3px 3px 0 0;
+}
+
+/* ============ CHECKLIST ============ */
+.checklist {
+  background: var(--blanc);
+  border-radius: var(--r);
+  box-shadow: 0 2px 12px rgba(26,58,30,0.06);
+  overflow: hidden;
+}
+
+.checklist-header {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--sable);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+}
+
+.progress-bar {
+  width: 100px;
+  height: 6px;
+  background: var(--sable);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--sol-light);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 0.72rem;
+  color: var(--texte-doux);
+  margin-top: 3px;
+  text-align: right;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0.85rem 1.4rem;
+  border-bottom: 1px solid rgba(232,220,196,0.5);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.check-item:last-child { border: none; }
+.check-item:hover { background: rgba(74,124,89,0.04); }
+
+.check-box {
+  width: 20px; height: 20px;
+  border: 2px solid var(--sable);
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 0.75rem;
+}
+
+.check-item.done .check-box {
+  background: var(--sol-light);
+  border-color: var(--sol-light);
+  color: white;
+}
+
+.check-item.done .check-content {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.check-content { flex: 1; }
+
+.check-titre {
+  font-weight: 600;
+  font-size: 0.84rem;
+  color: var(--texte);
+}
+
+.check-detail {
+  font-size: 0.74rem;
+  color: var(--texte-doux);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.check-tag {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: white;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ============ INVENTAIRE ============ */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.inv-card {
+  background: var(--blanc);
+  border-radius: var(--r);
+  padding: 1.2rem;
+  box-shadow: 0 2px 12px rgba(26,58,30,0.06);
+  text-align: center;
+  transition: all 0.25s;
+}
+
+.inv-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(26,58,30,0.1);
+}
+
+.inv-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.inv-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--sol);
+}
+.inv-unit {
+  font-size: 0.72rem;
+  color: var(--texte-doux);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.inv-label {
+  font-size: 0.78rem;
+  color: var(--texte-doux);
+  margin-top: 4px;
+}
+
+/* editable inventory value */
+.inv-val-input {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--sol);
+  border: none;
+  background: transparent;
+  width: 90px;
+  text-align: center;
+  outline: none;
+  border-bottom: 2px dashed var(--sable);
+  transition: border-color 0.2s;
+}
+.inv-val-input:focus { border-color: var(--sol-light); }
+
+/* ============ MODAL / OVERLAY ============ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,58,30,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay.open {
+  display: flex;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--blanc);
+  border-radius: 14px;
+  max-width: 540px;
+  width: 92%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 30px 80px rgba(26,58,30,0.25);
+  animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popUp {
+  from { transform: scale(0.88); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--sable);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--sol);
+}
+
+.modal-close {
+  background: var(--sable);
+  border: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--sol-light); color: white; }
+
+.modal-body { padding: 1.5rem; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 640px) {
+  .cards-grid, .fiches-grid { grid-template-columns: 1fr; }
+  .inventory-grid { grid-template-columns: repeat(2, 1fr); }
+  .header { padding: 0 1rem; }
+  .logo-text { font-size: 1.25rem; }
+  .main { padding: 1.2rem 1rem 4rem; }
+  .status-pill span { display: none; }
+  .section-title { font-size: 1.6rem; }
+}
+
+/* ============ MOTTO BAND ============ */
+.motto-band {
+  background: var(--sol);
+  color: rgba(244,239,227,0.55);
+  text-align: center;
+  padding: 6px;
+  font-size: 0.7rem;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  font-family: 'Playfair Display', serif;
+}
+
+/* ============ THINKING INDICATOR ============ */
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1rem 1.4rem;
+  color: var(--texte-doux);
+  font-size: 0.83rem;
+  font-style: italic;
+}
+
+.thinking-dots span {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: var(--sol-light);
+  border-radius: 50%;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+</style>
+</head>
+<body>
+
+<div class="motto-band">« Une passion pour le sol, un engagement pour la vie »</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">🌱</div>
+    <div>
+      <span class="logo-text">NosVers</span>
+      <span class="logo-sub">Gestion Agroécologique · Dordogne</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="reloj">—</div>
+    <div class="status-pill">
+      <span class="dot-live"></span>
+      <span>IA active</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="goTo('agents')">🤖 Agents IA</button>
+  <button class="nav-tab" onclick="goTo('fiches')">📋 Fiches Techniques</button>
+  <button class="nav-tab" onclick="goTo('checklist')">✅ Checklist</button>
+  <button class="nav-tab" onclick="goTo('inventaire')">📦 Inventaire</button>
+  <button class="nav-tab" onclick="goTo('journal')">📔 Journal</button>
+</nav>
+
+<main class="main">
+
+<!-- ===================== SECTION: AGENTS IA ===================== -->
+<div class="section active" id="sec-agents">
+  <div class="section-header">
+    <h2 class="section-title">Agents <em>de Gestion</em></h2>
+    <p class="section-sub">Sélectionne un domaine · L'IA génère les ordres de travail du jour avec paramètres mesurables</p>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card-agent domain-compost" id="card-compost" onclick="callAgent('compost')">
+      <div class="card-top">
+        <div class="card-icon">🍂</div>
+        <div class="card-info">
+          <div class="card-name">Compost</div>
+          <div class="card-desc">Gestion des andains · Température · C/N · Maturation</div>
+        </div>
+      </div>
+      <div class="card-bar"></div>
+    </div>
+
+    <div class="card-agent domain-animaux" id="card-animaux" onclick="callAgent('animaux')">
+      <div class="card-top">
+        <div class="card-icon">🐓</div>
+        <div class="card-info">
+          <div class="card-name">Animaux</div>
+          <div class="card-desc">Poules · Canards · Lapins · Brebis Cameroun</div>
+        </div>
+      </div>
+      <div class="card-bar"></div>
+    </div>
+
+    <div class="card-agent domain-huerto" id="card-huerto" onclick="callAgent('huerto')">
+      <div class="card-top">
+        <div class="card-icon">🌿</div>
+        <div class="card-info">
+          <div class="card-name">Potager & Semis</div>
+          <div class="card-desc">Serre · Plantation · Arrosage · Récolte · Semences</div>
+        </div>
+      </div>
+      <div class="card-bar"></div>
+    </div>
+
+    <div class="card-agent domain-vers" id="card-vers" onclick="callAgent('vers')">
+      <div class="card-top">
+        <div class="card-icon">🪱</div>
+        <div class="card-info">
+          <div class="card-name">Lombricompost</div>
+          <div class="card-desc">Eisenia · Alimentation · Humidité · Récolte · Thé</div>
+        </div>
+      </div>
+      <div class="card-bar"></div>
+    </div>
+  </div>
+
+  <!-- Query input -->
+  <div class="query-zone">
+    <input type="text" class="query-input" id="queryInput"
+      placeholder="Précision optionnelle : température actuelle, problème constaté, stade…"
+      onkeydown="if(event.key==='Enter' && activeAgent) callAgent(activeAgent)">
+    <button class="btn-query" id="btnQuery" onclick="callAgent(activeAgent)" disabled>Générer</button>
+  </div>
+
+  <!-- Response panel -->
+  <div class="response-panel" id="responsePanel">
+    <div class="resp-header">
+      <div class="resp-domain" id="respDomain">—</div>
+      <div class="resp-meta" id="respMeta">—</div>
+    </div>
+    <div class="resp-body" id="respBody"></div>
+    <div class="resp-footer">
+      <button class="btn-action btn-primary" id="btnDone" onclick="markDone()">✓ Tâches enregistrées</button>
+      <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copier</button>
+      <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: FICHES TECHNIQUES ===================== -->
+<div class="section" id="sec-fiches">
+  <div class="section-header">
+    <h2 class="section-title">Fiches <em>Techniques</em></h2>
+    <p class="section-sub">Paramètres clés de référence pour NosVers · Dordogne</p>
+  </div>
+
+  <div class="fiches-grid">
+    <!-- Vers -->
+    <div class="fiche">
+      <div class="fiche-head" style="border-color: var(--vers-col);">
+        <h3>🪱 Eisenia (lombricompost)</h3>
+        <p>Conditions optimales de production</p>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-row"><span class="fiche-label">Température idéale</span><span class="fiche-val good">20–25 °C</span></div>
+        <div class="fiche-row"><span class="fiche-label">Seuil critique bas</span><span class="fiche-val warn">&lt; 10 °C → activité ↓↓</span></div>
+        <div class="fiche-row"><span class="fiche-label">Humidité cible</span><span class="fiche-val good">70–90 %</span></div>
+        <div class="fiche-row"><span class="fiche-label">pH optimal</span><span class="fiche-val good">6,5 – 7,5</span></div>
+        <div class="fiche-row"><span class="fiche-label">Ration actuelle</span><span class="fiche-val">~6 kg / 2 jours</span></div>
+        <div class="fiche-row"><span class="fiche-label">Signal de division</span><span class="fiche-val">Haute densité + cocôns</span></div>
+        <div class="fiche-row"><span class="fiche-label">Maille tamis</span><span class="fiche-val">5–8 mm (trommel)</span></div>
+        <div style="margin-top:10px">
+          <span class="param-badge">❌ Agrumes</span>
+          <span class="param-badge">❌ Oignon/Ail</span>
+          <span class="param-badge">❌ Viande</span>
+          <span class="param-badge">❌ Laitiers</span>
+          <span class="param-badge">✅ Fumiers herbivores</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compost -->
+    <div class="fiche">
+      <div class="fiche-head" style="border-color: var(--compost-col);">
+        <h3>🍂 Compostage actif</h3>
+        <p>Andains & maturation</p>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-row"><span class="fiche-label">Temp. active (cœur)</span><span class="fiche-val good">55–65 °C</span></div>
+        <div class="fiche-row"><span class="fiche-label">Alerte anaérobiose</span><span class="fiche-val alert">&lt; 45 °C → ajouter N</span></div>
+        <div class="fiche-row"><span class="fiche-label">Humidité cible</span><span class="fiche-val good">50–60 % (test poing)</span></div>
+        <div class="fiche-row"><span class="fiche-label">Rapport C/N</span><span class="fiche-val">25–30 : 1</span></div>
+        <div class="fiche-row"><span class="fiche-label">Fréquence retournement</span><span class="fiche-val">Tous les 3–5 jours (phase active)</span></div>
+        <div class="fiche-row"><span class="fiche-label">Odeur normale</span><span class="fiche-val good">Terre humide</span></div>
+        <div class="fiche-row"><span class="fiche-label">Odeur ammoniaque</span><span class="fiche-val alert">Excès N → ajouter C</span></div>
+        <div class="fiche-row"><span class="fiche-label">Sources fumier</span><span class="fiche-val">Poule · Lapin · Brebis</span></div>
+      </div>
+    </div>
+
+    <!-- Animaux -->
+    <div class="fiche">
+      <div class="fiche-head" style="border-color: var(--animaux-col);">
+        <h3>🐓 Élevage intégré</h3>
+        <p>Poules · Canards · Lapins · Brebis</p>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-row"><span class="fiche-label">Ration poule</span><span class="fiche-val">120 g/tête/j (céréales+légum.)</span></div>
+        <div class="fiche-row"><span class="fiche-label">Eau poule (été)</span><span class="fiche-val warn">300 ml/tête/j</span></div>
+        <div class="fiche-row"><span class="fiche-label">Rotation parcelles</span><span class="fiche-val good">Min. 21 jours de repos</span></div>
+        <div class="fiche-row"><span class="fiche-label">Coquilles d'huître</span><span class="fiche-val">Si œufs à coquille molle</span></div>
+        <div class="fiche-row"><span class="fiche-label">Races</span><span class="fiche-val">Canards coureurs indiens · Brebis Cameroun</span></div>
+        <div class="fiche-row"><span class="fiche-label">Sortie au pâturage</span><span class="fiche-val">Si terrain sec · parcelle définie</span></div>
+        <div class="fiche-row"><span class="fiche-label">Fermeture poulailler</span><span class="fiche-val">18:30–19:00 (anti-prédat.)</span></div>
+      </div>
+    </div>
+
+    <!-- Potager -->
+    <div class="fiche">
+      <div class="fiche-head" style="border-color: var(--huerto-col);">
+        <h3>🌿 Potager & Semis</h3>
+        <p>Serre · Cultures en pleine terre</p>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-row"><span class="fiche-label">Arrosage goutte-à-goutte</span><span class="fiche-val">20 min (humidité sol 15 cm)</span></div>
+        <div class="fiche-row"><span class="fiche-label">Tuteurage tomates</span><span class="fiche-val">Tous les 40 cm · Raphia en 8</span></div>
+        <div class="fiche-row"><span class="fiche-label">Espacement laitues</span><span class="fiche-val">25 cm plante · 30 cm rangs</span></div>
+        <div class="fiche-row"><span class="fiche-label">Paillage</span><span class="fiche-val">5–8 cm paille · 3 cm autour tige</span></div>
+        <div class="fiche-row"><span class="fiche-label">Engrais vert</span><span class="fiche-val">Trèfle persan + Ray-grass + Daïkon</span></div>
+        <div class="fiche-row"><span class="fiche-label">Kit urbain</span><span class="fiche-val">Semences ferme + lombricompost</span></div>
+        <div class="fiche-row"><span class="fiche-label">Thé lombric dilution</span><span class="fiche-val good">1:10 (percolat/eau)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objectifs financiers -->
+  <div class="fiche" style="margin-top:1rem">
+    <div class="fiche-head" style="border-color: var(--humus);">
+      <h3>💰 Objectifs Production & Business</h3>
+      <p>Plan de relance NosVers.fr</p>
+    </div>
+    <div class="fiche-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem">
+      <div style="text-align:center;padding:0.8rem;background:var(--crème);border-radius:8px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--sol);font-weight:700">1 m³</div>
+        <div style="font-size:0.72rem;color:var(--texte-doux)">Production départ/mois (≈500 kg)</div>
+      </div>
+      <div style="text-align:center;padding:0.8rem;background:var(--crème);border-radius:8px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--sol);font-weight:700">4 m³</div>
+        <div style="font-size:0.72rem;color:var(--texte-doux)">Objectif an 2 (si marché)</div>
+      </div>
+      <div style="text-align:center;padding:0.8rem;background:var(--crème);border-radius:8px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--sol);font-weight:700">1 800€</div>
+        <div style="font-size:0.72rem;color:var(--texte-doux)">Salaire net cible mensuel</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: CHECKLIST ===================== -->
+<div class="section" id="sec-checklist">
+  <div class="section-header">
+    <h2 class="section-title">Checklist <em>Journalière</em></h2>
+    <p class="section-sub">Tâches récurrentes NosVers · Cocher au fil de la journée</p>
+  </div>
+
+  <div class="checklist" id="checklistMain">
+    <div class="checklist-header">
+      <h3>🌅 Tâches du jour</h3>
+      <div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div class="progress-text" id="progressText">0 / 0 tâches</div>
+      </div>
+    </div>
+    <!-- Items injected by JS -->
+    <div id="checkItems"></div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: INVENTAIRE ===================== -->
+<div class="section" id="sec-inventaire">
+  <div class="section-header">
+    <h2 class="section-title">Inventaire <em>Opérationnel</em></h2>
+    <p class="section-sub">Clique sur une valeur pour la modifier · Sauvegarde automatique</p>
+  </div>
+
+  <div class="inventory-grid" id="inventoryGrid">
+    <!-- injected by JS -->
+  </div>
+
+  <div style="background:var(--blanc);border-radius:var(--r);padding:1.2rem;box-shadow:0 2px 12px rgba(26,58,30,0.05)">
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--sol);margin-bottom:0.8rem">📦 Produits NosVers — Stock SKU prioritaires</div>
+    <div id="skuList"></div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: JOURNAL ===================== -->
+<div class="section" id="sec-journal">
+  <div class="section-header">
+    <h2 class="section-title">Journal <em>de Bord</em></h2>
+    <p class="section-sub">Historique des consultations IA et des actions enregistrées</p>
+  </div>
+
+  <div style="display:flex;gap:0.6rem;margin-bottom:1.2rem">
+    <button class="btn-action btn-primary" onclick="openModal('addNote')">+ Entrée manuelle</button>
+    <button class="btn-action btn-secondary" onclick="clearJournal()">🗑 Effacer journal</button>
+  </div>
+
+  <div class="log-entries" id="logEntries">
+    <div class="log-empty" id="logEmpty">Aucune entrée. Lance un agent ou ajoute une note.</div>
+  </div>
+</div>
+
+</main>
+
+<!-- ===================== MODAL NOTE ===================== -->
+<div class="overlay" id="overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Note</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ==================== CONFIG ====================
+// ⚠ Cambia esta URL por la tuya en Hostinger (ruta relativa si están en la misma carpeta)
+const API_URL = 'https://nosvers.com/granja/api.php';
+
+// ==================== STATE ====================
+let activeAgent = null;
+let lastResp = '';
+let journal = [];
+let inventory = {
+  vers: 10, compost_stock: 0, bacs: 2, ibc: 1,
+  poules: 12, canards: 6, lapins: 4, brebis: 3,
+};
+let checkState = {};
+
+// Helper API
+async function api(action, body = null) {
+  const url = API_URL + '?action=' + action;
+  const opts = { headers: { 'Content-Type': 'application/json' } };
+  if (body) { opts.method = 'POST'; opts.body = JSON.stringify(body); }
+  const r = await fetch(url, opts);
+  if (!r.ok) throw new Error('API ' + action + ' → HTTP ' + r.status);
+  return r.json();
+}
+
+const domainColors = {
+  compost: '#c45c00', animaux: '#7b3f00',
+  huerto: '#2e6b30', vers: '#6b3a2a'
+};
+
+const domainLabels = {
+  compost: '🍂 Compost', animaux: '🐓 Animaux',
+  huerto: '🌿 Potager', vers: '🪱 Lombricompost'
+};
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', async () => {
+  updateClock();
+  setInterval(updateClock, 30000);
+  try {
+    const [inv, chk, jrn] = await Promise.all([
+      api('inventaire_get'),
+      api('checklist_get'),
+      api('journal_get')
+    ]);
+    if (inv && typeof inv === 'object' && !inv.error) inventory = { ...inventory, ...inv };
+    if (chk && typeof chk === 'object' && !chk.error) checkState = chk;
+    if (Array.isArray(jrn)) journal = jrn;
+  } catch(e) {
+    console.warn('API no disponible, modo local:', e.message);
+  }
+  renderChecklist();
+  renderInventory();
+  renderJournal();
+});
+
+function updateClock() {
+  const d = new Date();
+  document.getElementById('reloj').innerHTML =
+    d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }) +
+    '<br>' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ==================== NAVIGATION ====================
+function goTo(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ==================== AGENTS IA ====================
+function callAgent(domain) {
+  if (!domain) return;
+  activeAgent = domain;
+
+  // Reset UI
+  document.querySelectorAll('.card-agent').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + domain).classList.add('selected', 'loading');
+  document.getElementById('btnQuery').disabled = false;
+
+  const extras = document.getElementById('queryInput').value.trim();
+  const panel = document.getElementById('responsePanel');
+  panel.classList.add('visible');
+
+  // Set domain label
+  const col = domainColors[domain];
+  document.getElementById('respDomain').innerHTML =
+    `<span class="resp-domain-dot" style="background:${col}"></span> ${domainLabels[domain]}`;
+  document.getElementById('respMeta').textContent =
+    new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  // Show thinking
+  document.getElementById('respBody').innerHTML = `
+    <div class="thinking">
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+      L'agent analyse les conditions NosVers…
+    </div>`;
+
+  const btnDone = document.getElementById('btnDone');
+  btnDone.textContent = '✓ Tâches enregistrées';
+  btnDone.classList.remove('done');
+
+  callClaude(domain, extras).then(text => {
+    lastResp = text;
+    document.getElementById('respBody').textContent = text;
+    document.getElementById('card-' + domain).classList.remove('loading');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    addJournalEntry(domain, 'Consultation agent IA');
+  }).catch(err => {
+    document.getElementById('respBody').textContent = '⚠ Erreur de connexion : ' + err.message;
+    document.getElementById('card-' + domain).classList.remove('loading');
+  });
+}
+
+async function callClaude(domain, extras) {
+  const today = new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  const systemPrompts = {
+    compost: `Tu es l'agent de gestion du COMPOST de la ferme agroécologique NosVers en Dordogne (région de Neuvic).
+La ferme produit du lombricompost avec Eisenia, intègre des animaux (poules, canards coureurs indiens, lapins, brebis du Cameroun) et un potager familial intensif.
+Sources de fumier disponibles : poule, lapin, brebis (en précompost).
+Paramètres de référence : température andain actif 55-65°C, humidité 50-60%, rapport C/N 25-30:1.
+Génère un plan d'action concret pour aujourd'hui : ordres de travail précis avec horaires, températures cibles, volumes, durées. Langage direct et opérationnel. Réponds en français.`,
+
+    animaux: `Tu es l'agent de gestion des ANIMAUX de la ferme agroécologique NosVers en Dordogne.
+Animaux présents : poules pondeuses, canards coureurs indiens (contrôle limaces), lapins (engrais), brebis du Cameroun (débroussaillage).
+Paramètres : ration poule 120g/j, eau 300ml/j (été), rotation parcelles min. 21 jours, coquilles d'huître si œufs mous.
+Génère un plan d'action journalier détaillé avec horaires précis, quantités mesurables et points de contrôle sanitaire. Langage direct. Réponds en français.`,
+
+    huerto: `Tu es l'agent de gestion du POTAGER & SEMIS de NosVers en Dordogne.
+La ferme a : potager familial intensif agroécologique, serre à semis, production de semences adaptées, engrais vert (trèfle persan + ray-grass + daïkon), kits de culture à vendre.
+L'objectif commercial : kit "Commence ton jardin NosVers" (semences maison + lombricompost + conseils d'África).
+Thé de lombric dilué 1:10 pour fertilisation liquide.
+Génère un plan d'action journalier précis : arrosage, tuteurage, semis, récolte, traitements biologiques. Horaires et paramètres mesurables. Réponds en français.`,
+
+    vers: `Tu es l'agent de gestion de la LOMBRICOMPOSTIÈRE de NosVers en Dordogne.
+Espèce : Eisenia fetida/andrei. Conditions optimales : 20-25°C (seuil critique <10°C), humidité 70-90%, pH 6,5-7,5.
+Ration actuelle : ~6 kg tous les 2 jours. Objectif production : 1 m³/mois départ, puis 2-4 m³.
+Infrastructure : bacs en bois + IBC 1000L (à connecter avec robinets pour récupérer lixiviats). Trommel prévu pour la récolte.
+Produits : lombricompost solide (sacs 10kg, 20L, big bags), thé de lombric, vente de vers (packs 500g/1kg).
+À éviter : agrumes, oignon, ail, viande, laitiers.
+Génère les ordres de travail du jour : contrôles, alimentation, humidité, pH, récolte si pertinent. Paramètres précis et mesurables. Réponds en français.`
+  };
+
+  const userMsg = `Date : ${today}${extras ? '\nPrécision opératrice : ' + extras : ''}
+
+Génère les ordres de travail détaillés pour aujourd'hui. Format : liste d'actions avec horaires (HH:MM), paramètres mesurables (températures, volumes, poids, durées), et critères de validation pour chaque tâche. Sois direct et pragmatique, comme un cahier de consignes professionnel.`;
+
+  // Llamada al proxy PHP (la API key está segura en el servidor)
+  const resp = await fetch(API_URL + '?action=agente', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system: systemPrompts[domain],
+      user: userMsg
+    })
+  });
+
+  if (!resp.ok) {
+    const errBody = await resp.text();
+    throw new Error(`HTTP ${resp.status} – ${errBody}`);
+  }
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  return data.content.map(b => b.text || '').join('');
+}
+
+function markDone() {
+  const btn = document.getElementById('btnDone');
+  btn.textContent = '✓ Enregistré !';
+  btn.classList.add('done');
+  addJournalEntry(activeAgent, 'Tâches marquées complètes', true);
+}
+
+function copyResp() {
+  navigator.clipboard.writeText(lastResp).catch(() => {});
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Copié';
+  setTimeout(() => btn.textContent = orig, 1500);
+}
+
+// ==================== CHECKLIST ====================
+const checkItems = [
+  { id: 'c1', domain: 'vers', title: 'Contrôle humidité lombricompostière', detail: 'Test du poing en 3 points · Objectif 70-80%', urgent: true },
+  { id: 'c2', domain: 'vers', title: 'Alimentation Eisenia', detail: '~6 kg déchets végétaux hachés <2 cm · Couvrir cartón' },
+  { id: 'c3', domain: 'vers', title: 'Récolte lixiviat (thé de lombric)', detail: 'Vider bac collecteur · Diluer 1:10 pour arrosage' },
+  { id: 'c4', domain: 'animaux', title: 'Ouverture poulailler + inspection', detail: 'Plumage · Yeux · Mobilité · Rechercher léthargie' },
+  { id: 'c5', domain: 'animaux', title: 'Alimentation animaux', detail: '120 g/poule · eau fraîche · Contrôler œufs' },
+  { id: 'c6', domain: 'animaux', title: 'Rotation parcelle pâturage', detail: 'Vérifier si terrain sec · Rotation parcelle planifiée' },
+  { id: 'c7', domain: 'huerto', title: 'Arrosage potager', detail: '20 min goutte-à-goutte · Humidité sol à 15 cm' },
+  { id: 'c8', domain: 'huerto', title: 'Inspection ravageurs', detail: 'Envers feuilles : puceron, mouche blanche, araignée rouge' },
+  { id: 'c9', domain: 'compost', title: 'Mesure température andain', detail: 'Cœur : 55-65°C · Si <45°C → ajouter matière N' },
+  { id: 'c10', domain: 'compost', title: 'Retournement si nécessaire', detail: 'Phase active : tous les 3-5 jours · Humidité 50-60%' },
+  { id: 'c11', domain: 'animaux', title: 'Fermeture poulailler', detail: 'Comptage têtes · Fermeture anti-prédateurs · 18h30' },
+  { id: 'c12', domain: 'vers', title: 'Contrôle pH lombricompostière', detail: 'Bandelettes réactives · Cible 6,5-7,5 · Si acide → coquilles d\'œuf' },
+];
+
+function renderChecklist() {
+  const container = document.getElementById('checkItems');
+  container.innerHTML = '';
+  checkItems.forEach(item => {
+    const done = !!checkState[item.id];
+    const div = document.createElement('div');
+    div.className = 'check-item' + (done ? ' done' : '');
+    div.id = 'chk-' + item.id;
+    div.onclick = () => toggleCheck(item.id);
+    const col = domainColors[item.domain];
+    div.innerHTML = `
+      <div class="check-box">${done ? '✓' : ''}</div>
+      <div class="check-content">
+        <div class="check-titre">${item.title}</div>
+        <div class="check-detail">${item.detail}</div>
+        <span class="check-tag" style="background:${col}">${domainLabels[item.domain].replace(/\S+ /, '')}</span>
+      </div>`;
+    container.appendChild(div);
+  });
+  updateProgress();
+}
+
+function toggleCheck(id) {
+  checkState[id] = !checkState[id];
+  api('checklist_set', checkState).catch(() => {});
+  renderChecklist();
+}
+
+function updateProgress() {
+  const done = Object.values(checkState).filter(Boolean).length;
+  const total = checkItems.length;
+  const pct = total ? (done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total} tâches`;
+}
+
+// ==================== INVENTORY ====================
+const invDefs = [
+  { key: 'vers', icon: '🪱', label: 'Vers Eisenia', unit: 'kg' },
+  { key: 'compost_stock', icon: '🍂', label: 'Lombricompost prêt', unit: 'kg' },
+  { key: 'bacs', icon: '📦', label: 'Bacs actifs', unit: '' },
+  { key: 'ibc', icon: '🛢️', label: 'IBC 1000 L', unit: '' },
+  { key: 'poules', icon: '🐓', label: 'Poules', unit: '' },
+  { key: 'canards', icon: '🦆', label: 'Canards coureurs', unit: '' },
+  { key: 'lapins', icon: '🐇', label: 'Lapins', unit: '' },
+  { key: 'brebis', icon: '🐑', label: 'Brebis Cameroun', unit: '' },
+];
+
+const skuDefs = [
+  { name: 'Lombricompost 10 kg', sku: 'SKU-001', key: 'sku_10kg' },
+  { name: 'Lombricompost 20 L', sku: 'SKU-002', key: 'sku_20l' },
+  { name: 'Kit urbain "Mon Jardin NosVers"', sku: 'SKU-003', key: 'sku_kit' },
+  { name: 'Vers 500 g (lombricompostage domest.)', sku: 'SKU-004', key: 'sku_vers500' },
+  { name: 'Vers 1 kg (professionnel)', sku: 'SKU-005', key: 'sku_vers1k' },
+];
+
+function renderInventory() {
+  // Inv cards
+  const grid = document.getElementById('inventoryGrid');
+  grid.innerHTML = '';
+  invDefs.forEach(def => {
+    const val = inventory[def.key] ?? 0;
+    const card = document.createElement('div');
+    card.className = 'inv-card';
+    card.innerHTML = `
+      <div class="inv-icon">${def.icon}</div>
+      <input class="inv-val-input" type="number" min="0" value="${val}"
+        onchange="updateInv('${def.key}', this.value)"
+        title="Cliquer pour modifier">
+      <div class="inv-unit">${def.unit}</div>
+      <div class="inv-label">${def.label}</div>`;
+    grid.appendChild(card);
+  });
+
+  // SKU list
+  const skuList = document.getElementById('skuList');
+  skuList.innerHTML = skuDefs.map(s => {
+    const stock = inventory[s.key] ?? 0;
+    return `
+      <div class="fiche-row">
+        <span class="fiche-label">${s.sku} · ${s.name}</span>
+        <span>
+          <input type="number" min="0" value="${stock}" style="width:60px;border:2px solid var(--sable);border-radius:6px;padding:3px 8px;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;text-align:center;background:var(--crème)"
+            onchange="updateInv('${s.key}', this.value)">
+          <span style="font-size:0.72rem;color:var(--texte-doux);margin-left:4px">unités</span>
+        </span>
+      </div>`;
+  }).join('');
+}
+
+function updateInv(key, val) {
+  inventory[key] = parseFloat(val) || 0;
+  api('inventaire_set', { [key]: inventory[key] }).catch(() => {});
+}
+
+// ==================== JOURNAL ====================
+function addJournalEntry(domain, action, completed = false) {
+  const entry = {
+    domain,
+    action,
+    completed,
+    ts: new Date().toISOString()
+  };
+  journal.unshift(entry);
+  if (journal.length > 60) journal = journal.slice(0, 60);
+  api('journal_add', entry).catch(() => {});
+  renderJournal();
+}
+
+function renderJournal() {
+  const container = document.getElementById('logEntries');
+  const empty = document.getElementById('logEmpty');
+  if (!journal.length) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  container.innerHTML = journal.map(e => {
+    const dt = new Date(e.ts);
+    const timeStr = dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) +
+      ' · ' + dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const col = e.domain ? domainColors[e.domain] : '#666';
+    const lbl = e.domain ? domainLabels[e.domain].split(' ')[1] : 'Note';
+    return `<div class="log-entry">
+      <span class="log-domain-tag" style="background:${col}">${lbl || 'Note'}</span>
+      <span class="log-text">${e.action}${e.completed ? ' ✓' : ''}</span>
+      <span class="log-time">${timeStr}</span>
+    </div>`;
+  }).join('');
+}
+
+function clearJournal() {
+  if (confirm('Effacer tout le journal ?')) {
+    journal = [];
+    api('journal_clear').catch(() => {});
+    renderJournal();
+  }
+}
+
+// ==================== MODAL ====================
+function openModal(type) {
+  const overlay = document.getElementById('overlay');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+
+  if (type === 'addNote' || type === 'saveNote') {
+    title.textContent = '+ Entrée manuelle';
+    body.innerHTML = `
+      <div style="margin-bottom:1rem">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--texte-doux);display:block;margin-bottom:6px">Domaine</label>
+        <select id="noteDomaineSelect" style="width:100%;padding:0.6rem;border:2px solid var(--sable);border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;background:var(--crème)">
+          <option value="vers">🪱 Lombricompost</option>
+          <option value="compost">🍂 Compost</option>
+          <option value="animaux">🐓 Animaux</option>
+          <option value="huerto">🌿 Potager</option>
+        </select>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--texte-doux);display:block;margin-bottom:6px">Note / Observation</label>
+        <textarea id="noteText" rows="4" style="width:100%;padding:0.75rem;border:2px solid var(--sable);border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:0.88rem;resize:vertical;background:var(--crème)" placeholder="Température relevée, observation animaux, problème détecté…"></textarea>
+      </div>
+      <button class="btn-action btn-primary" onclick="saveNote()" style="width:100%">Enregistrer dans le journal</button>`;
+  }
+
+  overlay.classList.add('open');
+}
+
+function saveNote() {
+  const dom = document.getElementById('noteDomaineSelect').value;
+  const txt = document.getElementById('noteText').value.trim();
+  if (!txt) return;
+  addJournalEntry(dom, txt);
+  closeModal();
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
