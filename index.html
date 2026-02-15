@@ -1812,6 +1812,70 @@ body::before {
   </div>
 </div>
 
+<!-- ===================== SECTION: PLANO HUERTO ===================== -->
+<div class="section" id="sec-huerto">
+  <div class="section-header">
+    <h2 class="section-title">Plano <em>del Huerto</em></h2>
+    <p class="section-sub">Parcelas · Rotaciones · Foto para análisis IA</p>
+  </div>
+
+  <!-- Foto para generar/actualizar plano -->
+  <div style="background:var(--blanc);border-radius:var(--r);padding:1.2rem;margin-bottom:1.2rem;box-shadow:0 2px 12px rgba(26,58,30,0.06)">
+    <div style="font-weight:700;font-size:0.85rem;color:var(--texte-doux);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.06em">📷 Analizar huerto con foto</div>
+    <div class="photo-zone">
+      <label class="btn-photo" id="btnPhotoHuerto" for="photoInputHuerto">
+        📷 <span id="photoLabelHuerto">Foto del huerto o parcela</span>
+      </label>
+      <input type="file" id="photoInputHuerto" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoHuerto(this)">
+    </div>
+    <div class="photo-preview-wrap" id="photoPreviewWrapHuerto">
+      <img class="photo-preview" id="photoPreviewHuerto" src="" alt="Foto huerto">
+      <button class="photo-remove" onclick="removePhotoHuerto()">✕</button>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap">
+      <input type="text" class="query-input" id="huertoPhotoQuery" style="flex:1;min-width:200px"
+        placeholder="¿Qué quieres analizar? (plagas, estado, identificar cultivo...)"
+        onkeydown="if(event.key==='Enter') analyzeHuertoPhoto()">
+      <button class="btn-action btn-primary" onclick="analyzeHuertoPhoto()" id="btnAnalyzeHuerto">Analizar</button>
+    </div>
+    <div class="response-panel" id="huertoPhotoPanel" style="margin-top:0.8rem">
+      <div class="resp-body" id="huertoPhotoBody"></div>
+      <div class="resp-footer" style="display:none" id="huertoPhotoFooter">
+        <button class="btn-action btn-secondary" onclick="saveHuertoAnalysis()">💾 Guardar en plano</button>
+        <button class="btn-action btn-secondary" onclick="copyHuertoAnalysis()">⎘ Copiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plano manual -->
+  <div class="huerto-controls">
+    <button class="btn-action btn-primary" onclick="openModalHuerto()">+ Nueva parcela</button>
+    <button class="btn-action btn-secondary" onclick="resetHuerto()">🔄 Nueva temporada</button>
+    <span style="font-size:0.75rem;color:var(--texte-doux);margin-left:auto" id="huertoCount"></span>
+  </div>
+
+  <div class="rotation-warning" id="rotationWarning" style="display:none">
+    <strong>⚠️ Alertas de rotación</strong>
+    <div id="rotationWarningText"></div>
+  </div>
+
+  <div class="huerto-legend">
+    <div class="legend-item"><span class="legend-dot fam-solanacees"></span>Solanacées</div>
+    <div class="legend-item"><span class="legend-dot fam-cucurbitacees"></span>Cucurbitacées</div>
+    <div class="legend-item"><span class="legend-dot fam-liliacees"></span>Liliacées</div>
+    <div class="legend-item"><span class="legend-dot fam-legumineuses"></span>Légumineuses</div>
+    <div class="legend-item"><span class="legend-dot fam-cruciferes"></span>Crucifères</div>
+    <div class="legend-item"><span class="legend-dot fam-apiacees"></span>Apiacées</div>
+    <div class="legend-item"><span class="legend-dot fam-asteracees"></span>Astéracées</div>
+    <div class="legend-item"><span class="legend-dot fam-autre"></span>Autre</div>
+  </div>
+
+  <div class="huerto-grid-wrap">
+    <div class="huerto-grid" id="huertoGrid" style="grid-template-columns: repeat(3, 1fr)">
+    </div>
+  </div>
+</div>
+
 <!-- ===================== SECTION: FICHES TECHNIQUES ===================== -->
 <div class="section" id="sec-fiches">
   <div class="section-header">
@@ -2741,6 +2805,113 @@ ${getHuertoContext()}`
 }
 
 
+
+
+// ==================== HUERTO PHOTO ANALYSIS ====================
+let huertoPhotoBase64 = null;
+let huertoPhotoType = 'image/jpeg';
+let lastHuertoAnalysis = '';
+
+function handlePhotoHuerto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  huertoPhotoType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    huertoPhotoBase64 = dataUrl.split(',')[1];
+    const preview = document.getElementById('photoPreviewHuerto');
+    const wrap = document.getElementById('photoPreviewWrapHuerto');
+    const btn = document.getElementById('btnPhotoHuerto');
+    const lbl = document.getElementById('photoLabelHuerto');
+    if (preview) preview.src = dataUrl;
+    if (wrap) wrap.classList.add('visible');
+    if (btn) btn.classList.add('has-photo');
+    if (lbl) lbl.textContent = '📷 ' + file.name.substring(0, 25);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhotoHuerto() {
+  huertoPhotoBase64 = null;
+  const els = ['photoPreviewHuerto','photoPreviewWrapHuerto','btnPhotoHuerto','photoLabelHuerto','photoInputHuerto'];
+  const preview = document.getElementById('photoPreviewHuerto');
+  const wrap = document.getElementById('photoPreviewWrapHuerto');
+  const btn = document.getElementById('btnPhotoHuerto');
+  const lbl = document.getElementById('photoLabelHuerto');
+  const input = document.getElementById('photoInputHuerto');
+  if (preview) preview.src = '';
+  if (wrap) wrap.classList.remove('visible');
+  if (btn) btn.classList.remove('has-photo');
+  if (lbl) lbl.textContent = 'Foto del huerto o parcela';
+  if (input) input.value = '';
+}
+
+async function analyzeHuertoPhoto() {
+  const query = document.getElementById('huertoPhotoQuery')?.value.trim() || '';
+  const panel = document.getElementById('huertoPhotoPanel');
+  const body = document.getElementById('huertoPhotoBody');
+  const footer = document.getElementById('huertoPhotoFooter');
+  const btn = document.getElementById('btnAnalyzeHuerto');
+
+  if (!huertoPhotoBase64 && !query) {
+    if (body) body.textContent = 'Añade una foto o escribe una pregunta sobre el huerto.';
+    if (panel) panel.classList.add('visible');
+    return;
+  }
+
+  if (panel) panel.classList.add('visible');
+  if (body) body.innerHTML = '<div class="thinking"><div class="thinking-dots"><span></span><span></span><span></span></div> Analizando...</div>';
+  if (btn) btn.disabled = true;
+  if (footer) footer.style.display = 'none';
+
+  const huertoCtx = getHuertoContext();
+  const systemHuerto = `Eres el especialista en POTAGER de NosVers, granja agroecologica en Dordona.
+Filosofia: suelo vivo (Elaine Ingham), sin laboreo, JADAM, biodynamie (Maria Thun/Christofleau), sintropía (Götsch), La Tanina, permacultura.
+Huerto actual: ${huertoCtx}
+Analiza lo que ves en la foto con ojo de experto agroecologico. Identifica: cultivos, estado sanitario, familias botanicas, plagas/enfermedades, oportunidades de mejora. Proporciona recomendaciones concretas alineadas con la filosofia NosVers. Si puedes deducir informacion para el plano (que cultivo es, en que parcela podria estar, familia botanica) indicalo al final en formato: DATOS PARA PLANO: cultivo X - familia Y - estado Z. Responde en ESPANOL.`;
+
+  const userContent = [];
+  if (huertoPhotoBase64) {
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: huertoPhotoType, data: huertoPhotoBase64 }});
+  }
+  userContent.push({ type: 'text', text: query || 'Analiza esta foto del huerto NosVers y dame tu diagnóstico experto.' });
+
+  try {
+    const token = sessionStorage.getItem('nv_token') || '';
+    const resp = await fetch(API_URL + '?action=agente', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-App-Token': token },
+      body: JSON.stringify({ system: systemHuerto, user_content: userContent })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (data.error) throw new Error(typeof data.error === 'object' ? data.error.message : data.error);
+    lastHuertoAnalysis = data.content.map(b => b.text || '').join('');
+    if (body) body.textContent = lastHuertoAnalysis;
+    if (footer) footer.style.display = '';
+  } catch(e) {
+    if (body) body.textContent = 'Error: ' + e.message;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function saveHuertoAnalysis() {
+  if (!lastHuertoAnalysis) return;
+  const date = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  saved['etat_huerto_problemas'] = '[Análisis ' + date + '] ' + lastHuertoAnalysis.substring(0, 400) + '\n\n' + (saved['etat_huerto_problemas'] || '');
+  localStorage.setItem('nv_etat', JSON.stringify(saved));
+  const el = document.getElementById('etat_huerto_problemas');
+  if (el) el.value = saved['etat_huerto_problemas'];
+  api('etat_set', { etat_huerto_problemas: saved['etat_huerto_problemas'] }).catch(() => {});
+  alert('✓ Análisis guardado en el estado del huerto');
+}
+
+function copyHuertoAnalysis() {
+  if (lastHuertoAnalysis) navigator.clipboard.writeText(lastHuertoAnalysis).catch(() => {});
+}
 
 // ==================== PLANO HUERTO ====================
 const FAMILIAS = {
