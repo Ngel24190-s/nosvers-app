@@ -1190,6 +1190,159 @@ body::before {
   padding: 4px 0;
 }
 
+
+/* ============ PLANO HUERTO ============ */
+.huerto-controls {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.huerto-legend {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--texte-doux);
+}
+.legend-dot {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.huerto-grid-wrap {
+  background: var(--blanc);
+  border-radius: var(--r);
+  padding: 1.2rem;
+  box-shadow: 0 2px 12px rgba(26,58,30,0.06);
+  margin-bottom: 1.2rem;
+  overflow-x: auto;
+}
+.huerto-grid {
+  display: grid;
+  gap: 8px;
+  min-width: 300px;
+}
+.parcelle {
+  background: var(--crème);
+  border: 2px solid var(--sable);
+  border-radius: 8px;
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 80px;
+  position: relative;
+}
+.parcelle:hover { border-color: var(--sol-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,58,30,0.1); }
+.parcelle.vide { border-style: dashed; opacity: 0.6; }
+.parcelle.vide:hover { opacity: 1; }
+.parcelle-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--texte-doux);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.parcelle-cultivo {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texte);
+  line-height: 1.2;
+}
+.parcelle-famille {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+  color: white;
+}
+.parcelle-date {
+  font-size: 0.68rem;
+  color: var(--texte-doux);
+  margin-top: 4px;
+}
+.parcelle-alerte {
+  position: absolute;
+  top: 6px; right: 6px;
+  font-size: 0.75rem;
+  title: "Rotation conseillée";
+}
+.rotation-warning {
+  background: rgba(255,150,0,0.1);
+  border: 1px solid rgba(255,150,0,0.3);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.82rem;
+  color: #8b5500;
+  margin-bottom: 1rem;
+}
+.rotation-warning strong { display: block; margin-bottom: 4px; }
+
+/* Famille colors */
+.fam-solanacees { background: #e74c3c; }
+.fam-cucurbitacees { background: #f39c12; }
+.fam-liliacees { background: #9b59b6; }
+.fam-legumineuses { background: #27ae60; }
+.fam-cruciferes { background: #3498db; }
+.fam-apiacees { background: #1abc9c; }
+.fam-asteracees { background: #e67e22; }
+.fam-chenopodiaceae { background: #e91e63; }
+.fam-poaceae { background: #795548; }
+.fam-autre { background: #95a5a6; }
+.fam-vide { background: #bdc3c7; }
+
+/* Modal parcelle */
+.parcelle-form label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texte-doux);
+  margin-bottom: 4px;
+  margin-top: 0.8rem;
+}
+.parcelle-form input, .parcelle-form select, .parcelle-form textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 2px solid var(--sable);
+  border-radius: 7px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  background: var(--crème);
+  transition: border-color 0.2s;
+}
+.parcelle-form input:focus, .parcelle-form select:focus, .parcelle-form textarea:focus {
+  outline: none;
+  border-color: var(--sol-light);
+}
+.parcelle-historique {
+  margin-top: 0.8rem;
+  font-size: 0.78rem;
+  color: var(--texte-doux);
+}
+.hist-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sable);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .parcelle { min-height: 65px; padding: 0.5rem; }
+  .parcelle-cultivo { font-size: 0.82rem; }
+}
+
 </style>
 </head>
 <body>
@@ -1238,6 +1391,7 @@ body::before {
 <nav class="nav-tabs">
   <button class="nav-tab" onclick="goTo('etat')">🌾 État Ferme</button>
   <button class="nav-tab active" onclick="goTo('agents')">🤖 Agents IA</button>
+  <button class="nav-tab" onclick="goTo('huerto')">🗺️ Plano Huerto</button>
   <button class="nav-tab" onclick="goTo('fiches')">📋 Fiches Techniques</button>
   <button class="nav-tab" onclick="goTo('checklist')">✅ Checklist</button>
   <button class="nav-tab" onclick="goTo('inventaire')">📦 Inventaire</button>
@@ -1442,6 +1596,42 @@ body::before {
       <button class="btn-action btn-primary" id="btnDone" onclick="markDone()">✓ Tâches enregistrées</button>
       <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copier</button>
       <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: PLANO HUERTO ===================== -->
+<div class="section" id="sec-huerto">
+  <div class="section-header">
+    <h2 class="section-title">Plano <em>del Huerto</em></h2>
+    <p class="section-sub">Gestión de parcelas · Rotaciones de familias · Contexto para los agentes</p>
+  </div>
+
+  <div class="huerto-controls">
+    <button class="btn-action btn-primary" onclick="openModalHuerto()">+ Nueva parcela</button>
+    <button class="btn-action btn-secondary" onclick="resetHuerto()">🔄 Nueva temporada</button>
+    <span style="font-size:0.75rem;color:var(--texte-doux);margin-left:auto" id="huertoCount"></span>
+  </div>
+
+  <div class="rotation-warning" id="rotationWarning" style="display:none">
+    <strong>⚠️ Alertas de rotación</strong>
+    <div id="rotationWarningText"></div>
+  </div>
+
+  <div class="huerto-legend">
+    <div class="legend-item"><span class="legend-dot fam-solanacees"></span>Solanacées</div>
+    <div class="legend-item"><span class="legend-dot fam-cucurbitacees"></span>Cucurbitacées</div>
+    <div class="legend-item"><span class="legend-dot fam-liliacees"></span>Liliacées</div>
+    <div class="legend-item"><span class="legend-dot fam-legumineuses"></span>Légumineuses</div>
+    <div class="legend-item"><span class="legend-dot fam-cruciferes"></span>Crucifères</div>
+    <div class="legend-item"><span class="legend-dot fam-apiacees"></span>Apiacées</div>
+    <div class="legend-item"><span class="legend-dot fam-asteracees"></span>Astéracées</div>
+    <div class="legend-item"><span class="legend-dot fam-autre"></span>Autre</div>
+  </div>
+
+  <div class="huerto-grid-wrap">
+    <div class="huerto-grid" id="huertoGrid" style="grid-template-columns: repeat(3, 1fr)">
+      <!-- injected by JS -->
     </div>
   </div>
 </div>
@@ -1721,6 +1911,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateClock, 30000);
   loadEtat();
   fetchMeteo();
+  renderHuerto();
   setInterval(fetchMeteo, 10 * 60 * 1000); // refresh météo every 10min
   const token = sessionStorage.getItem('nv_token');
   const user  = sessionStorage.getItem('nv_user');
@@ -2239,7 +2430,8 @@ function getEtatContext(domain) {
 - Cultures en place: ${get('etat_huerto_cultivos') || 'non renseigné'}
 - Serre à semis: ${get('etat_huerto_serre') || 'non renseigné'}
 - Dernier arrosage: ${get('etat_huerto_riego') || 'non renseigné'}
-- Problèmes détectés: ${get('etat_huerto_problemas') || 'non renseigné'}`
+- Problèmes détectés: ${get('etat_huerto_problemas') || 'non renseigné'}
+${getHuertoContext()}`
   };
   const infra = get('etat_infra_ibcs') || get('etat_infra_notas') ? 
     `\nINFRASTRUCTURE & GÉNÉRAL:
@@ -2248,6 +2440,212 @@ function getEtatContext(domain) {
   return (sections[domain] || '') + infra;
 }
 
+
+
+// ==================== PLANO HUERTO ====================
+const FAMILIAS = {
+  'solanacees':    { label: 'Solanacées',    ex: 'Tomate, poivron, aubergine, pomme de terre' },
+  'cucurbitacees': { label: 'Cucurbitacées', ex: 'Courgette, concombre, melon, courge' },
+  'liliacees':     { label: 'Liliacées',     ex: 'Oignon, ail, poireau, échalote' },
+  'legumineuses':  { label: 'Légumineuses',  ex: 'Haricot, pois, fève, lentille' },
+  'cruciferes':    { label: 'Crucifères',    ex: 'Chou, radis, navet, roquette' },
+  'apiacees':      { label: 'Apiacées',      ex: 'Carotte, persil, fenouil, céleri' },
+  'asteracees':    { label: 'Astéracées',    ex: 'Laitue, artichaut, chicorée' },
+  'chenopodiaceae':{ label: 'Chénopodiacées',ex: 'Épinard, betterave, blette' },
+  'poaceae':       { label: 'Poacées',       ex: 'Maïs, engrais vert graminées' },
+  'autre':         { label: 'Autre/Mixte',   ex: 'Engrais vert, fleurs, aromates' },
+  'vide':          { label: 'Vide/Repos',    ex: 'Parcelle en jachère ou préparation' },
+};
+
+let parcelles = JSON.parse(localStorage.getItem('nv_parcelles') || '[]');
+let editingParcelle = null;
+
+function saveParcelles() {
+  localStorage.setItem('nv_parcelles', JSON.stringify(parcelles));
+}
+
+function renderHuerto() {
+  const grid = document.getElementById('huertoGrid');
+  const count = document.getElementById('huertoCount');
+  if (!grid) return;
+
+  const actives = parcelles.filter(p => p.cultivo && p.cultivo !== 'Vide');
+  if (count) count.textContent = actives.length + ' parcelles cultivées';
+
+  // Check rotation warnings
+  checkRotations();
+
+  grid.innerHTML = parcelles.map((p, i) => {
+    const fam = p.famille || 'vide';
+    const famLabel = FAMILIAS[fam]?.label || fam;
+    const isEmpty = !p.cultivo || p.cultivo === 'Vide' || fam === 'vide';
+    const rotAlert = p.rotation_warning ? '<span class="parcelle-alerte" title="Rotation conseillée">⚠️</span>' : '';
+    return `<div class="parcelle ${isEmpty ? 'vide' : ''}" onclick="editParcelle(${i})">
+      ${rotAlert}
+      <div class="parcelle-num">Parcelle ${p.nom || (i+1)}</div>
+      <div class="parcelle-cultivo">${p.cultivo || '+ Ajouter'}</div>
+      ${!isEmpty ? `<span class="parcelle-famille fam-${fam}">${famLabel}</span>` : ''}
+      ${p.date_semis ? `<div class="parcelle-date">Semis: ${p.date_semis}</div>` : ''}
+      ${p.statut ? `<div class="parcelle-date">${p.statut}</div>` : ''}
+    </div>`;
+  }).join('') + `<div class="parcelle vide" onclick="addParcelle()" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--texte-doux)">+</div>`;
+}
+
+function checkRotations() {
+  const warnings = [];
+  parcelles.forEach((p, i) => {
+    if (!p.famille || p.famille === 'vide') return;
+    // Check historique for same family in last 2 seasons
+    if (p.historique && p.historique.length > 0) {
+      const lastSeason = p.historique[p.historique.length - 1];
+      if (lastSeason.famille === p.famille) {
+        p.rotation_warning = true;
+        warnings.push(`Parcelle ${p.nom || (i+1)}: ${FAMILIAS[p.famille]?.label} déjà cultivée la saison dernière`);
+      } else {
+        p.rotation_warning = false;
+      }
+    }
+  });
+
+  const warnEl = document.getElementById('rotationWarning');
+  const warnText = document.getElementById('rotationWarningText');
+  if (warnings.length > 0 && warnEl && warnText) {
+    warnEl.style.display = 'block';
+    warnText.innerHTML = warnings.map(w => `• ${w}`).join('<br>');
+  } else if (warnEl) {
+    warnEl.style.display = 'none';
+  }
+}
+
+function addParcelle() {
+  editingParcelle = null;
+  openModalParcelle(null, parcelles.length);
+}
+
+function editParcelle(idx) {
+  editingParcelle = idx;
+  openModalParcelle(parcelles[idx], idx);
+}
+
+function openModalHuerto() {
+  addParcelle();
+}
+
+function openModalParcelle(p, idx) {
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  if (!title || !body) return;
+
+  title.textContent = p ? `Parcelle ${p.nom || (idx+1)}` : 'Nouvelle parcelle';
+
+  const famOptions = Object.entries(FAMILIAS).map(([k, v]) =>
+    `<option value="${k}" ${p?.famille === k ? 'selected' : ''}>${v.label}</option>`
+  ).join('');
+
+  const hist = p?.historique?.length > 0 ? `
+    <div class="parcelle-historique">
+      <strong>Historique rotations:</strong>
+      ${p.historique.map(h => `<div class="hist-item"><span>${h.saison}</span><span>${h.cultivo} · ${FAMILIAS[h.famille]?.label || h.famille}</span></div>`).join('')}
+    </div>` : '';
+
+  body.innerHTML = `<div class="parcelle-form">
+    <label>Nom / Numéro</label>
+    <input id="pNom" value="${p?.nom || ''}" placeholder="Ex: A1, Bancal Nord, Serre...">
+    <label>Cultivo actuel</label>
+    <input id="pCultivo" value="${p?.cultivo || ''}" placeholder="Ex: Tomates cerises, Courgettes...">
+    <label>Famille botanique</label>
+    <select id="pFamille">${famOptions}</select>
+    <label>Date de semis / plantation</label>
+    <input id="pDate" type="date" value="${p?.date_semis || ''}">
+    <label>Statut</label>
+    <input id="pStatut" value="${p?.statut || ''}" placeholder="Ex: En fleur, Récolte début juillet...">
+    <label>Notes</label>
+    <textarea id="pNotes" rows="2" placeholder="Observations, traitements...">${p?.notes || ''}</textarea>
+    ${hist}
+    <div style="display:flex;gap:0.5rem;margin-top:1.2rem">
+      <button class="btn-action btn-primary" style="flex:1" onclick="saveParcelle(${idx})">Sauvegarder</button>
+      ${p ? `<button class="btn-action btn-secondary" onclick="archiveParcelle(${idx})">📦 Archiver saison</button>` : ''}
+      ${p ? `<button class="btn-action btn-secondary" onclick="deleteParcelle(${idx})" style="color:#c0392b;border-color:#c0392b">Supprimer</button>` : ''}
+    </div>
+  </div>`;
+
+  document.getElementById('overlay').classList.add('open');
+}
+
+function saveParcelle(idx) {
+  const p = {
+    nom: document.getElementById('pNom').value.trim(),
+    cultivo: document.getElementById('pCultivo').value.trim(),
+    famille: document.getElementById('pFamille').value,
+    date_semis: document.getElementById('pDate').value,
+    statut: document.getElementById('pStatut').value.trim(),
+    notes: document.getElementById('pNotes').value.trim(),
+    historique: parcelles[idx]?.historique || [],
+    rotation_warning: false,
+  };
+  if (idx < parcelles.length) {
+    parcelles[idx] = p;
+  } else {
+    parcelles.push(p);
+  }
+  saveParcelles();
+  renderHuerto();
+  closeModal();
+}
+
+function archiveParcelle(idx) {
+  const p = parcelles[idx];
+  if (!p.cultivo || p.cultivo === 'Vide') return;
+  const saison = new Date().getFullYear() + ' S' + (new Date().getMonth() < 6 ? '1' : '2');
+  if (!p.historique) p.historique = [];
+  p.historique.push({ saison, cultivo: p.cultivo, famille: p.famille });
+  if (p.historique.length > 4) p.historique.shift();
+  // Reset current season
+  p.cultivo = '';
+  p.famille = 'vide';
+  p.date_semis = '';
+  p.statut = '';
+  saveParcelles();
+  renderHuerto();
+  closeModal();
+}
+
+function deleteParcelle(idx) {
+  if (confirm('Supprimer cette parcelle ?')) {
+    parcelles.splice(idx, 1);
+    saveParcelles();
+    renderHuerto();
+    closeModal();
+  }
+}
+
+function resetHuerto() {
+  if (confirm('Archiver toutes les parcelles pour nouvelle saison ?')) {
+    const saison = new Date().getFullYear() + ' S' + (new Date().getMonth() < 6 ? '1' : '2');
+    parcelles.forEach(p => {
+      if (p.cultivo && p.cultivo !== 'Vide') {
+        if (!p.historique) p.historique = [];
+        p.historique.push({ saison, cultivo: p.cultivo, famille: p.famille });
+        if (p.historique.length > 4) p.historique.shift();
+        p.cultivo = ''; p.famille = 'vide'; p.date_semis = ''; p.statut = '';
+      }
+    });
+    saveParcelles();
+    renderHuerto();
+  }
+}
+
+function getHuertoContext() {
+  if (!parcelles.length) return '';
+  const actives = parcelles.filter(p => p.cultivo && p.famille !== 'vide');
+  if (!actives.length) return 'PLANO HUERTO: Sin parcelas registradas aún.';
+
+  const warnings = parcelles.filter(p => p.rotation_warning).map(p => p.nom || 'sin nombre');
+
+  return `PLANO HUERTO ACTUAL (${actives.length} parcelles actives):
+${actives.map(p => `- Parcelle ${p.nom || '?'}: ${p.cultivo} [${FAMILIAS[p.famille]?.label || p.famille}]${p.date_semis ? ' · Semis: '+p.date_semis : ''}${p.statut ? ' · '+p.statut : ''}`).join('\n')}
+${warnings.length > 0 ? '\n⚠ ROTATIONS A RESPECTER: ' + warnings.join(', ') : ''}`;
+}
 
 // ==================== PHOTO HANDLING ====================
 let currentPhotoBase64 = null;
