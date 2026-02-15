@@ -2042,12 +2042,12 @@ async function fetchMeteo() {
 
     let rainAlert = '';
     if (rain24h >= 10) {
-      rainAlert = `<div class="meteo-rain-alert">🌧️ ${rain24h.toFixed(1)}mm tombés hier — arrosage probablement inutile aujourd'hui</div>`;
+      rainAlert = `<div class="meteo-rain-alert">🌧️ ${rain24h.toFixed(1)}mm tombés hier — arrosage probablement inutile aujourd&#39;hui</div>`;
     } else if (rain24h >= 5) {
       rainAlert = `<div class="meteo-rain-alert">💧 ${rain24h.toFixed(1)}mm hier — vérifier humidité sol avant arrosage</div>`;
     }
     if (rainToday >= 5) {
-      rainAlert += `<div class="meteo-rain-alert">🌦️ ${rainToday.toFixed(1)}mm prévus aujourd'hui</div>`;
+      rainAlert += `<div class="meteo-rain-alert">🌦️ ${rainToday.toFixed(1)}mm prévus aujourd&#39;hui</div>`;
     }
 
     widget.innerHTML = `
@@ -2084,9 +2084,9 @@ function getMeteoContext() {
 - Humidité air: ${cur.relative_humidity_2m}%
 - Vent: ${Math.round(cur.windspeed_10m)} km/h
 - Précipitations hier (24h): ${rain24h.toFixed(1)} mm
-- Précipitations prévues aujourd'hui: ${rainToday.toFixed(1)} mm
-${rain24h >= 10 ? '⚠ PLUIE SIGNIFICATIVE HIER: adapter les recommandations d'arrosage en conséquence' : ''}
-${rainToday >= 10 ? '⚠ PLUIE PRÉVUE AUJOURD'HUI: adapter les activités extérieures' : ''}`;
+- Précipitations prévues aujourd&#39;hui: ${rainToday.toFixed(1)} mm
+${rain24h >= 10 ? '⚠ PLUIE SIGNIFICATIVE HIER: adapter les recommandations arrosage en conséquence' : ''}
+${rainToday >= 10 ? 'PLUIE PREVUE AUJOURDHUI: adapter les activites exterieures' : ''}`;
 }
 
 // ==================== ÉTAT DE LA FERME ====================
