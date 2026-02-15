@@ -1384,6 +1384,152 @@ body::before {
 }
 .conseil-saved.visible { display: block; }
 
+
+/* ============ DIRECTOR DE OPERACIONES ============ */
+.director-card {
+  background: var(--sol);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--crème);
+  box-shadow: 0 8px 32px rgba(26,58,30,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.director-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+.director-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.director-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.director-meta {
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+.director-meteo-strip {
+  display: flex;
+  gap: 1rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.director-meteo-item { display: flex; align-items: center; gap: 4px; opacity: 0.85; }
+.director-body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.director-body::-webkit-scrollbar { width: 4px; }
+.director-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+.director-thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.7;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+.director-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.btn-director {
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-director-primary {
+  background: var(--crème);
+  color: var(--sol);
+}
+.btn-director-primary:hover { background: white; }
+.btn-director-secondary {
+  background: rgba(255,255,255,0.1);
+  color: var(--crème);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-director-secondary:hover { background: rgba(255,255,255,0.18); }
+.btn-director-secondary.done { background: rgba(255,255,255,0.2); pointer-events: none; }
+.director-last {
+  font-size: 0.72rem;
+  opacity: 0.5;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Specialist agents - conseil only */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+.agent-specialist {
+  background: var(--blanc);
+  border-radius: var(--r);
+  border: 2px solid var(--sable);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.agent-specialist:hover { border-color: var(--sol-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,58,30,0.1); }
+.agent-specialist.active { border-color: var(--sol); background: rgba(26,58,30,0.04); }
+.agent-specialist.loading { opacity: 0.6; pointer-events: none; }
+.agent-spec-icon { font-size: 1.8rem; flex-shrink: 0; }
+.agent-spec-info { flex: 1; min-width: 0; }
+.agent-spec-name { font-weight: 700; font-size: 0.88rem; color: var(--texte); }
+.agent-spec-desc { font-size: 0.72rem; color: var(--texte-doux); margin-top: 2px; }
+.agent-spec-badge {
+  font-size: 0.65rem;
+  background: rgba(74,124,89,0.12);
+  color: var(--sol-mid);
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .agents-grid { grid-template-columns: 1fr; }
+  .director-card { padding: 1rem; }
+}
+
 </style>
 </head>
 <body>
@@ -1431,7 +1577,8 @@ body::before {
 <!-- NAV -->
 <nav class="nav-tabs">
   <button class="nav-tab" onclick="goTo('etat')">🌾 État Ferme</button>
-  <button class="nav-tab active" onclick="goTo('agents')">🤖 Agents IA</button>
+  <button class="nav-tab active" onclick="goTo('director')">🎯 Dirección</button>
+  <button class="nav-tab" onclick="goTo('agents')">🔬 Especialistas</button>
   <button class="nav-tab" onclick="goTo('huerto')">🗺️ Plano Huerto</button>
   <button class="nav-tab" onclick="goTo('fiches')">📋 Fiches Techniques</button>
   <button class="nav-tab" onclick="goTo('checklist')">✅ Checklist</button>
@@ -1545,90 +1692,108 @@ body::before {
   <button class="etat-save-btn" id="etatSaveBtn" onclick="saveEtat()">💾 Sauvegarder l'état de la ferme</button>
 </div>
 
-<!-- ===================== SECTION: AGENTS IA ===================== -->
-<div class="section active" id="sec-agents">
+<!-- ===================== SECTION: DIRECTOR ===================== -->
+<div class="section" id="sec-director">
   <div class="section-header">
-    <h2 class="section-title">Agents <em>de Gestion</em>
-      <span class="context-active-badge" id="contextBadge" style="display:none">📍 Contexte actif</span>
+    <h2 class="section-title">Director <em>de Operaciones</em>
+      <span class="context-active-badge" id="contextBadge2" style="display:none">📍 Contexte actif</span>
     </h2>
-    <p class="section-sub">Sélectionne un domaine · Météo Neuvic + état de la ferme intégrés automatiquement</p>
+    <p class="section-sub">Briefing diario · Plan priorizado · Visión global de la granja</p>
   </div>
 
-  <!-- MÉTÉO WIDGET -->
-  <div class="meteo-widget" id="meteoWidget">
-    <span class="meteo-loading">⏳ Chargement météo Neuvic...</span>
+  <!-- Météo strip -->
+  <div class="meteo-widget" id="meteoWidget2" style="margin-bottom:1rem">
+    <span class="meteo-loading">⏳ Cargando météo Neuvic...</span>
   </div>
 
-  <div class="cards-grid">
-    <div class="card-agent domain-compost" id="card-compost" onclick="callAgent('compost')">
-      <div class="card-top">
-        <div class="card-icon">🍂</div>
-        <div class="card-info">
-          <div class="card-name">Compost</div>
-          <div class="card-desc">Gestion des andains · Température · C/N · Maturation</div>
-        </div>
-      </div>
-      <div class="card-bar"></div>
+  <!-- Director card -->
+  <div class="director-card" id="directorCard">
+    <div class="director-header">
+      <div class="director-title">🎯 Director de Operaciones NosVers</div>
+      <div class="director-meta" id="directorMeta">Listo para generar el briefing del día</div>
     </div>
-
-    <div class="card-agent domain-animaux" id="card-animaux" onclick="callAgent('animaux')">
-      <div class="card-top">
-        <div class="card-icon">🐓</div>
-        <div class="card-info">
-          <div class="card-name">Animaux</div>
-          <div class="card-desc">Poules · Canards · Lapins · Brebis Cameroun</div>
-        </div>
+    <div class="director-body" id="directorBody">
+      <div style="opacity:0.5;font-style:italic;font-size:0.85rem">
+        Pulsa "Generar briefing" para recibir el plan del día con prioridades, coordinación entre áreas y órdenes de trabajo integradas.
       </div>
-      <div class="card-bar"></div>
     </div>
-
-    <div class="card-agent domain-huerto" id="card-huerto" onclick="callAgent('huerto')">
-      <div class="card-top">
-        <div class="card-icon">🌿</div>
-        <div class="card-info">
-          <div class="card-name">Potager & Semis</div>
-          <div class="card-desc">Serre · Plantation · Arrosage · Récolte · Semences</div>
-        </div>
-      </div>
-      <div class="card-bar"></div>
+    <div class="director-actions">
+      <button class="btn-director btn-director-primary" onclick="launchDirector()">🎯 Generar briefing del día</button>
+      <button class="btn-director btn-director-secondary" id="btnDirectorDone" onclick="markDirectorDone()" style="display:none">✓ Plan ejecutado</button>
+      <button class="btn-director btn-director-secondary" onclick="copyDirector()">⎘ Copiar</button>
     </div>
-
-    <div class="card-agent domain-vers" id="card-vers" onclick="callAgent('vers')">
-      <div class="card-top">
-        <div class="card-icon">🪱</div>
-        <div class="card-info">
-          <div class="card-name">Lombricompost</div>
-          <div class="card-desc">Eisenia · Alimentation · Humidité · Récolte · Thé</div>
-        </div>
-      </div>
-      <div class="card-bar"></div>
-    </div>
+    <div class="director-last" id="directorLast"></div>
   </div>
 
-  <!-- Mode tabs -->
-  <div class="mode-tabs">
-    <button class="mode-tab active" id="modeOrdres" onclick="setMode('ordres')">📋 Ordres du jour</button>
-    <button class="mode-tab" id="modeConseil" onclick="setMode('conseil')">🔍 Conseil · Diagnostic</button>
+  <!-- Quick input for director -->
+  <div class="query-zone" style="margin-bottom:1.5rem">
+    <input type="text" class="query-input" id="directorInput"
+      placeholder="Añadir contexto al briefing: disponibilidad de hoy, visitas, materiales pendientes..."
+      onkeydown="if(event.key==='Enter') launchDirector()">
+  </div>
+</div>
+
+<!-- ===================== SECTION: ESPECIALISTAS ===================== -->
+<div class="section" id="sec-agents">
+  <div class="section-header">
+    <h2 class="section-title">Especialistas <em>de Consulta</em></h2>
+    <p class="section-sub">Diagnóstico · Análisis de foto · Consejo técnico experto</p>
+  </div>
+
+  <!-- Specialist grid -->
+  <div class="agents-grid">
+    <div class="agent-specialist" id="card-vers" onclick="selectAgent('vers')">
+      <div class="agent-spec-icon">🪱</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Lombricompost</div>
+        <div class="agent-spec-desc">Eisenia · Humedad · Cosecha</div>
+      </div>
+      <div class="agent-spec-badge">Conseil</div>
+    </div>
+    <div class="agent-specialist" id="card-compost" onclick="selectAgent('compost')">
+      <div class="agent-spec-icon">🍂</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Compost</div>
+        <div class="agent-spec-desc">Andains · Temperatura · Volteo</div>
+      </div>
+      <div class="agent-spec-badge">Conseil</div>
+    </div>
+    <div class="agent-specialist" id="card-animaux" onclick="selectAgent('animaux')">
+      <div class="agent-spec-icon">🐓</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Animaux</div>
+        <div class="agent-spec-desc">Gallinas · Canards · Brebis</div>
+      </div>
+      <div class="agent-spec-badge">Conseil</div>
+    </div>
+    <div class="agent-specialist" id="card-huerto" onclick="selectAgent('huerto')">
+      <div class="agent-spec-icon">🌿</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Potager & Semis</div>
+        <div class="agent-spec-desc">Cultivos · JADAM · Rotaciones</div>
+      </div>
+      <div class="agent-spec-badge">Conseil</div>
+    </div>
   </div>
 
   <!-- Photo upload -->
   <div class="photo-zone">
     <label class="btn-photo" id="btnPhoto" for="photoInput">
-      📷 <span id="photoLabel">Ajouter une photo (optionnel)</span>
+      📷 <span id="photoLabel">Añadir foto para análisis (opcional)</span>
     </label>
     <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
   </div>
   <div class="photo-preview-wrap" id="photoPreviewWrap">
     <img class="photo-preview" id="photoPreview" src="" alt="Photo">
-    <button class="photo-remove" onclick="removePhoto()" title="Supprimer la photo">✕</button>
+    <button class="photo-remove" onclick="removePhoto()" title="Supprimer">✕</button>
   </div>
 
   <!-- Query input -->
   <div class="query-zone">
     <input type="text" class="query-input" id="queryInput"
-      placeholder="Précision optionnelle : température actuelle, problème constaté, stade…"
+      placeholder="Tu pregunta: síntomas observados, duda técnica, descripción del problema..."
       onkeydown="if(event.key==='Enter' && activeAgent) callAgent(activeAgent)">
-    <button class="btn-query" id="btnQuery" onclick="callAgent(activeAgent)" disabled>Générer</button>
+    <button class="btn-query" id="btnQuery" onclick="callAgent(activeAgent)" disabled>Consultar</button>
   </div>
 
   <!-- Response panel -->
@@ -1639,48 +1804,11 @@ body::before {
     </div>
     <div class="resp-body" id="respBody"></div>
     <div class="resp-footer">
-      <button class="btn-action btn-primary" id="btnDone" onclick="markDone()">✓ Tâches enregistrées</button>
-      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()" style="display:none">💾 Guardar en contexto</button>
-      <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copier</button>
-      <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Note</button>
+      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()">💾 Guardar en contexto</button>
+      <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copiar</button>
+      <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Nota</button>
     </div>
-    <div class="conseil-saved" id="conseilSavedBadge">✓ Diagnóstico guardado en el contexto de la ferme</div>
-  </div>
-</div>
-
-<!-- ===================== SECTION: PLANO HUERTO ===================== -->
-<div class="section" id="sec-huerto">
-  <div class="section-header">
-    <h2 class="section-title">Plano <em>del Huerto</em></h2>
-    <p class="section-sub">Gestión de parcelas · Rotaciones de familias · Contexto para los agentes</p>
-  </div>
-
-  <div class="huerto-controls">
-    <button class="btn-action btn-primary" onclick="openModalHuerto()">+ Nueva parcela</button>
-    <button class="btn-action btn-secondary" onclick="resetHuerto()">🔄 Nueva temporada</button>
-    <span style="font-size:0.75rem;color:var(--texte-doux);margin-left:auto" id="huertoCount"></span>
-  </div>
-
-  <div class="rotation-warning" id="rotationWarning" style="display:none">
-    <strong>⚠️ Alertas de rotación</strong>
-    <div id="rotationWarningText"></div>
-  </div>
-
-  <div class="huerto-legend">
-    <div class="legend-item"><span class="legend-dot fam-solanacees"></span>Solanacées</div>
-    <div class="legend-item"><span class="legend-dot fam-cucurbitacees"></span>Cucurbitacées</div>
-    <div class="legend-item"><span class="legend-dot fam-liliacees"></span>Liliacées</div>
-    <div class="legend-item"><span class="legend-dot fam-legumineuses"></span>Légumineuses</div>
-    <div class="legend-item"><span class="legend-dot fam-cruciferes"></span>Crucifères</div>
-    <div class="legend-item"><span class="legend-dot fam-apiacees"></span>Apiacées</div>
-    <div class="legend-item"><span class="legend-dot fam-asteracees"></span>Astéracées</div>
-    <div class="legend-item"><span class="legend-dot fam-autre"></span>Autre</div>
-  </div>
-
-  <div class="huerto-grid-wrap">
-    <div class="huerto-grid" id="huertoGrid" style="grid-template-columns: repeat(3, 1fr)">
-      <!-- injected by JS -->
-    </div>
+    <div class="conseil-saved" id="conseilSavedBadge">✓ Diagnóstico guardado en el contexto</div>
   </div>
 </div>
 
@@ -1909,6 +2037,12 @@ async function doLogin() {
       const ub = document.getElementById('userBadge'); if(ub) ub.style.display = 'block';
       const un = document.getElementById('userBadgeName'); if(un) un.textContent = data.user;
       initApp();
+      setTimeout(() => {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
+      }, 50);
     } else {
       errEl.textContent = data.error || 'Error de acceso';
     }
@@ -1941,6 +2075,7 @@ async function initApp() {
   renderChecklist();
   renderInventory();
   renderJournal();
+  updateMeteoWidget2();
 }
 
 const domainColors = {
@@ -1968,6 +2103,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const ub3 = document.getElementById('userBadge'); if(ub3) ub3.style.display = 'block';
     const ubn = document.getElementById('userBadgeName'); if(ubn) ubn.textContent = user;
     initApp();
+    // Start on director tab
+    setTimeout(() => {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
+      const tabs = document.querySelectorAll('.nav-tab'); tabs.forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
+    }, 50);
   }
 });
 
@@ -1986,47 +2128,43 @@ function goTo(id) {
   event.target.classList.add('active');
 }
 
-// ==================== AGENTS IA ====================
+// ==================== AGENTS ESPECIALISTAS (CONSEIL ONLY) ====================
 function callAgent(domain) {
   if (!domain) return;
   activeAgent = domain;
 
-  // Reset UI
-  document.querySelectorAll('.card-agent').forEach(c => c.classList.remove('selected'));
-  document.getElementById('card-' + domain).classList.add('selected', 'loading');
-  document.getElementById('btnQuery').disabled = false;
+  const card = document.getElementById('card-' + domain);
+  if (card) card.classList.add('loading');
+  const btnQ = document.getElementById('btnQuery');
+  if (btnQ) btnQ.disabled = true;
 
-  const extras = document.getElementById('queryInput').value.trim();
+  const extras = document.getElementById('queryInput')?.value.trim() || '';
   const panel = document.getElementById('responsePanel');
-  panel.classList.add('visible');
+  if (panel) panel.classList.add('visible');
 
-  // Set domain label
-  const col = domainColors[domain];
-  document.getElementById('respDomain').innerHTML =
-    `<span class="resp-domain-dot" style="background:${col}"></span> ${domainLabels[domain]}`;
-  document.getElementById('respMeta').textContent =
-    new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const metaEl = document.getElementById('respMeta');
+  if (metaEl) metaEl.textContent = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-  // Show thinking
-  document.getElementById('respBody').innerHTML = `
-    <div class="thinking">
-      <div class="thinking-dots"><span></span><span></span><span></span></div>
-      L'agent analyse les conditions NosVers…
-    </div>`;
+  const respBody = document.getElementById('respBody');
+  if (respBody) respBody.innerHTML = '<div class="thinking"><div class="thinking-dots"><span></span><span></span><span></span></div> Consultando especialista...</div>';
 
-  const btnDone = document.getElementById('btnDone');
-  btnDone.textContent = '✓ Tâches enregistrées';
-  btnDone.classList.remove('done');
+  // Always conseil mode for specialists
+  const prevMode = currentMode;
+  currentMode = 'conseil';
 
   callClaude(domain, extras).then(text => {
     lastResp = text;
-    document.getElementById('respBody').textContent = text;
-    document.getElementById('card-' + domain).classList.remove('loading');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    addJournalEntry(domain, 'Consultation agent IA');
+    currentMode = prevMode;
+    if (respBody) respBody.textContent = text;
+    if (card) card.classList.remove('loading');
+    if (btnQ) btnQ.disabled = false;
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    addJournalEntry(domain, extras ? 'Consulta: ' + extras.substring(0, 60) : 'Consulta especialista');
   }).catch(err => {
-    document.getElementById('respBody').textContent = '⚠ Erreur de connexion : ' + err.message;
-    document.getElementById('card-' + domain).classList.remove('loading');
+    currentMode = prevMode;
+    if (respBody) respBody.textContent = 'Error: ' + err.message;
+    if (card) card.classList.remove('loading');
+    if (btnQ) btnQ.disabled = false;
   });
 }
 
@@ -2367,6 +2505,13 @@ function closeModal() {
   document.getElementById('overlay').classList.remove('open');
 }
 
+
+function updateMeteoWidget2() {
+  const w1 = document.getElementById('meteoWidget');
+  const w2 = document.getElementById('meteoWidget2');
+  if (w1 && w2) w2.innerHTML = w1.innerHTML;
+}
+
 // ==================== MÉTÉO NEUVIC ====================
 // Coordonnées Neuvic, Dordogne
 const NEUVIC_LAT = 45.1003;
@@ -2435,7 +2580,7 @@ async function fetchMeteo() {
       rainAlert += `<div class="meteo-rain-alert">🌦️ ${rainToday.toFixed(1)}mm prévus aujourd&#39;hui</div>`;
     }
 
-    widget.innerHTML = `
+    const meteoHtml = `
       <div class="meteo-icon">${icon}</div>
       <div class="meteo-main">
         <div class="meteo-temp">${temp}°C</div>
@@ -2449,6 +2594,8 @@ async function fetchMeteo() {
       </div>
       ${rainAlert}
       <div class="meteo-forecast">${forecastItems}</div>`;
+    widget.innerHTML = meteoHtml;
+    const w2 = document.getElementById('meteoWidget2'); if(w2) w2.innerHTML = meteoHtml;
 
   } catch(e) {
     if (widget) widget.innerHTML = `<span class="meteo-loading">⚠ Météo indisponible (${e.message})</span>`;
@@ -2749,6 +2896,153 @@ ${actives.map(p => `- Parcelle ${p.nom || '?'}: ${p.cultivo} [${FAMILIAS[p.famil
 ${warnings.length > 0 ? '\n⚠ ROTATIONS A RESPECTER: ' + warnings.join(', ') : ''}`;
 }
 
+
+
+// ==================== DIRECTOR DE OPERACIONES ====================
+let directorLastResponse = '';
+
+function getJournalSummary() {
+  if (!journal || !journal.length) return 'Sin actividad registrada en el journal.';
+  const recent = journal.slice(0, 10);
+  return 'ACTIVIDAD RECIENTE (journal):\n' + recent.map(e => {
+    const dt = new Date(e.ts || e.created_at);
+    const d = isNaN(dt) ? '' : dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' ';
+    return `- ${d}[${e.domain || 'general'}] ${e.action}${e.completed ? ' (completado)' : ''}`;
+  }).join('\n');
+}
+
+function getAllEtatContext() {
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  const get = id => saved[id] ? saved[id].trim() : 'no indicado';
+  return `ESTADO COMPLETO DE LA GRANJA:
+LOMBRICOMPOSTIERE:
+- Kg de vers: ${get('etat_vers_kg')}
+- Condiciones: ${get('etat_vers_cond')}
+- Ultima alimentacion: ${get('etat_vers_alim')}
+- Stock listo: ${get('etat_vers_stock')}
+COMPOST:
+- Andains: ${get('etat_compost_andains')}
+- Materias disponibles: ${get('etat_compost_mat')}
+ANIMAUX:
+- Volailles: ${get('etat_anim_volailles')}
+- Brebis/lapins: ${get('etat_anim_autres')}
+- Rotacion parcelas: ${get('etat_anim_rotation')}
+- Produccion huevos: ${get('etat_anim_oeufs')}
+POTAGER:
+- Cultivos en marcha: ${get('etat_huerto_cultivos')}
+- Semillero/serre: ${get('etat_huerto_serre')}
+- Ultimo riego: ${get('etat_huerto_riego')}
+- Problemas detectados: ${get('etat_huerto_problemas')}
+INFRAESTRUCTURA:
+- IBCs/bacs: ${get('etat_infra_ibcs')}
+- Notas generales: ${get('etat_infra_notas')}`;
+}
+
+async function launchDirector() {
+  const extras = document.getElementById('directorInput')?.value.trim() || '';
+  const body = document.getElementById('directorBody');
+  const meta = document.getElementById('directorMeta');
+  const btnDone = document.getElementById('btnDirectorDone');
+  const lastEl = document.getElementById('directorLast');
+
+  if (body) body.innerHTML = '<div class="director-thinking"><div class="thinking-dots"><span></span><span></span><span></span></div> Analizando la granja y preparando el briefing del dia...</div>';
+  if (meta) meta.textContent = 'Generando...';
+  if (btnDone) btnDone.style.display = 'none';
+
+  const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const meteoCtx = getMeteoContext();
+  const allEtat = getAllEtatContext();
+  const journalCtx = getJournalSummary();
+  const huertoCtx = getHuertoContext();
+
+  const systemDirector = `Eres el DIRECTOR DE OPERACIONES de la granja agroecologica NosVers en Dordona, Francia.
+La granja es gestionada por Africa (responsable principal, todos los dias) y Angel (apoyo tecnico fines de semana).
+Animales: gallinas ponedoras, canards coureurs indiens (control limaces), lapins, brebis Cameroun.
+Productos: lombricompost Eisenia, the de lombric, venta de lombrices, kits de cultivo.
+
+FILOSOFIA (NO NEGOCIABLE): Suelo vivo (Elaine Ingham), sin laboreo (Fukuoka/no-dig), JADAM (SMJ/FPJ/FAA/LAB), biodynamie (Maria Thun/calendrier/BD500-501/Christofleau electrocultura), sintropía (Götsch), La Tanina, permacultura, animales integrados al ecosistema.
+
+TU ROL: Eres el unico que genera ordenes de trabajo. Los 4 especialistas (lombrices, compost, animaux, potager) solo dan consejo tecnico cuando se les consulta.
+
+COMO HACER EL BRIEFING:
+1. Saludo breve con fecha y condiciones del dia (clima, tipo de dia biodinamico si lo sabes)
+2. ALERTAS PRIORITARIAS: problemas urgentes detectados en el estado de la granja (temperatura lombrices critica, animales enfermos, riego urgente por calor, etc)
+3. PLAN DEL DIA - tareas ordenadas por prioridad y hora:
+   Cada tarea: [hora] AREA - accion concreta - parametro medible - criterio de exito
+4. COORDINACIONES: tareas que impactan varios dominios (ej: fumier animaux -> compost -> lombricompost)
+5. NOTA FINAL: 1 cosa a observar hoy que alimentara el contexto de manana
+
+Responde SIEMPRE en ESPANOL. Tono directo de jefe de operaciones de campo. Sin florituras. Maximo 600 palabras.`;
+
+  const userMsg = `Fecha: ${today}
+
+${meteoCtx}
+
+${allEtat}
+
+${huertoCtx}
+
+${journalCtx}
+${extras ? '\nCONTEXTO ADICIONAL HOY: ' + extras : ''}
+
+Genera el briefing completo del dia para la granja NosVers.`;
+
+  try {
+    const token = sessionStorage.getItem('nv_token') || '';
+    const resp = await fetch(API_URL + '?action=agente', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-App-Token': token },
+      body: JSON.stringify({ system: systemDirector, user: userMsg })
+    });
+    if (!resp.ok) { const e = await resp.text(); throw new Error('HTTP ' + resp.status + ' - ' + e); }
+    const data = await resp.json();
+    if (data.error) throw new Error(typeof data.error === 'object' ? data.error.message : data.error);
+    if (!data.content) throw new Error('Respuesta vacia');
+    directorLastResponse = data.content.map(b => b.text || '').join('');
+
+    if (body) body.textContent = directorLastResponse;
+    if (meta) meta.textContent = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    if (btnDone) btnDone.style.display = '';
+    if (lastEl) lastEl.textContent = 'Ultimo briefing: ' + new Date().toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+    // Save to journal
+    addJournalEntry('director', 'Briefing del dia generado', false);
+
+  } catch(e) {
+    if (body) body.textContent = 'Error: ' + e.message;
+    if (meta) meta.textContent = 'Error';
+  }
+}
+
+function markDirectorDone() {
+  const btn = document.getElementById('btnDirectorDone');
+  if (btn) { btn.textContent = '✓ Ejecutado!'; btn.classList.add('done'); }
+  addJournalEntry('director', 'Plan del dia ejecutado', true);
+}
+
+function copyDirector() {
+  if (directorLastResponse) {
+    navigator.clipboard.writeText(directorLastResponse).catch(() => {});
+    const btns = document.querySelectorAll('.btn-director-secondary');
+    btns.forEach(b => { if (b.textContent.includes('Copiar')) { const o = b.textContent; b.textContent = '✓ Copiado'; setTimeout(() => b.textContent = o, 1500); }});
+  }
+}
+
+function selectAgent(domain) {
+  activeAgent = domain;
+  document.querySelectorAll('.agent-specialist').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('card-' + domain);
+  if (card) card.classList.add('active');
+  const btnQ = document.getElementById('btnQuery');
+  if (btnQ) btnQ.disabled = false;
+
+  const labels = { vers: 'Especialista Lombricompost', compost: 'Especialista Compost', animaux: 'Especialista Animaux', huerto: 'Especialista Potager' };
+  const colors = { vers: '#6b3a2a', compost: '#c45c00', animaux: '#7b3f00', huerto: '#2e6b30' };
+  const icons = { vers: '🪱', compost: '🍂', animaux: '🐓', huerto: '🌿' };
+  const col = colors[domain] || '#666';
+  const domEl = document.getElementById('respDomain');
+  if (domEl) domEl.innerHTML = `<span class="resp-domain-dot" style="background:${col}"></span> ${icons[domain]} ${labels[domain]}`;
+}
 
 // ==================== DUAL MODE ====================
 let currentMode = 'ordres';
