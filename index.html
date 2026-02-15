@@ -2042,7 +2042,9 @@ async function doLogin() {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
         document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
-      }, 50);
+        // Reload etat NOW that token is set
+        loadEtat();
+      }, 100);
     } else {
       errEl.textContent = data.error || 'Error de acceso';
     }
@@ -2109,7 +2111,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
       const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
       const tabs = document.querySelectorAll('.nav-tab'); tabs.forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
-    }, 50);
+      // Token already in sessionStorage - load etat from MySQL
+      loadEtat();
+    }, 100);
   }
 });
 
@@ -2631,6 +2635,16 @@ const etatFields = [
 ];
 
 async function loadEtat() {
+  // Solo cargar si hay token activo
+  if (!sessionStorage.getItem('nv_token')) {
+    const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+    etatFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && saved[id]) el.value = saved[id];
+    });
+    updateContextBadge();
+    return;
+  }
   // MySQL es la fuente de verdad — localStorage solo es cache offline
   // Primero limpiar campos para evitar datos viejos
   etatFields.forEach(id => {
@@ -2939,7 +2953,7 @@ let directorLastResponse = '';
 function getJournalSummary() {
   if (!journal || !journal.length) return 'Sin actividad registrada en el journal.';
   const recent = journal.slice(0, 10);
-  return 'ACTIVIDAD RECIENTE (journal):\n' + recent.map(e => {
+  return 'ACTIVIDAD RECIENTE (journal):\n' + recent.filter(e => e && (e.ts || e.created_at)).map(e => {
     const dt = new Date(e.ts || e.created_at);
     const d = isNaN(dt) ? '' : dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' ';
     return `- ${d}[${e.domain || 'general'}] ${e.action}${e.completed ? ' (completado)' : ''}`;
