@@ -2631,23 +2631,37 @@ const etatFields = [
 ];
 
 async function loadEtat() {
+  // MySQL es la fuente de verdad — localStorage solo es cache offline
+  // Primero limpiar campos para evitar datos viejos
+  etatFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   try {
     const data = await api('etat_get');
-    if (data && typeof data === 'object') {
+    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
       etatFields.forEach(id => {
         const el = document.getElementById(id);
-        if (el && data[id]) el.value = data[id];
+        if (el && data[id] !== undefined) el.value = data[id];
       });
-      // Also update localStorage as cache
+      // Actualizar cache local con datos del servidor
       localStorage.setItem('nv_etat', JSON.stringify(data));
+    } else {
+      // MySQL vacío — cargar cache local si existe
+      const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+      etatFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && saved[id]) el.value = saved[id];
+      });
     }
   } catch(e) {
-    // Fallback to localStorage cache
+    // Sin conexión — fallback a cache local
     const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
     etatFields.forEach(id => {
       const el = document.getElementById(id);
       if (el && saved[id]) el.value = saved[id];
     });
+    console.warn('loadEtat fallback localStorage:', e.message);
   }
   updateContextBadge();
 }
