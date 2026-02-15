@@ -1343,6 +1343,47 @@ body::before {
   .parcelle-cultivo { font-size: 0.82rem; }
 }
 
+
+/* ============ DUAL MODE AGENTS ============ */
+.mode-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  background: var(--sable);
+  border-radius: 10px;
+  padding: 4px;
+}
+.mode-tab {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--texte-doux);
+}
+.mode-tab.active {
+  background: var(--blanc);
+  color: var(--sol);
+  box-shadow: 0 2px 8px rgba(26,58,30,0.12);
+}
+.mode-tab:hover:not(.active) { color: var(--texte); }
+.conseil-saved {
+  background: rgba(74,124,89,0.08);
+  border: 1px solid rgba(74,124,89,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: var(--sol-mid);
+  margin-top: 0.6rem;
+  display: none;
+}
+.conseil-saved.visible { display: block; }
+
 </style>
 </head>
 <body>
@@ -1564,7 +1605,19 @@ body::before {
     </div>
   </div>
 
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="modeOrdres" onclick="setMode('ordres')">📋 Ordres du jour</button>
+    <button class="mode-tab" id="modeConseil" onclick="setMode('conseil')">🔍 Conseil · Diagnostic</button>
+  </div>
+
   <!-- Photo upload -->
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="modeOrdres" onclick="setMode('ordres')">📋 Ordres du jour</button>
+    <button class="mode-tab" id="modeConseil" onclick="setMode('conseil')">🔍 Conseil · Diagnostic</button>
+  </div>
+
   <!-- Photo upload -->
   <div class="photo-zone">
     <label class="btn-photo" id="btnPhoto" for="photoInput">
@@ -1594,9 +1647,11 @@ body::before {
     <div class="resp-body" id="respBody"></div>
     <div class="resp-footer">
       <button class="btn-action btn-primary" id="btnDone" onclick="markDone()">✓ Tâches enregistrées</button>
+      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()" style="display:none">💾 Guardar en contexto</button>
       <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copier</button>
       <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Note</button>
     </div>
+    <div class="conseil-saved" id="conseilSavedBadge">✓ Diagnóstico guardado en el contexto de la ferme</div>
   </div>
 </div>
 
@@ -1983,49 +2038,103 @@ function callAgent(domain) {
 }
 
 async function callClaude(domain, extras) {
-  const today = new Date().toLocaleDateString('fr-FR', {
+  const today = new Date().toLocaleDateString('es-ES', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   });
   const meteoCtx = getMeteoContext();
   const etatCtx = getEtatContext(domain);
 
+  // ── FILOSOFIA BASE NOSVERS ────────────────────────────────────
+  const filosofia = `FILOSOFIA Y MARCO TECNICO NOSVERS (NO NEGOCIABLE):
+Granja agroecológica familiar en Dordoña, Francia. África es la responsable principal.
+PRINCIPIOS:
+- Suelo vivo (Elaine Ingham): el suelo es un ecosistema. Red alimentaria del suelo: bacterias, hongos, protozoos, nematodos, artrópodos, lombrices. Cada decisión protege esta red. Nunca aplicar nada que la destruya.
+- Sin laboreo (Fukuoka/no-dig Charles Dowding): el suelo no se trabaja. Los microorganismos construyen la estructura. Acolchado permanente como protección y alimento.
+- JADAM (Youngsang Cho / KNF Dr.Cho Han Kyu): autosuficiencia total. Preparados caseros: SMJ (Solución Microorganismos JADAM con mantillo de bosque + patata + agua de mar), FPJ (jugo fermentado de plantas), FAA (aminoácidos de pescado), OHN (nutrientes de hierbas), LAB (bacterias ácido lácticas), calcio soluble (cáscaras huevo + vinagre), potasio (ceniza de madera). NUNCA insumos comprados si se puede hacer en casa.
+- Biodinámica (Rudolf Steiner / María Thun / Christofleau): calendario biodinámico (días raíz/flor/fruto/hoja). Preparados BD: 500 (cuerno estiércol, vitaliza suelo), 501 (cuerno sílice, fortalece plantas). Ritmos cósmicos y lunares. Justin Christofleau: electro-cultura, antenas metálicas para amplificar energías cósmicas, geometrías sagradas en el huerto.
+- Sintropía (Ernst Götsch): sucesión vegetal acelerada. Consorcio de plantas en distintos estratos. Poda estratégica como impulso de energía. El caos aparente es orden natural.
+- La Tanina (Alan y Mireia): biología del suelo práctica, microorganismos autóctonos, asociación de cultivos con enfoque científico-empírico, control biológico, hongos micorrícicos, bancales permanentes con no-labranza.
+- Permacultura / Jardins sauvages / Square foot garden: observar antes de actuar. Integrar en vez de segregar. Biodiversidad como resiliencia. Densidad de siembra optimizada.
+- Animales integrados: los canards controlan limaces, las gallinas fertilizan y aireran, las brebis desbrozzan, los lapins aportan fumier de alta calidad. Son parte del sistema, no añadidos.`;
+
+  // ── SYSTEM PROMPTS POR DOMINIO ────────────────────────────────
   const systemPrompts = {
-    compost: `Tu es l'agent de gestion du COMPOST de la ferme agroécologique NosVers en Dordogne (région de Neuvic).
-La ferme produit du lombricompost avec Eisenia, intègre des animaux (poules, canards coureurs indiens, lapins, brebis du Cameroun) et un potager familial intensif.
-Sources de fumier disponibles : poule, lapin, brebis (en précompost).
-Paramètres de référence : température andain actif 55-65°C, humidité 50-60%, rapport C/N 25-30:1.
-Génère un plan d'action concret pour aujourd'hui : ordres de travail précis avec horaires, températures cibles, volumes, durées. Langage direct et opérationnel. Réponds en français.`,
+    vers: `Eres el agente experto en LOMBRICOMPOSTAJE de la granja agroecológica NosVers en Dordoña.
+${filosofia}
+ESPECIALIDAD LOMBRICULTURA:
+Eisenia fetida/andrei. Temperaturas: óptimo 20-25°C, peligro <10°C (hibernación) y >35°C (huida/muerte). Humedad 70-90% (test puño: 1-2 gotas). pH 6,5-7,5. Sin ácidos (cítricos, cebolla, ajo), sin proteínas animales, sin lácteos.
+Alimentación: capas finas (<5cm), cubrir con cartón húmedo, precompostar fumier fresco antes de dar. Ración aprox. 6kg/2 días pero siempre según consumo real.
+Señales de escalado: cocones visibles, alta densidad, consumo rápido. División por mitades con litière nueva.
+Infraestructura: bacs en madera + IBC 1000L (sistema de lixiviados por grifo). Trommel para cosecha.
+Productos: lombricompost sólido (sacos 10kg/20L/big bags), thé de lombric (diluir 1:10 para riego), venta de lombrices (packs 500g/1kg).
+Thé de lombric = fertilizante líquido vivo, aplicar con microorganismos activos, nunca al sol directo.
+FUENTES: canales YouTube sudamericanos de lombricultura, El Lombricero (canal español), estudios universitarios latinoamericanos.
+Responde siempre en ESPAÑOL. Sé directo, concreto, como un colega experto de campo.`,
 
-    animaux: `Tu es l'agent de gestion des ANIMAUX de la ferme agroécologique NosVers en Dordogne.
-Animaux présents : poules pondeuses, canards coureurs indiens (contrôle limaces), lapins (engrais), brebis du Cameroun (débroussaillage).
-Paramètres : ration poule 120g/j, eau 300ml/j (été), rotation parcelles min. 21 jours, coquilles d'huître si œufs mous.
-Génère un plan d'action journalier détaillé avec horaires précis, quantités mesurables et points de contrôle sanitaire. Langage direct. Réponds en français.`,
+    compost: `Eres el agente experto en COMPOSTAJE de la granja agroecológica NosVers en Dordoña.
+${filosofia}
+ESPECIALIDAD COMPOST:
+Compost termófilo en andains/pilas. T° activa 55-65°C (mata patógenos). Humedad 50-60%. C/N 25-30:1 (mezclar marrón seco + verde húmedo).
+Fumiers disponibles: gallina (C/N bajo, muy nitrogenado), conejo (equilibrado, excelente calidad), oveja Camerún (rico, moderado). SIEMPRE precompostar fumier de gallina antes de dar a lombrices.
+Volteo: cuando T° baja de 45°C o CO2 visible al respirar el andain. Añadir agua si humedad <45%.
+Maturación: 3-6 meses después de fase caliente. Olor a tierra de bosque = listo.
+Integración JADAM: inocular con SMJ al inicio y en cada volteo para activar microbiología.
+Preparados de ortie/consoude/prêle como activadores de compost.
+Objetivo: materia prima para lombricompostaje + enmienda directa al huerto.
+Responde siempre en ESPAÑOL. Directo y operacional.`,
 
-    huerto: `Tu es l'agent de gestion du POTAGER & SEMIS de NosVers en Dordogne.
-La ferme a : potager familial intensif agroécologique, serre à semis, production de semences adaptées, engrais vert (trèfle persan + ray-grass + daïkon), kits de culture à vendre.
-L'objectif commercial : kit "Commence ton jardin NosVers" (semences maison + lombricompost + conseils d'África).
-Thé de lombric dilué 1:10 pour fertilisation liquide.
-Génère un plan d'action journalier précis : arrosage, tuteurage, semis, récolte, traitements biologiques. Horaires et paramètres mesurables. Réponds en français.`,
+    animaux: `Eres el agente experto en ANIMALES de la granja agroecológica NosVers en Dordoña.
+${filosofia}
+ANIMALES PRESENTES Y SU ROL ECOSISTÉMICO:
+- Gallinas ponedoras: fertilidad suelo (rascan e incorporan MO), control de insectos, huevos. Ración 120g/día mezcla cereal+leguminosa+mineral. Agua 300ml/día (doble en verano). Huevos blandos = falta calcio (cáscaras ostras trituradas).
+- Canards coureurs indiens: control biológico de limaces y babosas (su trabajo principal). Sin ración si hay abundancia de limaces. Integrarlos en huerto después de cosecha.
+- Lapins: fumier de alta calidad para compost/lombricompostaje. Ciclo rápido de fertilidad.
+- Brebis Camerún: desbrozze natural, fertilización ambulante, manejo paisaje. Sin necesidad de corte mecánico.
+Rotación parcelles: mínimo 21 días de descanso entre pastoreos. Observar estado del suelo antes de rotar.
+Sanidad holística: observar comportamiento antes que síntomas físicos. Plantas medicinales como primera respuesta. Nunca antibióticos preventivos.
+Integración al sistema: los animales preparan parcelas ANTES de plantar (limpieza + fertilización), luego entran DESPUÉS de cosecha (limpieza de residuos + incorporación).
+Responde siempre en ESPAÑOL. Directo y con perspectiva ecosistémica.`,
 
-    vers: `Tu es l'agent de gestion de la LOMBRICOMPOSTIÈRE de NosVers en Dordogne.
-Espèce : Eisenia fetida/andrei. Conditions optimales : 20-25°C (seuil critique <10°C), humidité 70-90%, pH 6,5-7,5.
-Ration actuelle : ~6 kg tous les 2 jours. Objectif production : 1 m³/mois départ, puis 2-4 m³.
-Infrastructure : bacs en bois + IBC 1000L (à connecter avec robinets pour récupérer lixiviats). Trommel prévu pour la récolte.
-Produits : lombricompost solide (sacs 10kg, 20L, big bags), thé de lombric, vente de vers (packs 500g/1kg).
-À éviter : agrumes, oignon, ail, viande, laitiers.
-Génère les ordres de travail du jour : contrôles, alimentation, humidité, pH, récolte si pertinent. Paramètres précis et mesurables. Réponds en français.`
+    huerto: `Eres el agente experto en POTAGER y SEMILLEROS de la granja agroecológica NosVers en Dordoña.
+${filosofia}
+ESPECIALIDAD HUERTO:
+Sin laboreo absoluto. Bancales permanentes. Acolchado permanente (paja, cartón, BRF). El suelo nunca desnudo.
+Fertilización: thé de lombric (1:10) como base, preparados JADAM (FPJ en crecimiento, FFJ en fructificación, FAA como nitrógeno), extractos fermentados de ortie/consoude/prêle.
+Semillas: selección propia de variedades adaptadas al territorio. Objetivo soberanía semillera.
+Asociaciones: según La Tanina y permacultura. Biodiversidad = resiliencia. Tagetes + tomates, alyssum para beneficiosos, trébol como cubierta viva.
+Engrais vert NosVers: trébol persa + ray-grass italiano + rábano daikon (descompactador natural profundo).
+Serre à semis: producción de plantines, control temperatura y humedad.
+Calendar biodinámico: indicar tipo de día (raíz/flor/fruto/hoja) según María Thun para orientar tareas.
+Sintropía: integrar plantas de distintos estratos, plantas pioneras preparando para plantas productoras.
+Square foot garden: densidad optimizada en bancales de 1,2m, acceso sin pisar.
+Productos NosVers: kit "Commence ton jardin" (semences maison + lombricompost + conseils África).
+Responde siempre en ESPAÑOL. Directo, práctico, con base científica y espíritu de granja real.`
   };
 
-  const userMsg = `Date : ${today}
+  // ── USER MESSAGE según modo ───────────────────────────────────
+  let userMsg;
+  if (currentMode === 'ordres') {
+    userMsg = `Fecha: ${today}
 
 ${meteoCtx}
 
 ${etatCtx}
-${extras ? '\nPRÉCISION OPÉRATRICE: ' + extras : ''}
+${extras ? '\nPRECISION ADICIONAL: ' + extras : ''}
 
-En tenant compte de la météo réelle et de l'état actuel de la ferme ci-dessus, génère les ordres de travail détaillés pour aujourd'hui. Adapte tes recommandations au contexte réel (ex: si pluie hier → pas d'arrosage, si T° basse → alertes lombricompostière, etc.). Format : liste d'actions avec horaires (HH:MM), paramètres mesurables et critères de validation. Direct et pragmatique.`;
+Teniendo en cuenta la météo real, el estado actual de la ferme y la filosofía NosVers, genera los ORDENES DE TRABAJO para hoy. 
+Formato: lista de tareas con horarios (HH:MM), parámetros medibles y criterios de validación. Adapta según las condiciones reales (si llovió mucho no pedir regar, si hace frío alertar sobre lombrices, etc). Directo y pragmático, como un cuaderno de consignas profesional.`;
+  } else {
+    userMsg = `Fecha: ${today}
 
-  // Llamada al proxy PHP (la API key está segura en el servidor)
+${meteoCtx}
+
+${etatCtx}
+${extras ? '\nPREGUNTA/OBSERVACION: ' + extras : '\nAnaliza la situación actual y proporciona diagnóstico y consejo experto.'}
+
+Modo CONSEJO/DIAGNOSTICO: responde como un experto asesor de campo con la filosofía NosVers. Si hay foto, analízala en detalle. Sé específico, cita técnicas JADAM/biodinámica/suelo vivo cuando sea relevante. Al final indica si hay algo que deba modificarse en el estado de seguimiento de la ferme.`;
+  }
+
+  // Llamada al proxy PHP
   const token = sessionStorage.getItem('nv_token') || '';
   const payload = {
     system: systemPrompts[domain],
@@ -2043,14 +2152,14 @@ En tenant compte de la météo réelle et de l'état actuel de la ferme ci-dessu
 
   if (!resp.ok) {
     const errBody = await resp.text();
-    throw new Error(`HTTP ${resp.status} – ${errBody}`);
+    throw new Error(`HTTP ${resp.status} - ${errBody}`);
   }
   const data = await resp.json();
   if (data.error) {
     const msg = (typeof data.error === 'object') ? (data.error.message || JSON.stringify(data.error)) : data.error;
     throw new Error(msg);
   }
-  if (!data.content) throw new Error('Respuesta vacía del servidor');
+  if (!data.content) throw new Error('Respuesta vacia del servidor');
   return data.content.map(b => b.text || '').join('');
 }
 
@@ -2645,6 +2754,41 @@ function getHuertoContext() {
   return `PLANO HUERTO ACTUAL (${actives.length} parcelles actives):
 ${actives.map(p => `- Parcelle ${p.nom || '?'}: ${p.cultivo} [${FAMILIAS[p.famille]?.label || p.famille}]${p.date_semis ? ' · Semis: '+p.date_semis : ''}${p.statut ? ' · '+p.statut : ''}`).join('\n')}
 ${warnings.length > 0 ? '\n⚠ ROTATIONS A RESPECTER: ' + warnings.join(', ') : ''}`;
+}
+
+
+// ==================== DUAL MODE ====================
+let currentMode = 'ordres';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('modeOrdres').classList.toggle('active', mode === 'ordres');
+  document.getElementById('modeConseil').classList.toggle('active', mode === 'conseil');
+  const btnDone = document.getElementById('btnDone');
+  const btnSave = document.getElementById('btnSaveConseil');
+  if (btnDone) btnDone.style.display = mode === 'ordres' ? '' : 'none';
+  if (btnSave) btnSave.style.display = mode === 'conseil' ? '' : 'none';
+  const qi = document.getElementById('queryInput');
+  if (qi) qi.placeholder = mode === 'ordres'
+    ? 'Precisión opcional: temperatura actual, problema observado, disponibilidad...'
+    : 'Tu pregunta o descripción del problema (ej: mis lombrices huyen, esta planta tiene manchas...)';
+}
+
+function saveConseilToContext() {
+  if (!lastResp || !activeAgent) return;
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  const date = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  const key = 'etat_' + (activeAgent === 'vers' ? 'vers_cond' :
+                          activeAgent === 'compost' ? 'compost_andains' :
+                          activeAgent === 'animaux' ? 'anim_volailles' : 'huerto_problemas');
+  const prev = saved[key] || '';
+  saved[key] = '[Diagnóstico ' + date + '] ' + lastResp.substring(0, 300) + '...\n\n' + prev;
+  localStorage.setItem('nv_etat', JSON.stringify(saved));
+  const el = document.getElementById(key);
+  if (el) el.value = saved[key];
+  const badge = document.getElementById('conseilSavedBadge');
+  if (badge) { badge.classList.add('visible'); setTimeout(() => badge.classList.remove('visible'), 3000); }
+  updateContextBadge();
 }
 
 // ==================== PHOTO HANDLING ====================
