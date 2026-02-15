@@ -2630,25 +2630,45 @@ const etatFields = [
   'etat_infra_ibcs','etat_infra_notas'
 ];
 
-function loadEtat() {
-  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
-  etatFields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el && saved[id]) el.value = saved[id];
-  });
+async function loadEtat() {
+  try {
+    const data = await api('etat_get');
+    if (data && typeof data === 'object') {
+      etatFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id]) el.value = data[id];
+      });
+      // Also update localStorage as cache
+      localStorage.setItem('nv_etat', JSON.stringify(data));
+    }
+  } catch(e) {
+    // Fallback to localStorage cache
+    const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+    etatFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && saved[id]) el.value = saved[id];
+    });
+  }
   updateContextBadge();
 }
 
-function saveEtat() {
+async function saveEtat() {
   const data = {};
   etatFields.forEach(id => {
     const el = document.getElementById(id);
     if (el) data[id] = el.value;
   });
+  // Save to localStorage as immediate cache
   localStorage.setItem('nv_etat', JSON.stringify(data));
-  const btn = document.getElementById('etatSaveBtn');
-  if (btn) { btn.textContent = '✓ Sauvegardé !'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder letat de la ferme'; btn.classList.remove('saved'); }, 2000); }
   updateContextBadge();
+  const btn = document.getElementById('etatSaveBtn');
+  if (btn) { btn.textContent = '⏳ Guardando...'; }
+  try {
+    await api('etat_set', data);
+    if (btn) { btn.textContent = '✓ Guardado y sincronizado!'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Guardar estado de la granja'; btn.classList.remove('saved'); }, 2500); }
+  } catch(e) {
+    if (btn) { btn.textContent = '⚠ Guardado local (sin sync)'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Guardar estado de la granja'; btn.classList.remove('saved'); }, 2500); }
+  }
 }
 
 function updateContextBadge() {
@@ -2659,6 +2679,7 @@ function updateContextBadge() {
 }
 
 function getEtatContext(domain) {
+  // Read from localStorage cache (synced from MySQL on load)
   const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
   const get = id => saved[id] ? saved[id].trim() : '';
   const sections = {
@@ -2912,6 +2933,7 @@ function getJournalSummary() {
 }
 
 function getAllEtatContext() {
+  // Read from localStorage cache (synced from MySQL on load)
   const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
   const get = id => saved[id] ? saved[id].trim() : 'no indicado';
   return `ESTADO COMPLETO DE LA GRANJA:
@@ -3073,6 +3095,10 @@ function saveConseilToContext() {
   localStorage.setItem('nv_etat', JSON.stringify(saved));
   const el = document.getElementById(key);
   if (el) el.value = saved[key];
+  // Sync to MySQL
+  const syncData = {};
+  syncData[key] = saved[key];
+  api('etat_set', syncData).catch(() => {});
   const badge = document.getElementById('conseilSavedBadge');
   if (badge) { badge.classList.add('visible'); setTimeout(() => badge.classList.remove('visible'), 3000); }
   updateContextBadge();
