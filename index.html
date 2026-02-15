@@ -1116,6 +1116,80 @@ body::before {
   .meteo-details { gap: 0.6rem; }
 }
 
+
+/* ============ PHOTO UPLOAD ============ */
+.photo-zone {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-photo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.6rem 1rem;
+  background: var(--blanc);
+  border: 2px dashed var(--sable);
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--texte-doux);
+  cursor: pointer;
+  transition: all 0.22s;
+  flex: 1;
+}
+.btn-photo:hover {
+  border-color: var(--sol-light);
+  color: var(--sol);
+  background: rgba(74,124,89,0.05);
+}
+.btn-photo.has-photo {
+  border-color: var(--sol-light);
+  background: rgba(74,124,89,0.08);
+  color: var(--sol);
+  border-style: solid;
+}
+
+.photo-preview-wrap {
+  position: relative;
+  display: none;
+  margin-bottom: 0.8rem;
+}
+.photo-preview-wrap.visible { display: block; }
+.photo-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--sable);
+}
+.photo-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-analyzing {
+  font-size: 0.78rem;
+  color: var(--sol-light);
+  font-style: italic;
+  padding: 4px 0;
+}
+
 </style>
 </head>
 <body>
@@ -1334,6 +1408,30 @@ body::before {
       </div>
       <div class="card-bar"></div>
     </div>
+  </div>
+
+  <!-- Photo upload -->
+  <div class="photo-zone">
+    <label class="btn-photo" id="btnPhoto" for="photoInput">
+      📷 <span id="photoLabel">Ajouter une photo (optionnel)</span>
+    </label>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+  </div>
+  <div class="photo-preview-wrap" id="photoPreviewWrap">
+    <img class="photo-preview" id="photoPreview" src="" alt="Photo">
+    <button class="photo-remove" onclick="removePhoto()" title="Supprimer la photo">✕</button>
+  </div>
+
+  <!-- Photo upload -->
+  <div class="photo-zone">
+    <label class="btn-photo" id="btnPhoto" for="photoInput">
+      📷 <span id="photoLabel">Ajouter une photo (optionnel)</span>
+    </label>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+  </div>
+  <div class="photo-preview-wrap" id="photoPreviewWrap">
+    <img class="photo-preview" id="photoPreview" src="" alt="Photo">
+    <button class="photo-remove" onclick="removePhoto()" title="Supprimer la photo">✕</button>
   </div>
 
   <!-- Query input -->
@@ -1749,13 +1847,18 @@ En tenant compte de la météo réelle et de l'état actuel de la ferme ci-dessu
 
   // Llamada al proxy PHP (la API key está segura en el servidor)
   const token = sessionStorage.getItem('nv_token') || '';
+  const payload = {
+    system: systemPrompts[domain],
+    user: userMsg
+  };
+  if (currentPhotoBase64) {
+    payload.image_base64 = currentPhotoBase64;
+    payload.image_type = currentPhotoType;
+  }
   const resp = await fetch(API_URL + '?action=agente', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-App-Token': token },
-    body: JSON.stringify({
-      system: systemPrompts[domain],
-      user: userMsg
-    })
+    body: JSON.stringify(payload)
   });
 
   if (!resp.ok) {
@@ -2154,6 +2257,45 @@ function getEtatContext(domain) {
 - IBCs/bacs: ${get('etat_infra_ibcs') || 'non renseigné'}
 - Notes: ${get('etat_infra_notas') || 'non renseigné'}` : '';
   return (sections[domain] || '') + infra;
+}
+
+
+// ==================== PHOTO HANDLING ====================
+let currentPhotoBase64 = null;
+let currentPhotoType = 'image/jpeg';
+
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  currentPhotoType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    currentPhotoBase64 = dataUrl.split(',')[1];
+    const preview = document.getElementById('photoPreview');
+    const wrap = document.getElementById('photoPreviewWrap');
+    const btn = document.getElementById('btnPhoto');
+    const lbl = document.getElementById('photoLabel');
+    if (preview) preview.src = dataUrl;
+    if (wrap) wrap.classList.add('visible');
+    if (btn) btn.classList.add('has-photo');
+    if (lbl) lbl.textContent = '📷 ' + file.name.substring(0, 25);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  currentPhotoBase64 = null;
+  const preview = document.getElementById('photoPreview');
+  const wrap = document.getElementById('photoPreviewWrap');
+  const btn = document.getElementById('btnPhoto');
+  const lbl = document.getElementById('photoLabel');
+  const input = document.getElementById('photoInput');
+  if (preview) preview.src = '';
+  if (wrap) wrap.classList.remove('visible');
+  if (btn) btn.classList.remove('has-photo');
+  if (lbl) lbl.textContent = 'Ajouter une photo (optionnel)';
+  if (input) input.value = '';
 }
 
 </script>
