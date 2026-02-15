@@ -125,6 +125,26 @@ switch ($action) {
         echo json_encode(['ok' => true]);
         break;
 
+    case 'etat_get':
+        $stmt = $pdo->query("SELECT cle, valeur FROM inventaire WHERE cle LIKE 'etat_%'");
+        $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        echo json_encode($rows);
+        break;
+
+    case 'etat_set':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $stmt = $pdo->prepare(
+            "INSERT INTO inventaire (cle, valeur) VALUES (:cle, :valeur)
+             ON DUPLICATE KEY UPDATE valeur = :valeur2"
+        );
+        foreach ($data as $cle => $valeur) {
+            if (strpos($cle, 'etat_') === 0) {
+                $stmt->execute([':cle' => $cle, ':valeur' => $valeur, ':valeur2' => $valeur]);
+            }
+        }
+        echo json_encode(['ok' => true]);
+        break;
+
     case 'agente':
         $data = json_decode(file_get_contents('php://input'), true);
         if (empty($data['system']) || empty($data['user'])) {
