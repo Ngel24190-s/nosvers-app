@@ -132,7 +132,19 @@ switch ($action) {
             echo json_encode(['error' => 'Faltan parametros system/user']);
             break;
         }
-        $payload = json_encode(['model' => 'claude-sonnet-4-5-20250929', 'max_tokens' => 1000, 'system' => $data['system'], 'messages' => [['role' => 'user', 'content' => $data['user']]]]);
+
+        // Build message content - text only or text + image
+        if (!empty($data['image_base64'])) {
+            $imageType = $data['image_type'] ?? 'image/jpeg';
+            $userContent = [
+                ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => $imageType, 'data' => $data['image_base64']]],
+                ['type' => 'text', 'text' => $data['user']]
+            ];
+        } else {
+            $userContent = $data['user'];
+        }
+
+        $payload = json_encode(['model' => 'claude-sonnet-4-5-20250929', 'max_tokens' => 1200, 'system' => $data['system'], 'messages' => [['role' => 'user', 'content' => $userContent]]]);
         $ch = curl_init('https://api.anthropic.com/v1/messages');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-api-key: ' . CLAUDE_KEY, 'anthropic-version: 2023-06-01'], CURLOPT_TIMEOUT => 60]);
         $resp = curl_exec($ch);
