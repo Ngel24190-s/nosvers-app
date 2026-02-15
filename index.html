@@ -981,6 +981,141 @@ body::before {
 }
 .login-user-badge:hover { opacity: 1; }
 
+
+/* ============ ÉTAT DE LA FERME ============ */
+.meteo-widget {
+  background: var(--sol);
+  color: var(--crème);
+  border-radius: var(--r);
+  padding: 1rem 1.3rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(26,58,30,0.2);
+}
+.meteo-loading { opacity: 0.5; font-size: 0.82rem; font-style: italic; }
+.meteo-icon { font-size: 2rem; flex-shrink: 0; }
+.meteo-main { flex: 1; min-width: 120px; }
+.meteo-temp { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+.meteo-desc { font-size: 0.75rem; opacity: 0.7; text-transform: capitalize; margin-top: 2px; }
+.meteo-details { display: flex; gap: 1rem; flex-wrap: wrap; }
+.meteo-detail { text-align: center; }
+.meteo-detail-val { font-weight: 700; font-size: 0.9rem; }
+.meteo-detail-lbl { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.06em; }
+.meteo-rain-alert {
+  background: rgba(255,200,0,0.15);
+  border: 1px solid rgba(255,200,0,0.3);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffe066;
+  width: 100%;
+  margin-top: 4px;
+}
+.meteo-forecast {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+}
+.meteo-forecast-item {
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 6px 10px;
+  text-align: center;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+.meteo-forecast-item .f-hour { opacity: 0.6; margin-bottom: 2px; }
+.meteo-forecast-item .f-temp { font-weight: 700; }
+.meteo-forecast-item .f-rain { color: #7ec8e3; margin-top: 2px; }
+
+.etat-section { margin-bottom: 1.5rem; }
+.etat-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--sol);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.etat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+.etat-card {
+  background: var(--blanc);
+  border-radius: var(--r);
+  padding: 1rem;
+  box-shadow: 0 2px 10px rgba(26,58,30,0.05);
+  border-left: 4px solid var(--sable);
+  transition: border-color 0.2s;
+}
+.etat-card:focus-within { border-left-color: var(--sol-light); }
+.etat-card-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texte-doux);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.etat-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  color: var(--texte);
+  resize: none;
+  min-height: 70px;
+  line-height: 1.5;
+  outline: none;
+}
+.etat-textarea::placeholder { color: #c0b8ac; font-style: italic; }
+.etat-save-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: var(--sol);
+  color: var(--crème);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+.etat-save-btn:hover { background: var(--sol-mid); }
+.etat-save-btn.saved { background: var(--sol-light); }
+.context-active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(74,124,89,0.12);
+  border: 1px solid rgba(74,124,89,0.25);
+  color: var(--sol-mid);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+@media (max-width: 640px) {
+  .etat-grid { grid-template-columns: 1fr; }
+  .meteo-details { gap: 0.6rem; }
+}
+
 </style>
 </head>
 <body>
@@ -1027,6 +1162,7 @@ body::before {
 
 <!-- NAV -->
 <nav class="nav-tabs">
+  <button class="nav-tab" onclick="goTo('etat')">🌾 État Ferme</button>
   <button class="nav-tab active" onclick="goTo('agents')">🤖 Agents IA</button>
   <button class="nav-tab" onclick="goTo('fiches')">📋 Fiches Techniques</button>
   <button class="nav-tab" onclick="goTo('checklist')">✅ Checklist</button>
@@ -1036,11 +1172,122 @@ body::before {
 
 <main class="main">
 
+<!-- ===================== SECTION: ÉTAT DE LA FERME ===================== -->
+<div class="section" id="sec-etat">
+  <div class="section-header">
+    <h2 class="section-title">État <em>de la Ferme</em></h2>
+    <p class="section-sub">Point zéro · Contexte réel que les agents IA utilisent pour générer les ordres de travail</p>
+  </div>
+
+  <div class="etat-section">
+    <div class="etat-title">🪱 Lombricompostière</div>
+    <div class="etat-grid">
+      <div class="etat-card">
+        <div class="etat-card-title">⚖️ Kg de vers actuels</div>
+        <textarea class="etat-textarea" id="etat_vers_kg" placeholder="Ex: ~10 kg Eisenia, répartis sur 2 bacs bois..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🌡️ Conditions actuelles</div>
+        <textarea class="etat-textarea" id="etat_vers_cond" placeholder="Ex: Humidité correcte, pH non mesuré récemment, T° hangar ~15°C..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🍽️ Dernière alimentation</div>
+        <textarea class="etat-textarea" id="etat_vers_alim" placeholder="Ex: Il y a 2 jours, 6kg épluchures + carton..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">📦 Stock lombricompost prêt</div>
+        <textarea class="etat-textarea" id="etat_vers_stock" placeholder="Ex: ~20kg tamisé, 3 sacs 10kg prêts à vendre..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="etat-section">
+    <div class="etat-title">🍂 Compost</div>
+    <div class="etat-grid">
+      <div class="etat-card">
+        <div class="etat-card-title">🔥 Andains en cours</div>
+        <textarea class="etat-textarea" id="etat_compost_andains" placeholder="Ex: 2 andains actifs. Andain A: phase chaude ~55°C. Andain B: maturation..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🌿 Matières disponibles</div>
+        <textarea class="etat-textarea" id="etat_compost_mat" placeholder="Ex: Fumier poule ~50kg, paille sèche disponible, pas de fumier lapin cette semaine..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="etat-section">
+    <div class="etat-title">🐓 Animaux</div>
+    <div class="etat-grid">
+      <div class="etat-card">
+        <div class="etat-card-title">🐓 État général volailles</div>
+        <textarea class="etat-textarea" id="etat_anim_volailles" placeholder="Ex: 12 poules en bonne santé, 1 poule boiteuse à surveiller. 6 canards OK..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🐑 Brebis & lapins</div>
+        <textarea class="etat-textarea" id="etat_anim_autres" placeholder="Ex: 3 brebis Cameroun en bonne santé, herbe suffisante. 4 lapins, dernier sevrage il y a 3 semaines..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🔄 Rotation parcelles</div>
+        <textarea class="etat-textarea" id="etat_anim_rotation" placeholder="Ex: Parcelle A: repos depuis 5 jours. Parcelle B: en cours. Parcelle C: disponible..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🥚 Production œufs</div>
+        <textarea class="etat-textarea" id="etat_anim_oeufs" placeholder="Ex: ~8 œufs/jour cette semaine, coquilles normales..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="etat-section">
+    <div class="etat-title">🌿 Potager & Semis</div>
+    <div class="etat-grid">
+      <div class="etat-card">
+        <div class="etat-card-title">🌱 Cultures en place</div>
+        <textarea class="etat-textarea" id="etat_huerto_cultivos" placeholder="Ex: Tomates (bancal A, 8 plants), laitues (bancal B, 2ème tande), courgettes..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">🏠 État serre à semis</div>
+        <textarea class="etat-textarea" id="etat_huerto_serre" placeholder="Ex: 30 plants tomates prêts à repiquer, semis poivrons en cours, T° serre ~22°C..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">💧 Dernier arrosage</div>
+        <textarea class="etat-textarea" id="etat_huerto_riego" placeholder="Ex: Hier matin goutte-à-goutte 20min. Sol encore humide bancal A..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">⚠️ Problèmes détectés</div>
+        <textarea class="etat-textarea" id="etat_huerto_problemas" placeholder="Ex: Pucerons sur tomates (traitement savon noir hier), limaces après la pluie..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="etat-section">
+    <div class="etat-title">🏗️ Infrastructure & Général</div>
+    <div class="etat-grid">
+      <div class="etat-card">
+        <div class="etat-card-title">🛢️ IBCs & bacs</div>
+        <textarea class="etat-textarea" id="etat_infra_ibcs" placeholder="Ex: 1 IBC installé, pas encore connecté. 2 bacs bois opérationnels. Hangar disponible..."></textarea>
+      </div>
+      <div class="etat-card">
+        <div class="etat-card-title">📝 Notes générales</div>
+        <textarea class="etat-textarea" id="etat_infra_notas" placeholder="Ex: Semaine chargée en travail, seulement 1h/jour disponible. Livraison paille vendredi..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="etat-save-btn" id="etatSaveBtn" onclick="saveEtat()">💾 Sauvegarder l'état de la ferme</button>
+</div>
+
 <!-- ===================== SECTION: AGENTS IA ===================== -->
 <div class="section active" id="sec-agents">
   <div class="section-header">
-    <h2 class="section-title">Agents <em>de Gestion</em></h2>
-    <p class="section-sub">Sélectionne un domaine · L'IA génère les ordres de travail du jour avec paramètres mesurables</p>
+    <h2 class="section-title">Agents <em>de Gestion</em>
+      <span class="context-active-badge" id="contextBadge" style="display:none">📍 Contexte actif</span>
+    </h2>
+    <p class="section-sub">Sélectionne un domaine · Météo Neuvic + état de la ferme intégrés automatiquement</p>
+  </div>
+
+  <!-- MÉTÉO WIDGET -->
+  <div class="meteo-widget" id="meteoWidget">
+    <span class="meteo-loading">⏳ Chargement météo Neuvic...</span>
   </div>
 
   <div class="cards-grid">
@@ -1385,7 +1632,9 @@ const domainLabels = {
 document.addEventListener('DOMContentLoaded', () => {
   updateClock();
   setInterval(updateClock, 30000);
-  // Si ya hay token en sesión, entrar directamente
+  loadEtat();
+  fetchMeteo();
+  setInterval(fetchMeteo, 10 * 60 * 1000); // refresh météo every 10min
   const token = sessionStorage.getItem('nv_token');
   const user  = sessionStorage.getItem('nv_user');
   if (token && user) {
@@ -1459,6 +1708,8 @@ async function callClaude(domain, extras) {
   const today = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   });
+  const meteoCtx = getMeteoContext();
+  const etatCtx = getEtatContext(domain);
 
   const systemPrompts = {
     compost: `Tu es l'agent de gestion du COMPOST de la ferme agroécologique NosVers en Dordogne (région de Neuvic).
@@ -1487,9 +1738,14 @@ Produits : lombricompost solide (sacs 10kg, 20L, big bags), thé de lombric, ven
 Génère les ordres de travail du jour : contrôles, alimentation, humidité, pH, récolte si pertinent. Paramètres précis et mesurables. Réponds en français.`
   };
 
-  const userMsg = `Date : ${today}${extras ? '\nPrécision opératrice : ' + extras : ''}
+  const userMsg = `Date : ${today}
 
-Génère les ordres de travail détaillés pour aujourd'hui. Format : liste d'actions avec horaires (HH:MM), paramètres mesurables (températures, volumes, poids, durées), et critères de validation pour chaque tâche. Sois direct et pragmatique, comme un cahier de consignes professionnel.`;
+${meteoCtx}
+
+${etatCtx}
+${extras ? '\nPRÉCISION OPÉRATRICE: ' + extras : ''}
+
+En tenant compte de la météo réelle et de l'état actuel de la ferme ci-dessus, génère les ordres de travail détaillés pour aujourd'hui. Adapte tes recommandations au contexte réel (ex: si pluie hier → pas d'arrosage, si T° basse → alertes lombricompostière, etc.). Format : liste d'actions avec horaires (HH:MM), paramètres mesurables et critères de validation. Direct et pragmatique.`;
 
   // Llamada al proxy PHP (la API key está segura en el servidor)
   const token = sessionStorage.getItem('nv_token') || '';
@@ -1725,6 +1981,181 @@ function saveNote() {
 function closeModal() {
   document.getElementById('overlay').classList.remove('open');
 }
+
+// ==================== MÉTÉO NEUVIC ====================
+// Coordonnées Neuvic, Dordogne
+const NEUVIC_LAT = 45.1003;
+const NEUVIC_LON = 0.4681;
+
+let meteoData = null;
+
+const WMO_CODES = {
+  0:'☀️ Ciel dégagé', 1:'🌤️ Peu nuageux', 2:'⛅ Partiellement nuageux', 3:'☁️ Couvert',
+  45:'🌫️ Brouillard', 48:'🌫️ Brouillard givrant',
+  51:'🌦️ Bruine légère', 53:'🌦️ Bruine', 55:'🌧️ Bruine forte',
+  61:'🌧️ Pluie légère', 63:'🌧️ Pluie', 65:'🌧️ Pluie forte',
+  71:'❄️ Neige légère', 73:'❄️ Neige', 75:'❄️ Neige forte',
+  80:'🌧️ Averses légères', 81:'🌧️ Averses', 82:'⛈️ Averses violentes',
+  95:'⛈️ Orage', 96:'⛈️ Orage avec grêle', 99:'⛈️ Orage violent'
+};
+
+async function fetchMeteo() {
+  const widget = document.getElementById('meteoWidget');
+  if (!widget) return;
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${NEUVIC_LAT}&longitude=${NEUVIC_LON}&current=temperature_2m,relative_humidity_2m,precipitation,weathercode,windspeed_10m&hourly=temperature_2m,precipitation,weathercode&daily=precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=2&past_days=1`;
+    const r = await fetch(url);
+    const d = await r.json();
+    meteoData = d;
+
+    const cur = d.current;
+    const temp = Math.round(cur.temperature_2m);
+    const hum = cur.relative_humidity_2m;
+    const wind = Math.round(cur.windspeed_10m);
+    const precip = cur.precipitation;
+    const wcode = cur.weathercode;
+    const desc = WMO_CODES[wcode] || '🌡️ Variable';
+    const icon = desc.split(' ')[0];
+
+    // Pluie des dernières 24h (hier)
+    const rain24h = d.daily?.precipitation_sum?.[0] || 0;
+    const rainToday = d.daily?.precipitation_sum?.[1] || 0;
+
+    // Prévisions prochaines heures
+    const now = new Date();
+    const currentHour = now.getHours();
+    const hours = d.hourly.time.slice(24, 24+12); // next 12h from today
+    const forecastItems = hours.slice(currentHour, currentHour+6).map((t, i) => {
+      const idx = 24 + currentHour + i;
+      const h = new Date(t).getHours();
+      const ft = Math.round(d.hourly.temperature_2m[idx] || 0);
+      const fp = d.hourly.precipitation[idx] || 0;
+      const fc = WMO_CODES[d.hourly.weathercode[idx]] || '';
+      const fi = fc.split(' ')[0] || '🌡️';
+      return `<div class="meteo-forecast-item">
+        <div class="f-hour">${h}h</div>
+        <div>${fi}</div>
+        <div class="f-temp">${ft}°</div>
+        ${fp > 0 ? `<div class="f-rain">${fp}mm</div>` : ''}
+      </div>`;
+    }).join('');
+
+    let rainAlert = '';
+    if (rain24h >= 10) {
+      rainAlert = `<div class="meteo-rain-alert">🌧️ ${rain24h.toFixed(1)}mm tombés hier — arrosage probablement inutile aujourd'hui</div>`;
+    } else if (rain24h >= 5) {
+      rainAlert = `<div class="meteo-rain-alert">💧 ${rain24h.toFixed(1)}mm hier — vérifier humidité sol avant arrosage</div>`;
+    }
+    if (rainToday >= 5) {
+      rainAlert += `<div class="meteo-rain-alert">🌦️ ${rainToday.toFixed(1)}mm prévus aujourd'hui</div>`;
+    }
+
+    widget.innerHTML = `
+      <div class="meteo-icon">${icon}</div>
+      <div class="meteo-main">
+        <div class="meteo-temp">${temp}°C</div>
+        <div class="meteo-desc">${desc.split(' ').slice(1).join(' ')} · Neuvic</div>
+      </div>
+      <div class="meteo-details">
+        <div class="meteo-detail"><div class="meteo-detail-val">${hum}%</div><div class="meteo-detail-lbl">Humidité</div></div>
+        <div class="meteo-detail"><div class="meteo-detail-val">${wind}km/h</div><div class="meteo-detail-lbl">Vent</div></div>
+        <div class="meteo-detail"><div class="meteo-detail-val">${rain24h.toFixed(1)}mm</div><div class="meteo-detail-lbl">Pluie hier</div></div>
+        <div class="meteo-detail"><div class="meteo-detail-val">${precip}mm</div><div class="meteo-detail-lbl">Maintenant</div></div>
+      </div>
+      ${rainAlert}
+      <div class="meteo-forecast">${forecastItems}</div>`;
+
+  } catch(e) {
+    if (widget) widget.innerHTML = `<span class="meteo-loading">⚠ Météo indisponible (${e.message})</span>`;
+  }
+}
+
+function getMeteoContext() {
+  if (!meteoData) return 'Météo non disponible.';
+  const cur = meteoData.current;
+  const rain24h = meteoData.daily?.precipitation_sum?.[0] || 0;
+  const rainToday = meteoData.daily?.precipitation_sum?.[1] || 0;
+  const tmax = meteoData.daily?.temperature_2m_max?.[1] || cur.temperature_2m;
+  const tmin = meteoData.daily?.temperature_2m_min?.[1] || cur.temperature_2m;
+  const desc = WMO_CODES[cur.weathercode] || 'Variable';
+  return `MÉTÉO NEUVIC AUJOURD'HUI:
+- Conditions: ${desc}
+- Température actuelle: ${Math.round(cur.temperature_2m)}°C (min ${Math.round(tmin)}°C / max ${Math.round(tmax)}°C)
+- Humidité air: ${cur.relative_humidity_2m}%
+- Vent: ${Math.round(cur.windspeed_10m)} km/h
+- Précipitations hier (24h): ${rain24h.toFixed(1)} mm
+- Précipitations prévues aujourd'hui: ${rainToday.toFixed(1)} mm
+${rain24h >= 10 ? '⚠ PLUIE SIGNIFICATIVE HIER: adapter les recommandations d'arrosage en conséquence' : ''}
+${rainToday >= 10 ? '⚠ PLUIE PRÉVUE AUJOURD'HUI: adapter les activités extérieures' : ''}`;
+}
+
+// ==================== ÉTAT DE LA FERME ====================
+const etatFields = [
+  'etat_vers_kg','etat_vers_cond','etat_vers_alim','etat_vers_stock',
+  'etat_compost_andains','etat_compost_mat',
+  'etat_anim_volailles','etat_anim_autres','etat_anim_rotation','etat_anim_oeufs',
+  'etat_huerto_cultivos','etat_huerto_serre','etat_huerto_riego','etat_huerto_problemas',
+  'etat_infra_ibcs','etat_infra_notas'
+];
+
+function loadEtat() {
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  etatFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && saved[id]) el.value = saved[id];
+  });
+  updateContextBadge();
+}
+
+function saveEtat() {
+  const data = {};
+  etatFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  localStorage.setItem('nv_etat', JSON.stringify(data));
+  const btn = document.getElementById('etatSaveBtn');
+  if (btn) { btn.textContent = '✓ Sauvegardé !'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder l'état de la ferme'; btn.classList.remove('saved'); }, 2000); }
+  updateContextBadge();
+}
+
+function updateContextBadge() {
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  const hasData = Object.values(saved).some(v => v && v.trim());
+  const badge = document.getElementById('contextBadge');
+  if (badge) badge.style.display = hasData ? 'inline-flex' : 'none';
+}
+
+function getEtatContext(domain) {
+  const saved = JSON.parse(localStorage.getItem('nv_etat') || '{}');
+  const get = id => saved[id] ? saved[id].trim() : '';
+  const sections = {
+    vers: `ÉTAT ACTUEL LOMBRICOMPOSTIÈRE:
+- Kg de vers: ${get('etat_vers_kg') || 'non renseigné'}
+- Conditions: ${get('etat_vers_cond') || 'non renseigné'}
+- Dernière alimentation: ${get('etat_vers_alim') || 'non renseigné'}
+- Stock lombricompost prêt: ${get('etat_vers_stock') || 'non renseigné'}`,
+    compost: `ÉTAT ACTUEL COMPOST:
+- Andains en cours: ${get('etat_compost_andains') || 'non renseigné'}
+- Matières disponibles: ${get('etat_compost_mat') || 'non renseigné'}`,
+    animaux: `ÉTAT ACTUEL ANIMAUX:
+- Volailles: ${get('etat_anim_volailles') || 'non renseigné'}
+- Brebis & lapins: ${get('etat_anim_autres') || 'non renseigné'}
+- Rotation parcelles: ${get('etat_anim_rotation') || 'non renseigné'}
+- Production œufs: ${get('etat_anim_oeufs') || 'non renseigné'}`,
+    huerto: `ÉTAT ACTUEL POTAGER:
+- Cultures en place: ${get('etat_huerto_cultivos') || 'non renseigné'}
+- Serre à semis: ${get('etat_huerto_serre') || 'non renseigné'}
+- Dernier arrosage: ${get('etat_huerto_riego') || 'non renseigné'}
+- Problèmes détectés: ${get('etat_huerto_problemas') || 'non renseigné'}`
+  };
+  const infra = get('etat_infra_ibcs') || get('etat_infra_notas') ? 
+    `\nINFRASTRUCTURE & GÉNÉRAL:
+- IBCs/bacs: ${get('etat_infra_ibcs') || 'non renseigné'}
+- Notes: ${get('etat_infra_notas') || 'non renseigné'}` : '';
+  return (sections[domain] || '') + infra;
+}
+
 </script>
 
 </body>
