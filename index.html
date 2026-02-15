@@ -2130,6 +2130,8 @@ function goTo(id) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
   event.target.classList.add('active');
+  // Cuando se abre la seccion etat, recargar desde MySQL
+  if (id === 'etat') loadEtat();
 }
 
 // ==================== AGENTS ESPECIALISTAS (CONSEIL ONLY) ====================
