@@ -153,8 +153,11 @@ switch ($action) {
             break;
         }
 
-        // Build message content - text only or text + image
-        if (!empty($data['image_base64'])) {
+        // Build message content - text only, text+image, or full content array
+        if (!empty($data['user_content']) && is_array($data['user_content'])) {
+            // Full content array passed directly (huerto photo analysis)
+            $userContent = $data['user_content'];
+        } elseif (!empty($data['image_base64'])) {
             $imageType = $data['image_type'] ?? 'image/jpeg';
             $userContent = [
                 ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => $imageType, 'data' => $data['image_base64']]],
