@@ -2518,7 +2518,7 @@ function renderJournal() {
     const timeStr = dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) +
       ' · ' + dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     const col = e.domain ? domainColors[e.domain] : '#666';
-    const lbl = e.domain ? domainLabels[e.domain].split(' ')[1] : 'Note';
+    const lbl = (e.domain && domainLabels[e.domain]) ? domainLabels[e.domain].split(' ')[1] : 'Note';
     return `<div class="log-entry">
       <span class="log-domain-tag" style="background:${col}">${lbl || 'Note'}</span>
       <span class="log-text">${e.action}${e.completed ? ' ✓' : ''}</span>
