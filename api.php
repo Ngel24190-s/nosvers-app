@@ -147,9 +147,14 @@ switch ($action) {
 
     case 'agente':
         $data = json_decode(file_get_contents('php://input'), true);
-        if (empty($data['system']) || empty($data['user'])) {
+        if (empty($data['system'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Faltan parametros system/user']);
+            echo json_encode(['error' => 'Falta parametro system']);
+            break;
+        }
+        if (empty($data['user']) && empty($data['user_content'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta parametro user o user_content']);
             break;
         }
 
