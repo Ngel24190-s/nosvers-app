@@ -2238,6 +2238,36 @@ function callAgent(domain) {
   });
 }
 
+
+// ==================== KNOWLEDGE BASE ====================
+async function searchKB(query, category = null) {
+  try {
+    const params = new URLSearchParams({ action: 'search', q: query });
+    if (category) params.append('category', category);
+    const resp = await fetch('https://nosvers.com/granja/kb_search.php?' + params);
+    if (!resp.ok) return [];
+    const results = await resp.json();
+    return results;
+  } catch(e) {
+    console.warn('KB search failed:', e);
+    return [];
+  }
+}
+
+function formatKBContext(kbResults) {
+  if (!kbResults || kbResults.length === 0) return '';
+  
+  let context = '\n\n=== REFERENCIAS TÉCNICAS APLICABLES ===\n';
+  kbResults.forEach(r => {
+    context += `\n[${r.category}/${r.file}]\n`;
+    r.chunks.forEach(chunk => {
+      context += chunk.trim() + '\n';
+    });
+  });
+  context += '\n=== FIN REFERENCIAS ===\n';
+  return context;
+}
+
 async function callClaude(domain, extras) {
   const today = new Date().toLocaleDateString('es-ES', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -2333,6 +2363,16 @@ ${etatCtx}
 ${extras ? '\nPREGUNTA/OBSERVACION: ' + extras : '\nAnaliza la situación actual y proporciona diagnóstico y consejo experto.'}
 
 Modo CONSEJO/DIAGNOSTICO: responde como un experto asesor de campo con la filosofía NosVers. Si hay foto, analízala en detalle. Sé específico, cita técnicas JADAM/biodinámica/suelo vivo cuando sea relevante. Al final indica si hay algo que deba modificarse en el estado de seguimiento de la ferme.`;
+  }
+
+  // Search knowledge base for relevant context
+  const kbCategory = { vers: 'lombricultura', compost: 'jadam', animaux: null, huerto: 'latanina' }[domain];
+  const kbResults = await searchKB(extras || userMsg.substring(0, 200), kbCategory);
+  const kbContext = formatKBContext(kbResults);
+  
+  // Append KB context to user message if found
+  if (kbContext) {
+    userMsg += kbContext;
   }
 
   // Llamada al proxy PHP
