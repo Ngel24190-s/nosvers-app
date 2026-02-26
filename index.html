@@ -1530,6 +1530,49 @@ body::before {
   .director-card { padding: 1rem; }
 }
 
+
+/* ============ VOICE INPUT ============ */
+.btn-voice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--sol-light);
+  background: var(--blanc);
+  color: var(--sol);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.btn-voice:hover {
+  background: var(--sol-light);
+  color: white;
+  transform: scale(1.05);
+}
+.btn-voice.recording {
+  background: #e74c3c;
+  color: white;
+  border-color: #c0392b;
+  animation: pulse-record 1.5s infinite;
+}
+.btn-voice:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+@keyframes pulse-record {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(231,76,60,0); }
+}
+.voice-status {
+  font-size: 0.72rem;
+  color: var(--texte-doux);
+  font-style: italic;
+  margin-left: 8px;
+}
+
 </style>
 </head>
 <body>
@@ -1727,9 +1770,11 @@ body::before {
 
   <!-- Quick input for director -->
   <div class="query-zone" style="margin-bottom:1.5rem">
+    <button class="btn-voice" id="btnVoiceDirector" onclick="toggleVoice('directorInput')" title="Grabar por voz">🎤</button>
     <input type="text" class="query-input" id="directorInput"
       placeholder="Añadir contexto al briefing: disponibilidad de hoy, visitas, materiales pendientes..."
       onkeydown="if(event.key==='Enter') launchDirector()">
+    <span class="voice-status" id="voiceStatusDirector"></span>
   </div>
 </div>
 
@@ -1790,10 +1835,12 @@ body::before {
 
   <!-- Query input -->
   <div class="query-zone">
+    <button class="btn-voice" id="btnVoiceQuery" onclick="toggleVoice('queryInput')" title="Grabar por voz">🎤</button>
     <input type="text" class="query-input" id="queryInput"
       placeholder="Tu pregunta: síntomas observados, duda técnica, descripción del problema..."
       onkeydown="if(event.key==='Enter' && activeAgent) callAgent(activeAgent)">
     <button class="btn-query" id="btnQuery" onclick="callAgent(activeAgent)" disabled>Consultar</button>
+    <span class="voice-status" id="voiceStatusQuery"></span>
   </div>
 
   <!-- Response panel -->
@@ -1832,11 +1879,13 @@ body::before {
       <img class="photo-preview" id="photoPreviewHuerto" src="" alt="Foto huerto">
       <button class="photo-remove" onclick="removePhotoHuerto()">✕</button>
     </div>
-    <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap">
+    <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;align-items:center">
+      <button class="btn-voice" id="btnVoiceHuerto" onclick="toggleVoice('huertoPhotoQuery')" title="Grabar por voz">🎤</button>
       <input type="text" class="query-input" id="huertoPhotoQuery" style="flex:1;min-width:200px"
         placeholder="¿Qué quieres analizar? (plagas, estado, identificar cultivo...)"
         onkeydown="if(event.key==='Enter') analyzeHuertoPhoto()">
       <button class="btn-action btn-primary" onclick="analyzeHuertoPhoto()" id="btnAnalyzeHuerto">Analizar</button>
+      <span class="voice-status" id="voiceStatusHuerto"></span>
     </div>
     <div class="response-panel" id="huertoPhotoPanel" style="margin-top:0.8rem">
       <div class="resp-body" id="huertoPhotoBody"></div>
@@ -3381,6 +3430,87 @@ function removePhoto() {
   if (btn) btn.classList.remove('has-photo');
   if (lbl) lbl.textContent = 'Ajouter une photo (optionnel)';
   if (input) input.value = '';
+}
+
+
+// ==================== VOICE INPUT (Web Speech API) ====================
+let recognition = null;
+let currentVoiceInput = null;
+
+function initVoiceRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    console.warn('Speech Recognition not supported');
+    return false;
+  }
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES'; // Español por defecto
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    if (currentVoiceInput) {
+      const input = document.getElementById(currentVoiceInput);
+      if (input) {
+        input.value = transcript;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+    stopVoice();
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    stopVoice();
+    if (event.error === 'not-allowed') {
+      alert('Permiso de micrófono denegado. Actívalo en configuración del navegador.');
+    }
+  };
+  
+  recognition.onend = () => {
+    stopVoice();
+  };
+  
+  return true;
+}
+
+function toggleVoice(inputId) {
+  if (!recognition && !initVoiceRecognition()) {
+    alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari.');
+    return;
+  }
+  
+  const btn = document.getElementById('btnVoice' + inputId.replace('Input', '').replace('Query', 'Query').replace('huertoPhotoQuery', 'Huerto').replace('directorInput', 'Director'));
+  const status = document.getElementById('voiceStatus' + inputId.replace('Input', '').replace('Query', 'Query').replace('huertoPhotoQuery', 'Huerto').replace('directorInput', 'Director'));
+  
+  if (currentVoiceInput === inputId) {
+    // Stop recording
+    recognition.stop();
+    stopVoice();
+  } else {
+    // Start recording
+    currentVoiceInput = inputId;
+    if (btn) btn.classList.add('recording');
+    if (status) status.textContent = '🎙️ Escuchando...';
+    
+    try {
+      recognition.start();
+    } catch(e) {
+      console.error('Recognition start error:', e);
+      stopVoice();
+    }
+  }
+}
+
+function stopVoice() {
+  const btns = document.querySelectorAll('.btn-voice');
+  btns.forEach(b => b.classList.remove('recording'));
+  const statuses = document.querySelectorAll('.voice-status');
+  statuses.forEach(s => s.textContent = '');
+  currentVoiceInput = null;
 }
 
 </script>
