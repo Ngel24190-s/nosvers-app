@@ -1573,6 +1573,129 @@ body::before {
   margin-left: 8px;
 }
 
+/* ===== MÓDULOS DE SEGUIMIENTO OPERATIVO ===== */
+.home-alerts { border: 2px solid #c0392b; border-radius: var(--r); padding: 14px; margin-bottom: 14px; background: white; }
+.home-alerts h3 { font-size: 13px; color: #c0392b; font-weight: 700; margin-bottom: 10px; }
+.alert-item { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f5e0e0; font-size: 13px; align-items: flex-start; }
+.alert-item:last-child { border-bottom: none; }
+.alert-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.dot-red { background: #c0392b; }
+.dot-orange { background: #f39c12; }
+.dot-green { background: #27ae60; }
+.home-card { background: white; border: 1px solid #e0d8cc; border-radius: var(--r); margin-bottom: 12px; overflow: hidden; }
+.home-card-head { padding: 11px 14px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.home-card-body { padding: 13px 14px; }
+.quick-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.qstat { text-align: center; background: #f8f4ee; border-radius: 8px; padding: 10px 6px; }
+.qstat .qval { font-size: 26px; font-weight: 800; }
+.qstat .qlbl { font-size: 11px; color: var(--texte-doux); margin-top: 2px; }
+.qstat.c-sold .qval { color: #2196f3; }
+.qstat.c-col .qval { color: var(--humus); }
+.qstat.c-eat .qval { color: #4caf50; }
+.tag-pill { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; margin: 2px; }
+.tag-red { background: #fde8e8; color: #c0392b; }
+.tag-orange { background: #fff3e0; color: #e65100; }
+.tag-green { background: #e8f5e9; color: #2e7d32; }
+.btn-sm { padding: 7px 14px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-primary { background: #5d3a8a; color: white; }
+.btn-orange { background: #f39c12; color: white; }
+.btn-green { background: #27ae60; color: white; }
+.btn-grey { background: #ddd; color: #444; }
+.btn-red { background: #c0392b; color: white; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+/* Lapins */
+.lapin-card { background: white; border: 1px solid #e0d8cc; border-radius: 8px; padding: 13px; margin-bottom: 10px; }
+.lapin-name { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.timeline-wrap { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+.tstep { flex: 1; min-width: 70px; text-align: center; border-radius: 6px; padding: 7px 3px; font-size: 11px; background: #f0ece6; border: 1px solid #ddd; }
+.tstep.done { background: #e8f5e9; border-color: #81c784; }
+.tstep.urgent { background: #fff3e0; border-color: #f39c12; }
+.tstep.overdue { background: #fde8e8; border-color: #c0392b; }
+.tstep .ticon { font-size: 17px; }
+.tstep .tdate { font-size: 10px; color: #888; margin-top: 2px; }
+.lap-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+.lap-stat { flex: 1; text-align: center; background: #f0e8ff; border-radius: 8px; padding: 10px; }
+.lap-stat .lval { font-size: 22px; font-weight: 800; color: #5d3a8a; }
+.lap-stat .llbl { font-size: 11px; color: #888; }
+.ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
+/* Feed */
+.feed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 12px; }
+.feed-item { background: #f9f5ef; border: 1px solid #e0d0bc; border-radius: 8px; padding: 11px; }
+.feed-animal { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; }
+.feed-name { font-size: 13px; font-weight: 700; margin: 4px 0; }
+.feed-bar-wrap { background: #e0e0e0; border-radius: 3px; height: 7px; overflow: hidden; margin-top: 6px; }
+.feed-bar { height: 100%; border-radius: 3px; }
+.feed-bar.ok { background: #27ae60; }
+.feed-bar.low { background: #f39c12; }
+.feed-bar.critical { background: #c0392b; }
+.feed-qty { font-size: 11px; color: #888; margin-top: 3px; }
+.shopping-box { background: #fff8ee; border: 2px dashed #f39c12; border-radius: 8px; padding: 12px; margin-top: 10px; }
+.shopping-box h4 { font-size: 13px; font-weight: 700; color: var(--animaux-col); margin-bottom: 9px; }
+.shop-item { display: flex; align-items: center; padding: 5px 0; font-size: 13px; border-bottom: 1px solid #f0e0c0; gap: 8px; }
+.shop-item:last-child { border-bottom: none; }
+.shop-badge { background: #f39c12; color: white; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9px; margin-left: auto; white-space: nowrap; }
+/* Huevos */
+.eggs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 14px; }
+.egg-stat { background: white; border: 1px solid #e0d8cc; border-radius: 8px; padding: 12px; text-align: center; }
+.egg-stat .eval { font-size: 28px; font-weight: 800; }
+.egg-stat.c-col .eval { color: var(--humus); }
+.egg-stat.c-eat .eval { color: #4caf50; }
+.egg-stat.c-sell .eval { color: #2196f3; }
+.egg-stat .elbl { font-size: 11px; color: #888; margin-top: 2px; }
+.egg-history-row { display: grid; grid-template-columns: 90px 1fr 1fr 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; align-items: center; }
+.egg-history-row.hdr { font-weight: 700; font-size: 11px; color: #888; text-transform: uppercase; position: sticky; top: 0; background: white; }
+.sold-val { color: #2196f3; font-weight: 700; }
+.egg-scroll { max-height: 200px; overflow-y: auto; padding: 0 14px; }
+.suggest-box { background: #fff8ee; border: 1px solid #f0dca0; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 10px; }
+/* Cosecha */
+.harvest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.bac-card { background: white; border: 1px solid #e0d8cc; border-radius: 8px; padding: 12px; text-align: center; }
+.bac-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vers-col); text-align: left; margin-bottom: 6px; }
+.readiness-ring { width: 68px; height: 68px; border-radius: 50%; margin: 6px auto; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; border: 5px solid; }
+.ring-ready { border-color: #27ae60; color: #27ae60; }
+.ring-almost { border-color: #f39c12; color: #f39c12; }
+.ring-not { border-color: #ccc; color: #ccc; }
+.bac-detail { font-size: 12px; color: #888; text-align: left; margin-top: 5px; }
+.bac-detail strong { color: var(--texte); }
+.yield-box { background: #f0fbf0; border: 1px solid #a5d6a7; border-radius: 8px; padding: 11px; margin-bottom: 12px; font-size: 13px; }
+.yield-total { font-size: 22px; font-weight: 800; color: var(--vers-col); }
+/* Fechas */
+.countdown-hero { background: linear-gradient(135deg, var(--sol), #2d5c35); color: white; border-radius: var(--r); padding: 20px; text-align: center; margin-bottom: 14px; }
+.countdown-days { font-size: 58px; font-weight: 800; line-height: 1; }
+.countdown-label { font-size: 14px; opacity: 0.8; margin-top: 3px; }
+.countdown-date { font-size: 12px; opacity: 0.55; margin-top: 2px; }
+.milestone-list { display: flex; flex-direction: column; gap: 8px; }
+.milestone-item { display: flex; gap: 10px; background: white; border: 1px solid #e0d8cc; border-radius: 8px; padding: 11px 13px; align-items: flex-start; }
+.milestone-item.done { opacity: 0.55; }
+.milestone-item.done .m-title { text-decoration: line-through; }
+.m-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.m-icon.done-ic { background: #27ae60; color: white; }
+.m-icon.warn-ic { background: #f39c12; color: white; }
+.m-icon.pend-ic { background: #eee; border: 2px solid #ccc; }
+.m-title { font-weight: 700; font-size: 14px; }
+.m-date { font-size: 12px; color: #888; }
+.m-days { margin-left: auto; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.days-ok { color: #27ae60; }
+.days-warn { color: #f39c12; }
+.days-late { color: #c0392b; }
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: white; border-radius: 12px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+.modal-hdr { padding: 14px 16px; border-bottom: 1px solid #eee; font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+.modal-body { padding: 16px; }
+.modal-ftr { padding: 12px 16px; border-top: 1px solid #eee; display: flex; gap: 8px; justify-content: flex-end; }
+.close-x { background: none; border: none; font-size: 22px; cursor: pointer; color: #999; line-height: 1; }
+.form-grp { margin-bottom: 12px; }
+.form-grp label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.form-grp input, .form-grp select, .form-grp textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 9px 11px; font-size: 14px; font-family: inherit; }
+.form-grp textarea { height: 75px; resize: vertical; }
+.form-row { display: flex; gap: 10px; }
+.form-row .form-grp { flex: 1; }
+@media (max-width: 500px) {
+  .harvest-grid, .feed-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -1619,11 +1742,17 @@ body::before {
 
 <!-- NAV -->
 <nav class="nav-tabs">
+  <button class="nav-tab" onclick="goTo('home')">🏠 Inicio</button>
   <button class="nav-tab" onclick="goTo('etat')">🌾 État Ferme</button>
   <button class="nav-tab active" onclick="goTo('director')">🎯 Dirección</button>
   <button class="nav-tab" onclick="goTo('agents')">🔬 Especialistas</button>
   <button class="nav-tab" onclick="goTo('huerto')">🗺️ Plano Huerto</button>
   <button class="nav-tab" onclick="goTo('fiches')">📋 Fiches Techniques</button>
+  <button class="nav-tab" onclick="goTo('lapins')">🐰 Conejas</button>
+  <button class="nav-tab" onclick="goTo('feed')">🌾 Alimentación</button>
+  <button class="nav-tab" onclick="goTo('huevos')">🥚 Huevos</button>
+  <button class="nav-tab" onclick="goTo('cosecha')">🪱 Cosecha</button>
+  <button class="nav-tab" onclick="goTo('fechas')">📅 Fechas</button>
   <button class="nav-tab" onclick="goTo('checklist')">✅ Checklist</button>
   <button class="nav-tab" onclick="goTo('inventaire')">📦 Inventaire</button>
   <button class="nav-tab" onclick="goTo('journal')">📔 Journal</button>
@@ -2087,6 +2216,419 @@ body::before {
   </div>
 </div>
 
+<!-- ====== INICIO / ALERTAS ====== -->
+<div class="section" id="sec-home">
+  <div class="section-header">
+    <h2 class="section-title">Inicio <em>&amp; Alertas</em></h2>
+    <p class="section-sub">Panel de control diario · Lo más urgente de un vistazo</p>
+  </div>
+  <div class="home-alerts">
+    <h3>⚠️ Requieren atención</h3>
+    <div id="home-alert-list">
+      <div class="alert-item"><div class="alert-dot dot-red"></div><div><strong>Coneja Blanca</strong> — Destete urgente (día 31). Separar crías hoy.</div></div>
+      <div class="alert-item"><div class="alert-dot dot-red"></div><div><strong>Pienso gallinas</strong> — Stock crítico (~3 días). Comprar esta semana.</div></div>
+      <div class="alert-item"><div class="alert-dot dot-orange"></div><div><strong>Bac #1 y #2</strong> — Listos para cosechar. ~18 kg disponibles.</div></div>
+      <div class="alert-item"><div class="alert-dot dot-orange"></div><div><strong>Coneja Gris</strong> — Día 12. Preparar alimento sólido en 6 días.</div></div>
+      <div class="alert-item"><div class="alert-dot dot-green"></div><div><strong>Lanzamiento web</strong> — <span id="home-days-launch">29</span> días para el 1 abril. 4 tareas pendientes.</div></div>
+    </div>
+  </div>
+  <div class="home-card">
+    <div class="home-card-head" style="background:#8b6014;color:white;">🥚 Huevos esta semana</div>
+    <div class="home-card-body">
+      <div class="quick-stats">
+        <div class="qstat c-col"><div class="qval" id="hw-col">0</div><div class="qlbl">Recogidos</div></div>
+        <div class="qstat c-eat"><div class="qval" id="hw-eat">0</div><div class="qlbl">Consumidos</div></div>
+        <div class="qstat c-sold"><div class="qval" id="hw-sell">0</div><div class="qlbl">Vendidos</div></div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:#888;margin-top:8px;">Stock: <strong id="hw-stock">0</strong> huevos</div>
+      <div class="btn-row" style="justify-content:center;margin-top:10px;">
+        <button class="btn-sm btn-orange" onclick="goTo('huevos')">Registrar hoy</button>
+        <button class="btn-sm btn-grey" onclick="goTo('lapins')">Ver conejas</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-card">
+    <div class="home-card-head" style="background:#5d3a8a;color:white;">🐰 Conejas activas</div>
+    <div class="home-card-body">
+      <div id="home-lapins-summary" style="font-size:13px;margin-bottom:10px;">3 partos en seguimiento</div>
+      <div>
+        <span class="tag-pill tag-red">Blanca · destete urgente</span>
+        <span class="tag-pill tag-orange">Gris · día 12</span>
+        <span class="tag-pill tag-green">Negra · día 5</span>
+      </div>
+      <button class="btn-sm btn-primary" style="margin-top:10px;" onclick="goTo('lapins')">Ver detalle →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CONEJAS ====== -->
+<div class="section" id="sec-lapins">
+  <div class="section-header">
+    <h2 class="section-title">Conejas <em>&amp; Partos</em></h2>
+    <p class="section-sub">Seguimiento reproductivo · Alertas automáticas por camada</p>
+  </div>
+  <div class="lap-stats">
+    <div class="lap-stat"><div class="lval">3</div><div class="llbl">Partos activos</div></div>
+    <div class="lap-stat"><div class="lval">17</div><div class="llbl">Crías vivas</div></div>
+    <div class="lap-stat" style="background:#fde8e8;"><div class="lval" style="color:#c0392b;">1</div><div class="llbl">Destete urgente</div></div>
+  </div>
+  <button class="btn-sm btn-primary" onclick="openNvModal('modal-parto')" style="margin-bottom:14px;">+ Registrar parto</button>
+  <div class="lapin-card" style="border-left:4px solid #c0392b;">
+    <div class="lapin-name">🐰 Blanca <span class="tag-pill tag-red">Destete urgente</span></div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Parto: 30 enero 2026 · 6 crías vivas · Padre: Macho gris</div>
+    <div class="timeline-wrap">
+      <div class="tstep done"><div class="ticon">🐣</div><div>Parto</div><div class="tdate">30 ene</div></div>
+      <div class="tstep done"><div class="ticon">👁️</div><div>Ojos</div><div class="tdate">día 10</div></div>
+      <div class="tstep done"><div class="ticon">🥬</div><div>Sólido</div><div class="tdate">día 18</div></div>
+      <div class="tstep overdue"><div class="ticon">✂️</div><div><strong>Destete</strong></div><div class="tdate">¡HOY!</div></div>
+      <div class="tstep"><div class="ticon">💕</div><div>Cubrición</div><div class="tdate">~15 mar</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sm btn-red" onclick="alert('Destete registrado. Cubrición siguiente: ~15 marzo.')">✅ Marcar destete</button>
+      <button class="btn-sm btn-grey">Notas</button>
+    </div>
+  </div>
+  <div class="lapin-card" style="border-left:4px solid #f39c12;">
+    <div class="lapin-name">🐰 Gris <span class="tag-pill tag-orange">Día 12</span></div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Parto: 19 febrero 2026 · 5 crías vivas · Padre: Macho blanco</div>
+    <div class="timeline-wrap">
+      <div class="tstep done"><div class="ticon">🐣</div><div>Parto</div><div class="tdate">19 feb</div></div>
+      <div class="tstep done"><div class="ticon">👁️</div><div>Ojos</div><div class="tdate">1 mar</div></div>
+      <div class="tstep urgent"><div class="ticon">🥬</div><div>Sólido</div><div class="tdate">~9 mar</div></div>
+      <div class="tstep"><div class="ticon">✂️</div><div>Destete</div><div class="tdate">~21 mar</div></div>
+      <div class="tstep"><div class="ticon">💕</div><div>Cubrición</div><div class="tdate">~5 abr</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sm btn-orange">Registrar peso</button>
+      <button class="btn-sm btn-grey">Notas</button>
+    </div>
+  </div>
+  <div class="lapin-card" style="border-left:4px solid #81c784;">
+    <div class="lapin-name">🐰 Negra <span class="tag-pill tag-green">Día 5</span></div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Parto: 26 febrero 2026 · 6 crías vivas · Padre: Macho gris</div>
+    <div class="timeline-wrap">
+      <div class="tstep done"><div class="ticon">🐣</div><div>Parto</div><div class="tdate">26 feb</div></div>
+      <div class="tstep urgent"><div class="ticon">👁️</div><div>Ojos</div><div class="tdate">~8 mar</div></div>
+      <div class="tstep"><div class="ticon">🥬</div><div>Sólido</div><div class="tdate">~16 mar</div></div>
+      <div class="tstep"><div class="ticon">✂️</div><div>Destete</div><div class="tdate">~28 mar</div></div>
+      <div class="tstep"><div class="ticon">💕</div><div>Cubrición</div><div class="tdate">~12 abr</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sm btn-green">Todo bien ✓</button>
+      <button class="btn-sm btn-grey">Notas</button>
+    </div>
+  </div>
+  <div class="home-card" style="margin-top:14px;">
+    <div class="home-card-head">📋 Referencia crianza</div>
+    <div class="home-card-body">
+      <div class="ref-grid">
+        <div><strong>Gestación:</strong> 31 días</div>
+        <div><strong>Ojos abiertos:</strong> día 10</div>
+        <div><strong>Alimento sólido:</strong> día 18</div>
+        <div><strong>Destete:</strong> día 28-35</div>
+        <div><strong>Post-destete cubrición:</strong> 14 días</div>
+        <div><strong>Partos/año máx:</strong> 6-8</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ALIMENTACIÓN ====== -->
+<div class="section" id="sec-feed">
+  <div class="section-header">
+    <h2 class="section-title">Alimentación <em>&amp; Stock</em></h2>
+    <p class="section-sub">Niveles de pienso · Alertas de reposición · Lista de compra automática</p>
+  </div>
+  <button class="btn-sm btn-orange" onclick="openNvModal('modal-compra')" style="margin-bottom:14px;">+ Registrar compra</button>
+  <div class="feed-grid">
+    <div class="feed-item" style="border-left:4px solid #c0392b;">
+      <div class="feed-animal">🐓 Gallinas</div>
+      <div class="feed-name">Pienso ponedoras</div>
+      <div class="feed-bar-wrap"><div class="feed-bar critical" style="width:12%"></div></div>
+      <div class="feed-qty">⚠️ ~1 kg · 3 días</div>
+    </div>
+    <div class="feed-item" style="border-left:4px solid #f39c12;">
+      <div class="feed-animal">🐰 Conejas</div>
+      <div class="feed-name">Granulado + heno</div>
+      <div class="feed-bar-wrap"><div class="feed-bar low" style="width:35%"></div></div>
+      <div class="feed-qty">~3.5 kg · 10 días</div>
+    </div>
+    <div class="feed-item" style="border-left:4px solid #27ae60;">
+      <div class="feed-animal">🦆 Canards</div>
+      <div class="feed-name">Mezcla grano</div>
+      <div class="feed-bar-wrap"><div class="feed-bar ok" style="width:72%"></div></div>
+      <div class="feed-qty">~7 kg · 20 días</div>
+    </div>
+    <div class="feed-item" style="border-left:4px solid #27ae60;">
+      <div class="feed-animal">🐑 Brebis</div>
+      <div class="feed-name">Heno + complemento</div>
+      <div class="feed-bar-wrap"><div class="feed-bar ok" style="width:60%"></div></div>
+      <div class="feed-qty">~15 kg · 18 días</div>
+    </div>
+  </div>
+  <div class="shopping-box">
+    <h4>🛒 Lista de compra sugerida</h4>
+    <div class="shop-item"><span>🐓 Pienso ponedoras</span><span class="shop-badge">URGENTE · 10 kg</span></div>
+    <div class="shop-item"><span>🐰 Granulado conejas</span><span class="shop-badge">esta semana · 5 kg</span></div>
+    <div class="shop-item"><span>🐰 Heno suplementario</span><span class="shop-badge">esta semana · 2 fardos</span></div>
+    <div style="margin-top:10px;font-size:12px;color:#888;">Point Vert Neuvic · L-V 8h-12h / 14h-18h</div>
+    <div class="btn-row">
+      <button class="btn-sm btn-orange" onclick="alert('Lista copiada al portapapeles')">📋 Copiar lista</button>
+    </div>
+  </div>
+  <div class="home-card" style="margin-top:12px;">
+    <div class="home-card-head">📊 Consumo diario estimado</div>
+    <div class="home-card-body" style="font-size:13px;">
+      <div class="ref-grid">
+        <div>🐓 8 gallinas: <strong>~800g/día</strong></div>
+        <div>🦆 3 canards: <strong>~300g/día</strong></div>
+        <div>🐰 3 conejas+crías: <strong>~600g/día</strong></div>
+        <div>🐑 2 brebis: <strong>~800g/día</strong></div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;"><strong>Total: ~2,5 kg/día · ~17 kg/semana</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== HUEVOS ====== -->
+<div class="section" id="sec-huevos">
+  <div class="section-header">
+    <h2 class="section-title">Gestión <em>de Huevos</em></h2>
+    <p class="section-sub">Registro diario · Consumo vs venta · Historial e ingresos</p>
+  </div>
+  <div class="eggs-stats">
+    <div class="egg-stat c-col"><div class="eval" id="egg-col">47</div><div class="elbl">Esta semana</div></div>
+    <div class="egg-stat c-eat"><div class="eval" id="egg-eat">12</div><div class="elbl">Consumidos</div></div>
+    <div class="egg-stat c-sell"><div class="eval" id="egg-sell">24</div><div class="elbl">Vendidos</div></div>
+  </div>
+  <div class="home-card">
+    <div class="home-card-head" style="background:#8b6014;color:white;">Stock actual</div>
+    <div class="home-card-body">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:44px;font-weight:800;color:#8b6014;" id="egg-stock">11</div>
+        <div style="font-size:13px;color:#888;">huevos en stock</div>
+      </div>
+      <div class="suggest-box">💡 Con 11 huevos y ~7/día de producción, puedes vender una docena el jueves. Precio sugerido: <strong>3,50€/docena</strong></div>
+      <div class="btn-row">
+        <button class="btn-sm btn-orange" onclick="openNvModal('modal-huevos')">+ Registrar hoy</button>
+        <button class="btn-sm btn-green" onclick="openNvModal('modal-venta-huevos')">💰 Registrar venta</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-card" style="margin-top:12px;">
+    <div class="home-card-head">📅 Historial últimos 7 días</div>
+    <div class="egg-scroll">
+      <div class="egg-history-row hdr"><div>Fecha</div><div>Recogidos</div><div>Consumo</div><div>Venta</div></div>
+      <div class="egg-history-row"><div>Dom 1/3</div><div>8</div><div>2</div><div>—</div></div>
+      <div class="egg-history-row"><div>Sáb 28/2</div><div>7</div><div>0</div><div class="sold-val">12 / 4,20€</div></div>
+      <div class="egg-history-row"><div>Vie 27/2</div><div>8</div><div>2</div><div>—</div></div>
+      <div class="egg-history-row"><div>Jue 26/2</div><div>6</div><div>4</div><div>—</div></div>
+      <div class="egg-history-row"><div>Mié 25/2</div><div>9</div><div>2</div><div class="sold-val">12 / 4,20€</div></div>
+      <div class="egg-history-row"><div>Mar 24/2</div><div>9</div><div>2</div><div>—</div></div>
+    </div>
+    <div style="padding:10px 14px;font-size:12px;color:#888;border-top:1px solid #eee;">
+      Ingresos semana: <strong>8,40€</strong> · Mes: <strong>~32€</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ====== COSECHA ====== -->
+<div class="section" id="sec-cosecha">
+  <div class="section-header">
+    <h2 class="section-title">Cosecha <em>Lombricompost</em></h2>
+    <p class="section-sub">Madurez por bac · Estimación de kilos · Historial de producción</p>
+  </div>
+  <div class="yield-box">
+    <div style="font-size:12px;color:#888;margin-bottom:4px;">Disponible para cosechar</div>
+    <div class="yield-total">~18 kg lombricompost</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">2 bacs listos · Valor: <strong>~54€</strong> (3€/kg) o <strong>~90€</strong> en retail</div>
+  </div>
+  <button class="btn-sm btn-green" onclick="openNvModal('modal-cosecha')" style="margin-bottom:14px;">+ Registrar cosecha</button>
+  <div class="harvest-grid">
+    <div class="bac-card">
+      <div class="bac-title">🪱 Bac #1</div>
+      <div class="readiness-ring ring-ready">87%</div>
+      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ LISTO</div>
+      <div class="bac-detail">Última alimentación: <strong>hace 21 días</strong></div>
+      <div class="bac-detail">Estimado: <strong>~10 kg</strong></div>
+      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Cosechar</button>
+    </div>
+    <div class="bac-card">
+      <div class="bac-title">🪱 Bac #2</div>
+      <div class="readiness-ring ring-ready">92%</div>
+      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ LISTO</div>
+      <div class="bac-detail">Última alimentación: <strong>hace 25 días</strong></div>
+      <div class="bac-detail">Estimado: <strong>~8 kg</strong></div>
+      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Cosechar</button>
+    </div>
+    <div class="bac-card">
+      <div class="bac-title">🪱 Bac #3</div>
+      <div class="readiness-ring ring-almost">54%</div>
+      <div style="font-size:13px;font-weight:700;color:#f39c12;">En progreso</div>
+      <div class="bac-detail">Última alimentación: <strong>hace 8 días</strong></div>
+      <div class="bac-detail">Próxima cosecha: <strong>~15 mar</strong></div>
+      <button class="btn-sm btn-grey" style="margin-top:8px;width:100%;">Verificar</button>
+    </div>
+    <div class="bac-card">
+      <div class="bac-title">🪱 IBC</div>
+      <div class="readiness-ring ring-not">20%</div>
+      <div style="font-size:13px;font-weight:700;color:#ccc;">No listo</div>
+      <div class="bac-detail">Última alimentación: <strong>hace 3 días</strong></div>
+      <div class="bac-detail">Próxima cosecha: <strong>~25 abr</strong></div>
+      <button class="btn-sm btn-grey" style="margin-top:8px;width:100%;">Alimentar</button>
+    </div>
+  </div>
+  <div class="home-card">
+    <div class="home-card-head">📦 Historial cosechas 2026</div>
+    <div class="home-card-body" style="font-size:13px;">
+      <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;font-weight:700;font-size:11px;color:#888;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #eee;">
+        <div>Fecha</div><div>Bac</div><div>Kg</div><div>Destino</div>
+      </div>
+      <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #f5f5f5;">
+        <div>5 feb</div><div>#1</div><div><strong>9 kg</strong></div><div>Stock venta</div>
+      </div>
+      <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #f5f5f5;">
+        <div>18 ene</div><div>#2</div><div><strong>7 kg</strong></div><div>Huerto propio</div>
+      </div>
+      <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;padding:7px 0;">
+        <div>3 ene</div><div>#1</div><div><strong>11 kg</strong></div><div>Venta mercado</div>
+      </div>
+      <div style="padding-top:10px;border-top:1px solid #eee;margin-top:4px;">Total 2026: <strong>27 kg</strong> · Objetivo: <strong>50 kg/mes</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== FECHAS ====== -->
+<div class="section" id="sec-fechas">
+  <div class="section-header">
+    <h2 class="section-title">Fechas <em>Clave</em></h2>
+    <p class="section-sub">Cuenta atrás lanzamiento · Hitos granja · Checklist abril</p>
+  </div>
+  <div class="countdown-hero">
+    <div style="font-size:13px;opacity:0.8;margin-bottom:4px;">🚀 Lanzamiento NosVers.fr</div>
+    <div class="countdown-days" id="fechas-countdown">29</div>
+    <div class="countdown-label">días para el lanzamiento</div>
+    <div class="countdown-date">Objetivo: 1 abril 2026</div>
+  </div>
+  <div class="home-card">
+    <div class="home-card-head">🚀 Checklist lanzamiento</div>
+    <div class="home-card-body">
+      <div class="milestone-list">
+        <div class="milestone-item done"><div class="m-icon done-ic">✓</div><div><div class="m-title">Registro dominio NosVers.fr</div><div class="m-date">Completado · 15 enero</div></div></div>
+        <div class="milestone-item done"><div class="m-icon done-ic">✓</div><div><div class="m-title">Primera producción vermicompost</div><div class="m-date">Completado · 3 enero</div></div></div>
+        <div class="milestone-item"><div class="m-icon warn-ic">!</div><div><div class="m-title">Fotos producto + packaging</div><div class="m-date">Pendiente · antes 10 marzo</div></div><div class="m-days days-warn">8 días</div></div>
+        <div class="milestone-item"><div class="m-icon warn-ic">!</div><div><div class="m-title">Definir 3 SKUs y precios oficiales</div><div class="m-date">Pendiente · antes 15 marzo</div></div><div class="m-days days-warn">13 días</div></div>
+        <div class="milestone-item"><div class="m-icon pend-ic"></div><div><div class="m-title">Página web + pasarela de pago</div><div class="m-date">Pendiente · 25 marzo</div></div><div class="m-days days-ok">23 días</div></div>
+        <div class="milestone-item"><div class="m-icon pend-ic"></div><div><div class="m-title">Stock inicial: 20 kg disponibles</div><div class="m-date">Pendiente · 28 marzo</div></div><div class="m-days days-ok">26 días</div></div>
+        <div class="milestone-item"><div class="m-icon pend-ic"></div><div><div class="m-title">Primera publicación RRSS</div><div class="m-date">Pendiente · 1 abril</div></div><div class="m-days days-ok">29 días</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="home-card" style="margin-top:12px;">
+    <div class="home-card-head">🌱 Próximos eventos granja</div>
+    <div class="home-card-body">
+      <div class="milestone-list">
+        <div class="milestone-item" style="border-left:4px solid #c0392b;"><div style="font-size:20px;">✂️</div><div><div class="m-title">Destete Coneja Blanca</div><div class="m-date">HOY · 2 marzo</div></div><div class="m-days days-late">URGENTE</div></div>
+        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🪱</div><div><div class="m-title">Cosecha Bac #1 y #2</div><div class="m-date">Esta semana · ~5 marzo</div></div><div class="m-days days-warn">3 días</div></div>
+        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🛒</div><div><div class="m-title">Compra pienso gallinas</div><div class="m-date">Urgente · antes 5 marzo</div></div><div class="m-days days-warn">3 días</div></div>
+        <div class="milestone-item" style="border-left:4px solid #81c784;"><div style="font-size:20px;">🥬</div><div><div class="m-title">Crías Gris — inicio alimento sólido</div><div class="m-date">9 marzo</div></div><div class="m-days days-ok">7 días</div></div>
+        <div class="milestone-item" style="border-left:4px solid #81c784;"><div style="font-size:20px;">✂️</div><div><div class="m-title">Destete Coneja Gris</div><div class="m-date">~21 marzo</div></div><div class="m-days days-ok">19 días</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODALES ====== -->
+<div class="modal-overlay" id="modal-parto">
+  <div class="modal-box">
+    <div class="modal-hdr">🐣 Registrar parto <button class="close-x" onclick="closeNvModal('modal-parto')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grp"><label>Coneja</label><select><option>Blanca</option><option>Gris</option><option>Negra</option><option>Nueva coneja...</option></select></div>
+      <div class="form-row">
+        <div class="form-grp"><label>Fecha de parto</label><input type="date"></div>
+        <div class="form-grp"><label>Crías vivas</label><input type="number" placeholder="6" min="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp"><label>Crías muertas</label><input type="number" placeholder="0" min="0"></div>
+        <div class="form-grp"><label>Padre</label><input type="text" placeholder="Macho gris..."></div>
+      </div>
+      <div class="form-grp"><label>Notas</label><textarea placeholder="Observaciones del parto, estado de la madre..."></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-parto')">Cancelar</button>
+      <button class="btn-sm btn-primary" onclick="alert('Parto registrado. Alertas creadas para días 10, 18, 28.');closeNvModal('modal-parto')">Guardar y crear alertas</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-huevos">
+  <div class="modal-box">
+    <div class="modal-hdr">🥚 Registrar huevos <button class="close-x" onclick="closeNvModal('modal-huevos')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-grp"><label>Recogidos</label><input type="number" placeholder="0" min="0" id="inp-egg-col"></div>
+        <div class="form-grp"><label>Consumo casa</label><input type="number" placeholder="0" min="0" id="inp-egg-eat"></div>
+        <div class="form-grp"><label>Regalados</label><input type="number" placeholder="0" min="0"></div>
+      </div>
+      <div class="form-grp"><label>Nota rápida</label><input type="text" placeholder="Todo bien, gallina clueca..."></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-huevos')">Cancelar</button>
+      <button class="btn-sm btn-orange" onclick="saveEggEntry()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-venta-huevos">
+  <div class="modal-box">
+    <div class="modal-hdr">💰 Registrar venta huevos <button class="close-x" onclick="closeNvModal('modal-venta-huevos')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-grp"><label>Huevos vendidos</label><input type="number" placeholder="12" min="0" id="inp-egg-sell"></div>
+        <div class="form-grp"><label>Precio total (€)</label><input type="number" placeholder="3.50" step="0.10" id="inp-egg-price"></div>
+      </div>
+      <div class="form-grp"><label>Comprador (opcional)</label><input type="text" placeholder="Mercado, vecino..."></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-venta-huevos')">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="alert('Venta registrada.');closeNvModal('modal-venta-huevos')">Registrar</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-cosecha">
+  <div class="modal-box">
+    <div class="modal-hdr">🪱 Registrar cosecha <button class="close-x" onclick="closeNvModal('modal-cosecha')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-grp"><label>Bac cosechado</label><select><option>Bac #1</option><option>Bac #2</option><option>Bac #3</option><option>IBC</option></select></div>
+        <div class="form-grp"><label>Kg cosechados</label><input type="number" placeholder="10" min="0" step="0.5"></div>
+      </div>
+      <div class="form-grp"><label>Destino</label><select><option>Stock venta</option><option>Huerto propio</option><option>Venta inmediata</option><option>Otro</option></select></div>
+      <div class="form-grp"><label>Estado (color, textura...)</label><input type="text" placeholder="Negro granulado, sin olor..."></div>
+      <div class="form-grp"><label>Notas</label><textarea placeholder="Lombrices visibles, humedad, incidencias..."></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-cosecha')">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="alert('Cosecha registrada. Stock actualizado.');closeNvModal('modal-cosecha')">Registrar</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-compra">
+  <div class="modal-box">
+    <div class="modal-hdr">🛒 Registrar compra alimentación <button class="close-x" onclick="closeNvModal('modal-compra')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grp"><label>Producto</label><select><option>Pienso gallinas</option><option>Granulado conejas</option><option>Heno</option><option>Mezcla canards</option><option>Complemento brebis</option><option>Otro</option></select></div>
+      <div class="form-row">
+        <div class="form-grp"><label>Cantidad (kg)</label><input type="number" placeholder="10" min="0"></div>
+        <div class="form-grp"><label>Precio total (€)</label><input type="number" placeholder="18.50" step="0.10"></div>
+      </div>
+      <div class="form-grp"><label>Tienda</label><input type="text" placeholder="Point Vert, Gamm Vert..."></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-compra')">Cancelar</button>
+      <button class="btn-sm btn-orange" onclick="alert('Compra registrada. Stock actualizado.');closeNvModal('modal-compra')">Guardar</button>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <!-- ===================== MODAL NOTE ===================== -->
@@ -2153,8 +2695,8 @@ async function doLogin() {
       setTimeout(() => {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
-        document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
+        const sd = document.getElementById('sec-home'); if(sd) sd.classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.includes('Inicio')) t.classList.add('active'); });
         // Reload etat NOW that token is set
         loadEtat();
       }, 100);
@@ -2222,8 +2764,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      const sd = document.getElementById('sec-director'); if(sd) sd.classList.add('active');
-      const tabs = document.querySelectorAll('.nav-tab'); tabs.forEach(t => { if(t.textContent.includes('Direcci')) t.classList.add('active'); });
+      const sd = document.getElementById('sec-home'); if(sd) sd.classList.add('active');
+      const tabs = document.querySelectorAll('.nav-tab'); tabs.forEach(t => { if(t.textContent.includes('Inicio')) t.classList.add('active'); });
       // Token already in sessionStorage - load etat from MySQL
       loadEtat();
     }, 100);
@@ -3511,6 +4053,44 @@ function stopVoice() {
   const statuses = document.querySelectorAll('.voice-status');
   statuses.forEach(s => s.textContent = '');
   currentVoiceInput = null;
+}
+
+// ==================== MÓDULOS OPERATIVOS ====================
+
+// Modal helpers
+function openNvModal(id) { const m = document.getElementById(id); if(m) m.classList.add('open'); }
+function closeNvModal(id) { const m = document.getElementById(id); if(m) m.classList.remove('open'); }
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// Countdown to April 1 2026
+function updateCountdowns() {
+  const target = new Date('2026-04-01T00:00:00');
+  const now = new Date();
+  const days = Math.max(0, Math.ceil((target - now) / 86400000));
+  const el1 = document.getElementById('fechas-countdown');
+  const el2 = document.getElementById('home-days-launch');
+  if (el1) el1.textContent = days;
+  if (el2) el2.textContent = days;
+}
+updateCountdowns();
+
+// Simple egg entry save (updates DOM only, extend with API later)
+function saveEggEntry() {
+  const col = parseInt(document.getElementById('inp-egg-col')?.value || 0);
+  const eat = parseInt(document.getElementById('inp-egg-eat')?.value || 0);
+  const curStock = parseInt(document.getElementById('egg-stock')?.textContent || 0);
+  const newStock = curStock + col - eat;
+  const totalCol = parseInt(document.getElementById('egg-col')?.textContent || 0) + col;
+  const totalEat = parseInt(document.getElementById('egg-eat')?.textContent || 0) + eat;
+  if (document.getElementById('egg-stock')) document.getElementById('egg-stock').textContent = newStock;
+  if (document.getElementById('egg-col')) document.getElementById('egg-col').textContent = totalCol;
+  if (document.getElementById('egg-eat')) document.getElementById('egg-eat').textContent = totalEat;
+  if (document.getElementById('hw-col')) document.getElementById('hw-col').textContent = totalCol;
+  if (document.getElementById('hw-eat')) document.getElementById('hw-eat').textContent = totalEat;
+  if (document.getElementById('hw-stock')) document.getElementById('hw-stock').textContent = newStock;
+  closeNvModal('modal-huevos');
 }
 
 </script>
