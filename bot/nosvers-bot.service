@@ -1,0 +1,15 @@
+[Unit]
+Description=NosVers HQ Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/nosvers/bot
+ExecStart=/home/nosvers/venv/bin/python3 /home/nosvers/bot/bot.py
+Restart=always
+RestartSec=10
+EnvironmentFile=/home/nosvers/.env
+
+[Install]
+WantedBy=multi-user.target

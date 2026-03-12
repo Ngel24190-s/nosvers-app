@@ -1,0 +1,22 @@
+# Credenciales locales
+.env
+.env.local
+config.php
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
