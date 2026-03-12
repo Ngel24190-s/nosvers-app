@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""
+NosVers · Orchestrator
+Coordinador central — verifica estado de agentes y notifica a Angel
+Cron: 0 * * * * (cada hora)
+"""
+
+import os
+import json
+import subprocess
+import requests
+from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv('/home/nosvers/.env')
+
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
+APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
+APP_TOKEN = os.getenv('APP_TOKEN', '')
+AGENTS_DIR = '/home/nosvers/agents'
+LOG_FILE = '/home/nosvers/agents/orchestrator.log'
+
+
+def log(msg):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    line = f"[{timestamp}] {msg}"
+    print(line)
+    with open(LOG_FILE, 'a') as f:
+        f.write(line + '\n')
+
+
+def notify(msg):
+    if not TELEGRAM_TOKEN:
+        log("WARN: No TELEGRAM_TOKEN, skip notify")
+        return
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
+            timeout=10
+        )
+    except Exception as e:
+        log(f"ERROR notify: {e}")
+
+
+def check_services():
+    """Verifica servicios del sistema."""
+    results = []
+
+    # Bot Telegram
+    ret = subprocess.run(['systemctl', 'is-active', 'nosvers-bot'], capture_output=True, text=True)
+    bot_status = ret.stdout.strip()
+    results.append(('Bot Telegram', bot_status == 'active', bot_status))
+
+    # Vault
+    vault_path = '/home/nosvers/public_html/knowledge_base'
+    vault_ok = os.path.isdir(vault_path)
+    results.append(('Vault', vault_ok, 'OK' if vault_ok else 'no encontrada'))
+
+    # App granja
+    try:
+        r = requests.get(f"{APP_URL}?action=vault_list",
+                         headers={'X-App-Token': APP_TOKEN}, timeout=10)
+        results.append(('App granja', r.status_code == 200, f"HTTP {r.status_code}"))
+    except Exception as e:
+        results.append(('App granja', False, str(e)[:50]))
+
+    return results
+
+
+def check_agent_memory():
+    """Lee el estado de los agentes desde agent_memory.json."""
+    memory_path = '/home/nosvers/public_html/agent_memory.json'
+    if not os.path.exists(memory_path):
+        return {}
+    with open(memory_path) as f:
+        return json.load(f)
+
+
+def run():
+    log("=== Orchestrator check ===")
+
+    services = check_services()
+    memory = check_agent_memory()
+
+    all_ok = all(ok for _, ok, _ in services)
+
+    # Solo notificar si hay problemas o cada 6 horas (0, 6, 12, 18h)
+    hour = datetime.now().hour
+    should_notify = not all_ok or hour % 6 == 0
+
+    if should_notify:
+        msg = f"🤖 *Orchestrator · {datetime.now().strftime('%d/%m %H:%M')}*\n\n"
+        for name, ok, detail in services:
+            icon = "✅" if ok else "❌"
+            msg += f"{icon} {name}: {detail}\n"
+
+        if memory:
+            msg += "\n*Agentes:*\n"
+            for agent, data in memory.items():
+                last = data.get('last_vault_write', 'nunca')
+                msg += f"· {agent}: {last}\n"
+
+        notify(msg)
+
+    for name, ok, detail in services:
+        status = "OK" if ok else "FAIL"
+        log(f"  {name}: {status} ({detail})")
+
+    log("=== Check completado ===")
+
+
+if __name__ == '__main__':
+    run()
