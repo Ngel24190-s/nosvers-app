@@ -57,10 +57,10 @@ Claude Code — Director Ejecutivo
 
 ```bash
 # ── VPS Hostinger ─────────────────────────────────
-VPS_HOST=""           # ⏳ PENDIENTE — Angel lo proporciona
-VPS_USER=""           # ⏳ PENDIENTE
+VPS_HOST="srv1313138.hstgr.cloud"  # IPv4: 72.61.160.108
+VPS_USER="root"
 VPS_PORT=22
-VPS_PASS=""           # ⏳ PENDIENTE
+VPS_PASS=""           # ⏳ PENDIENTE — configurar en .env.local
 
 # ── WordPress API ─────────────────────────────────
 WP_API="https://nosvers.com/wp-json/wp/v2/"
