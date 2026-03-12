@@ -324,6 +324,24 @@ Lo que necesita aprobación → opciones concretas, nunca preguntas abiertas.
 
 ---
 
+
+## 🎨 TAREA ADICIONAL — Studio V2 → WordPress
+
+Existe un `nosvers-studio-v2.html` con 8 páginas completas del sitio nosvers.com.
+Es un editor visual standalone con contenido real de la ferme.
+
+**Misión:**
+1. Leer el Studio v2 (disponible en el proyecto Claude.ai o pedir a Angel que lo comparta)
+2. Crear `studio-to-wordpress.py` — convierte páginas Studio exportadas en templates PHP para Bricks Builder
+3. Subir script al repo GitHub
+4. Documentar en `knowledge_base/operaciones/studio-workflow.md`
+
+**Stack WordPress:**
+- Tema: Bricks Builder (custom)
+- Cache: LiteSpeed → purgar después de cambios
+- Templates vía: `POST /wp-json/wp/v2/templates/nosvers-theme//[nombre]` (doble barra)
+- CSS custom: Code Snippets plugin vía wp_footer priority 1-5
+
 ## 📊 ESTADO DEL PROYECTO
 
 ```
