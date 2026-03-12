@@ -184,6 +184,137 @@ switch ($action) {
         echo $resp;
         break;
 
+    // ============================================================
+    //  VAULT WRITE — Nuevo endpoint para api.php
+    //  Añadir dentro del switch($action) en api.php
+    //  Escribe/actualiza archivos Markdown en la knowledge_base
+    // ============================================================
+
+    case 'vault_write':
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Parámetros requeridos
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['category'] ?? ''));
+        $filename  = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['filename'] ?? ''));
+        $content   = $data['content'] ?? '';
+        $mode      = $data['mode'] ?? 'append'; // 'append' o 'overwrite'
+
+        if (!$category || !$filename || !$content) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan category, filename o content']);
+            break;
+        }
+
+        $kb_path  = __DIR__ . '/knowledge_base';
+        $cat_path = $kb_path . '/' . $category;
+        $filepath = $cat_path . '/' . $filename . '.md';
+
+        // Crear carpeta de categoría si no existe
+        if (!is_dir($cat_path)) {
+            mkdir($cat_path, 0755, true);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $entry = "
+
+---
+*Actualizado: {$timestamp}*
+
+" . $content;
+
+        if ($mode === 'overwrite' || !file_exists($filepath)) {
+            // Crear o sobreescribir con header
+            $header = "# " . ucfirst(str_replace('-', ' ', $filename)) . "
+";
+            $header .= "*Categoría: {$category} · Creado: {$timestamp}*
+";
+            file_put_contents($filepath, $header . "
+" . $content);
+        } else {
+            // Append — añadir al final con separador
+            file_put_contents($filepath, $entry, FILE_APPEND);
+        }
+
+        // Actualizar agent_memory.json
+        $memory_path = __DIR__ . '/agent_memory.json';
+        $memory = file_exists($memory_path) 
+            ? json_decode(file_get_contents($memory_path), true) 
+            : [];
+        
+        $memory[$category]['last_vault_write'] = $timestamp;
+        $memory[$category]['last_file']        = $filename . '.md';
+        
+        file_put_contents($memory_path, json_encode($memory, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        echo json_encode([
+            'ok'       => true,
+            'file'     => $category . '/' . $filename . '.md',
+            'mode'     => $mode,
+            'timestamp'=> $timestamp
+        ]);
+        break;
+
+    // ============================================================
+    //  VAULT READ — Leer un archivo Markdown de la knowledge_base
+    // ============================================================
+
+    case 'vault_read':
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($_GET['category'] ?? ''));
+        $filename  = preg_replace('/[^a-z0-9_-]/', '', strtolower($_GET['filename'] ?? ''));
+
+        if (!$category || !$filename) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan category y filename']);
+            break;
+        }
+
+        $filepath = __DIR__ . '/knowledge_base/' . $category . '/' . $filename . '.md';
+        
+        if (!file_exists($filepath)) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Archivo no encontrado', 'path' => $category . '/' . $filename . '.md']);
+            break;
+        }
+
+        echo json_encode([
+            'ok'      => true,
+            'category'=> $category,
+            'filename'=> $filename . '.md',
+            'content' => file_get_contents($filepath),
+            'size'    => filesize($filepath),
+            'modified'=> date('Y-m-d H:i:s', filemtime($filepath))
+        ]);
+        break;
+
+    // ============================================================
+    //  VAULT LIST — Listar todos los archivos de la vault
+    // ============================================================
+
+    case 'vault_list':
+        $kb_path = __DIR__ . '/knowledge_base';
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($_GET['category'] ?? ''));
+        
+        $result = [];
+        $cats = $category ? [$category] : array_diff(scandir($kb_path), ['.', '..']);
+        
+        foreach ($cats as $cat) {
+            $cat_path = $kb_path . '/' . $cat;
+            if (!is_dir($cat_path)) continue;
+            $files = array_diff(scandir($cat_path), ['.', '..']);
+            foreach ($files as $f) {
+                if (!str_ends_with($f, '.md')) continue;
+                $fp = $cat_path . '/' . $f;
+                $result[] = [
+                    'category' => $cat,
+                    'file'     => $f,
+                    'size'     => filesize($fp),
+                    'modified' => date('Y-m-d H:i:s', filemtime($fp))
+                ];
+            }
+        }
+        echo json_encode(['ok' => true, 'files' => $result, 'total' => count($result)]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Accion desconocida: ' . $action]);
