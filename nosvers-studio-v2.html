@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NosVers Studio v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#5A7A2E;--green-dark:#3D5420;--green-light:#B5C98A;
+  --green-pale:#EEF4E4;--tan:#C4893D;--tan-light:#F7EDD9;
+  --bg:#FEFAF4;--surface:#F0EAD9;--text:#1A1A1A;--muted:#7A746E;
+  --white:#FFFFFF;--sz-hero:58px;--sz-h1:44px;--sz-h2:34px;
+  --sz-h3:22px;--sz-body:16px;--radius:8px;--radius-lg:14px;
+  --section-gap:80px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+body{font-family:'DM Sans',sans-serif;background:#D5D1CB;overflow-x:hidden}
+
+/* ── EDITOR BAR ── */
+#ed-bar{position:fixed;top:0;left:0;right:0;height:50px;background:#181818;display:flex;align-items:center;z-index:9000;border-bottom:1px solid #2A2A2A;gap:0}
+#ed-logo{display:flex;align-items:center;gap:9px;padding:0 18px;border-right:1px solid #2A2A2A;height:100%;cursor:default}
+#ed-logo .dot{width:22px;height:22px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+#ed-logo .lbl{font-size:13px;font-weight:700;color:#fff;letter-spacing:.5px}
+#ed-logo .sub{font-size:10px;color:#555;margin-left:2px}
+#ed-tabs{display:flex;align-items:stretch;height:100%;flex:1;overflow-x:auto;scrollbar-width:none}
+#ed-tabs::-webkit-scrollbar{display:none}
+.ed-tab{display:flex;align-items:center;gap:7px;padding:0 15px;font-size:12px;font-weight:500;color:#777;cursor:pointer;white-space:nowrap;border-right:1px solid #242424;transition:all .15s;font-family:'DM Sans',sans-serif;user-select:none}
+.ed-tab:hover{color:#ddd;background:#222}
+.ed-tab.active{color:#fff;background:#262626;border-bottom:2px solid var(--green)}
+#ed-right{display:flex;align-items:center;gap:8px;padding:0 14px;border-left:1px solid #2A2A2A;height:100%}
+.ed-btn{padding:6px 13px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.ed-btn.ghost{background:#252525;color:#bbb;border:1px solid #383838}
+.ed-btn.ghost:hover{background:#333;color:#fff}
+.ed-btn.green{background:var(--green);color:#fff}
+.ed-btn.green:hover{background:var(--green-dark)}
+.mode-grp{display:flex;background:#252525;border-radius:5px;border:1px solid #383838;overflow:hidden}
+.mode-btn{padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#666;font-family:'DM Sans',sans-serif;transition:all .15s}
+.mode-btn.on{background:var(--green);color:#fff}
+#save-ind{font-size:11px;color:#4A4;font-family:monospace;opacity:0;transition:opacity .4s}
+#save-ind.show{opacity:1}
+
+/* ── LAYOUT ── */
+#ed-layout{display:flex;padding-top:50px;min-height:100vh}
+#ed-panel{width:252px;min-width:252px;background:#181818;border-right:1px solid #242424;height:calc(100vh - 50px);position:sticky;top:50px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;transition:width .2s,min-width .2s,opacity .2s}
+#ed-panel.hidden{width:0;min-width:0;opacity:0;overflow:hidden}
+.p-sec{padding:14px 16px;border-bottom:1px solid #242424}
+.p-ttl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:12px;font-family:'DM Sans',sans-serif}
+.color-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.color-cell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.color-sw{width:100%;aspect-ratio:1;border-radius:7px;position:relative;cursor:pointer;border:2px solid #333;transition:transform .15s,border-color .15s}
+.color-sw:hover{transform:scale(1.06);border-color:#555}
+.color-sw input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
+.c-name{font-size:9px;color:#555;text-align:center;font-family:'DM Sans',sans-serif}
+.sl-row{margin-bottom:13px}
+.sl-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.sl-lbl{font-size:11px;color:#AAA;font-family:'DM Sans',sans-serif}
+.sl-val{font-size:10px;color:#555;font-family:monospace}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:#2D2D2D;border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--green);cursor:pointer}
+.hint-box{background:#111;border-radius:7px;padding:10px 12px;font-size:11px;color:#555;line-height:1.6;font-family:'DM Sans',sans-serif;margin-top:4px}
+.hint-box b{color:#888}
+
+/* ── CANVAS ── */
+#ed-canvas-wrap{flex:1;overflow-y:auto;padding:28px;background:#CFCBC4}
+#ed-canvas{max-width:1180px;margin:0 auto;background:var(--bg);border-radius:10px;box-shadow:0 24px 90px rgba(0,0,0,.3);overflow:hidden;min-height:100vh}
+
+/* ── EDIT MODE ── */
+body.edit-mode #ed-canvas [data-e]:hover{outline:2px dashed rgba(90,122,46,.55);outline-offset:2px;cursor:text}
+body.edit-mode #ed-canvas [data-e]:focus{outline:2px solid var(--green);outline-offset:2px;cursor:text;background:rgba(90,122,46,.04)}
+body.edit-mode #ed-canvas [data-img]{cursor:pointer;position:relative}
+body.edit-mode #ed-canvas [data-img]:hover::after{content:'📷  Changer l\'image';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.82);color:#fff;padding:9px 18px;border-radius:6px;font-size:13px;white-space:nowrap;font-family:'DM Sans',sans-serif;pointer-events:none;z-index:10}
+body.edit-mode #ed-canvas [data-img]:hover{filter:brightness(.65)}
+
+/* ── TOAST & HINT ── */
+#ed-hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#181818;color:#bbb;padding:10px 22px;border-radius:30px;font-size:12px;font-family:'DM Sans',sans-serif;display:flex;gap:18px;align-items:center;z-index:8000;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none}
+#ed-hint.show{opacity:1}
+.hk{background:#252525;border:1px solid #404040;border-radius:3px;padding:2px 7px;font-size:10px;font-family:monospace;color:#999}
+#toast{position:fixed;top:62px;right:20px;background:#222;color:#ddd;border:1px solid #383838;border-left:3px solid var(--green);padding:12px 20px;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:300px;line-height:1.5}
+#toast.show{opacity:1}
+
+/* ══════════════════════════════════
+   SITE STYLES
+══════════════════════════════════ */
+.nv-nav{background:var(--bg);border-bottom:1px solid rgba(90,122,46,.12);padding:0 44px;height:68px;display:flex;align-items:center;justify-content:space-between}
+.nv-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--green-dark);display:flex;align-items:center;gap:10px}
+.nv-logo-mark{width:34px;height:34px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nv-nav-links{display:flex;gap:28px;list-style:none}
+.nv-nav-links a{font-size:14px;font-weight:500;color:var(--text);transition:color .2s}
+.nv-nav-links a:hover{color:var(--green)}
+.nav-btns{display:flex;gap:10px;align-items:center}
+.btn-g{background:var(--green);color:#fff;padding:10px 22px;border-radius:var(--radius);font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-g:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-o{background:transparent;color:var(--green);padding:10px 22px;border-radius:var(--radius);font-size:14px;font-weight:600;border:2px solid var(--green);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-o:hover{background:var(--green-pale)}
+
+/* HERO */
+.nv-hero{display:grid;grid-template-columns:1fr 1fr;min-height:580px}
+.hero-content{display:flex;flex-direction:column;justify-content:center;padding:80px 60px;background:var(--bg)}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--green-pale);color:var(--green-dark);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:6px 14px;border-radius:30px;margin-bottom:28px;width:fit-content}
+.hero-title{font-family:'Playfair Display',serif;font-size:var(--sz-hero);line-height:1.1;color:var(--text);margin-bottom:24px;font-weight:700}
+.hero-title em{color:var(--green);font-style:italic}
+.hero-desc{font-size:18px;color:var(--muted);line-height:1.7;margin-bottom:38px;max-width:460px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-trust{margin-top:40px;display:flex;gap:24px;align-items:center}
+.trust-item{display:flex;flex-direction:column;gap:2px}
+.trust-num{font-family:'DM Serif Display',serif;font-size:26px;color:var(--green)}
+.trust-lbl{font-size:11px;color:var(--muted);letter-spacing:.5px}
+.trust-div{width:1px;height:36px;background:var(--surface)}
+.hero-imgs{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;background:var(--green-dark)}
+.hero-img{overflow:hidden;position:relative}
+.hero-img.sp2{grid-column:span 2}
+.hero-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.hero-img:hover img{transform:scale(1.04)}
+
+/* CONFIANCE */
+.nv-conf{background:var(--green-pale);border-top:1px solid rgba(90,122,46,.15);border-bottom:1px solid rgba(90,122,46,.15);padding:18px 60px;display:flex;align-items:center;justify-content:center;gap:44px;flex-wrap:wrap}
+.conf-it{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green-dark);font-weight:500}
+.conf-ic{font-size:20px}
+
+/* SECTIONS */
+.nv-sec{padding:var(--section-gap) 60px}
+.nv-sec-alt{background:var(--surface)}
+.sec-kick{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.sec-title{font-family:'Playfair Display',serif;font-size:var(--sz-h2);line-height:1.2;color:var(--text);margin-bottom:14px}
+.sec-desc{font-size:var(--sz-body);color:var(--muted);line-height:1.75;max-width:580px}
+
+/* PRODUCT CARDS */
+.nv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.nv-grid.feat .p-card:first-child{grid-column:span 2}
+.prod-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:44px}
+.p-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(0,0,0,.06);transition:all .25s;display:flex;flex-direction:column}
+.p-card:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,.1)}
+.p-img{overflow:hidden;position:relative;background:var(--surface);aspect-ratio:4/3}
+.p-img.tall{aspect-ratio:3/4}
+.p-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.p-card:hover .p-img img{transform:scale(1.04)}
+.p-badge{position:absolute;top:14px;left:14px;background:var(--green);color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:20px}
+.p-body{padding:22px;flex:1;display:flex;flex-direction:column}
+.p-cat{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+.p-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:10px;line-height:1.3}
+.p-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;flex:1}
+.p-bullets{list-style:none;margin-bottom:18px}
+.p-bullets li{font-size:13px;color:var(--text);padding:3px 0;display:flex;align-items:center;gap:8px}
+.p-bullets li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px}
+.p-foot{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--surface)}
+.p-price{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
+.p-price span{font-size:14px;color:var(--muted);font-family:'DM Sans',sans-serif}
+.p-btn{background:var(--green);color:#fff;border:none;border-radius:var(--radius);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.p-btn:hover{background:var(--green-dark)}
+
+/* MOSAIC */
+.nv-mosaic{display:grid;grid-template-columns:5fr 4fr 3fr;grid-template-rows:220px 220px;gap:5px;overflow:hidden;border-radius:var(--radius-lg)}
+.mos-it{overflow:hidden;position:relative;border-radius:5px}
+.mos-it:nth-child(1){grid-row:span 2}
+.mos-it img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.mos-it:hover img{transform:scale(1.06)}
+.mos-cap{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;padding:20px 13px 13px;font-size:12px;font-weight:500;opacity:0;transition:opacity .3s}
+.mos-it:hover .mos-cap{opacity:1}
+
+/* CITATION */
+.nv-cit{background:var(--green-dark);padding:64px 100px;text-align:center}
+.cit-txt{font-family:'Playfair Display',serif;font-size:26px;font-style:italic;color:rgba(255,255,255,.94);line-height:1.55;max-width:780px;margin:0 auto 22px}
+.cit-auth{font-size:13px;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase}
+
+/* ATELIER SECTION */
+.nv-atel{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.atel-img{position:relative;min-height:480px}
+.atel-img img{width:100%;height:100%;object-fit:cover}
+.atel-content{background:var(--surface);padding:80px 60px;display:flex;flex-direction:column;justify-content:center}
+.atel-prog{list-style:none;margin:24px 0}
+.atel-prog li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:15px;color:var(--text);align-items:flex-start}
+.prog-n{font-family:'DM Serif Display',serif;font-size:20px;color:var(--green);min-width:26px;line-height:1}
+
+/* ENGAGEMENTS */
+.eng-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+.eng-it{background:var(--white);border-radius:var(--radius-lg);padding:24px;border:1px solid rgba(0,0,0,.06)}
+.eng-ic{font-size:26px;margin-bottom:12px}
+.eng-t{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:8px}
+.eng-d{font-size:14px;color:var(--muted);line-height:1.65}
+
+/* AVIS */
+.avis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+.avis-c{background:var(--white);border-radius:var(--radius-lg);padding:26px;border:1px solid rgba(0,0,0,.06);border-left:4px solid var(--green)}
+.avis-stars{color:#F5A623;font-size:15px;margin-bottom:12px}
+.avis-txt{font-size:15px;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:18px}
+.avis-auth{display:flex;align-items:center;gap:11px}
+.avis-av{width:38px;height:38px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:17px}
+.avis-n{font-weight:700;font-size:13px;color:var(--text)}
+.avis-l{font-size:11px;color:var(--muted)}
+
+/* FAQ */
+.faq-wrap{max-width:720px;margin-top:44px}
+.faq-it{border-bottom:1px solid rgba(0,0,0,.07);padding:18px 0;cursor:pointer}
+.faq-q{font-size:15px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.faq-ic{color:var(--green);font-size:18px;transition:transform .2s;min-width:20px;text-align:center}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.7;margin-top:10px;display:none}
+.faq-it.open .faq-ic{transform:rotate(45deg)}
+.faq-it.open .faq-a{display:block}
+
+/* PRODUCT PAGE */
+.nv-prod-hero{display:grid;grid-template-columns:1fr 1fr;min-height:560px}
+.prod-gallery{background:var(--surface);position:relative;overflow:hidden}
+.prod-gallery img{width:100%;height:100%;object-fit:cover}
+.prod-info{padding:60px 56px;display:flex;flex-direction:column;justify-content:center}
+.prod-cat{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.prod-title{font-family:'Playfair Display',serif;font-size:var(--sz-h1);line-height:1.15;color:var(--text);margin-bottom:7px}
+.prod-sub{font-family:'DM Serif Display',serif;font-size:19px;color:var(--muted);font-style:italic;margin-bottom:26px}
+.prod-desc{font-size:16px;color:var(--muted);line-height:1.78;margin-bottom:30px}
+.prod-benefits{list-style:none;margin-bottom:32px}
+.prod-benefits li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--text);padding:7px 0;line-height:1.5;border-bottom:1px solid rgba(0,0,0,.04)}
+.ben-ic{width:24px;height:24px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;min-width:24px}
+.prod-pricing{background:var(--surface);border-radius:var(--radius-lg);padding:22px;margin-bottom:22px}
+.price-main{font-family:'DM Serif Display',serif;font-size:34px;color:var(--text);margin-bottom:4px}
+.price-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.prod-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.prod-tag{background:var(--green-pale);color:var(--green-dark);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:44px}
+.step-it{text-align:center}
+.step-num{width:50px;height:50px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--green);margin:0 auto 14px}
+.step-t{font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);margin-bottom:8px}
+.step-d{font-size:14px;color:var(--muted);line-height:1.6}
+.compo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:38px}
+.compo-it{background:var(--white);border-radius:var(--radius);padding:18px 22px;border:1px solid rgba(0,0,0,.07);display:flex;gap:14px;align-items:flex-start}
+.compo-ic{font-size:24px;min-width:32px}
+.compo-t{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.compo-d{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ATELIER PAGE */
+.at-hero{background:var(--green-dark);padding:90px 80px;text-align:center;position:relative;overflow:hidden}
+.at-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.2}
+.at-hero-c{position:relative;z-index:1}
+.at-hero-title{font-family:'Playfair Display',serif;font-size:var(--sz-h1);font-weight:700;color:#fff;margin-bottom:18px;line-height:1.2}
+.at-hero-sub{font-family:'DM Serif Display',serif;font-size:20px;color:rgba(255,255,255,.72);margin-bottom:38px;font-style:italic}
+.at-info{display:flex;justify-content:center;gap:40px;margin-bottom:40px;flex-wrap:wrap}
+.at-info-it{display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.6)}
+.at-info-val{font-family:'DM Serif Display',serif;font-size:28px;color:#fff}
+.at-info-lbl{font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.at-prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:44px}
+.at-prog-it{background:var(--white);border-radius:var(--radius-lg);padding:26px;border:1px solid rgba(0,0,0,.06);display:flex;gap:18px}
+.at-prog-n{font-family:'DM Serif Display',serif;font-size:28px;color:var(--green-light);min-width:36px}
+.at-prog-t{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:8px}
+.at-prog-d{font-size:14px;color:var(--muted);line-height:1.6}
+.africa-section{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.africa-img{position:relative;min-height:460px}
+.africa-img img{width:100%;height:100%;object-fit:cover}
+.africa-c{padding:80px 60px;background:var(--surface);display:flex;flex-direction:column;justify-content:center}
+.africa-sig{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;color:var(--green);margin-top:28px}
+.includes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:32px}
+.inc-it{background:var(--white);border-radius:var(--radius);padding:16px 18px;border:1px solid rgba(0,0,0,.07);display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--text)}
+.inc-ic{font-size:20px;min-width:24px}
+
+/* ABOUT */
+.ab-hero{display:grid;grid-template-columns:1fr 1fr;min-height:500px;overflow:hidden}
+.ab-img{position:relative;overflow:hidden}
+.ab-img img{width:100%;height:100%;object-fit:cover}
+.ab-c{padding:80px 60px;background:var(--surface);display:flex;flex-direction:column;justify-content:center}
+.ab-sig{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--green);margin-top:28px}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px}
+.team-c{display:flex;gap:22px;align-items:flex-start}
+.team-img{width:110px;height:110px;border-radius:50%;overflow:hidden;min-width:110px;background:var(--surface)}
+.team-img img{width:100%;height:100%;object-fit:cover}
+.team-n{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:5px}
+.team-role{font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.team-bio{font-size:14px;color:var(--muted);line-height:1.7}
+.val-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+.val-it{background:var(--white);border-radius:var(--radius-lg);padding:26px;border:1px solid rgba(0,0,0,.06)}
+.val-ic{font-size:28px;margin-bottom:12px}
+.val-t{font-family:'DM Serif Display',serif;font-size:19px;color:var(--text);margin-bottom:10px}
+.val-d{font-size:14px;color:var(--muted);line-height:1.65}
+
+/* CONTACT */
+.ct-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:620px}
+.ct-info{padding:80px 60px;background:var(--surface);display:flex;flex-direction:column}
+.ct-form-wrap{padding:80px 60px;background:var(--bg)}
+.ct-det{display:flex;gap:14px;margin-bottom:26px;align-items:flex-start}
+.ct-ic{width:44px;height:44px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;min-width:44px}
+.ct-det-t h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ct-det-t p{font-size:14px;color:var(--muted);line-height:1.5}
+.form-grp{margin-bottom:18px}
+.form-lbl{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px}
+.form-inp{width:100%;padding:11px 15px;border:1.5px solid rgba(0,0,0,.11);border-radius:var(--radius);font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);transition:border-color .2s;outline:none}
+.form-inp:focus{border-color:var(--green)}
+textarea.form-inp{min-height:110px;resize:vertical}
+select.form-inp{appearance:none;cursor:pointer}
+
+/* FERME SNIPPET */
+.nv-ferme{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.ferme-img{position:relative;min-height:420px}
+.ferme-img img{width:100%;height:100%;object-fit:cover}
+.ferme-c{background:var(--green-dark);padding:80px 60px;display:flex;flex-direction:column;justify-content:center;color:#fff}
+.ferme-c .sec-kick{color:var(--green-light)}
+.ferme-c .sec-title{color:#fff}
+.ferme-c .sec-desc{color:rgba(255,255,255,.68);max-width:100%}
+.ferme-btn{margin-top:30px;background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.25);padding:11px 26px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:fit-content;transition:all .2s}
+.ferme-btn:hover{background:rgba(255,255,255,.2)}
+
+/* FOOTER */
+.nv-footer{background:var(--text);color:rgba(255,255,255,.75);padding:60px 60px 30px}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:44px}
+.ft-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ft-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.7;margin-bottom:18px}
+.ft-soc{display:flex;gap:10px}
+.soc-btn{width:34px;height:34px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s}
+.soc-btn:hover{background:var(--green)}
+.ft-col-h{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:14px}
+.ft-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ft-links a{font-size:14px;color:rgba(255,255,255,.5);transition:color .2s}
+.ft-links a:hover{color:#fff}
+.ft-bot{padding-top:28px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center}
+.ft-copy{font-size:12px;color:rgba(255,255,255,.25)}
+.ft-badges{display:flex;gap:8px}
+.ft-badge{font-size:11px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.35);padding:4px 10px;border-radius:20px}
+
+/* ENGRAIS VERT */
+.eg-hero{display:grid;grid-template-columns:1fr 1fr;min-height:560px}
+.eg-content{padding:80px 60px;background:var(--bg);display:flex;flex-direction:column;justify-content:center}
+.eg-img-area{background:var(--surface);position:relative;overflow:hidden}
+.eg-img-area img{width:100%;height:100%;object-fit:cover}
+.seeds-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
+.seed-it{background:var(--white);border-radius:var(--radius);padding:16px 18px;border:1px solid rgba(0,0,0,.07);display:flex;gap:12px;align-items:flex-start}
+.seed-ic{font-size:22px;min-width:26px}
+.seed-t{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.seed-d{font-size:12px;color:var(--muted);line-height:1.5}
+.benefits-big{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+.ben-big{background:var(--white);border-radius:var(--radius-lg);padding:24px;border:1px solid rgba(0,0,0,.06);text-align:center}
+.ben-big-ic{font-size:32px;margin-bottom:10px}
+.ben-big-n{font-family:'DM Serif Display',serif;font-size:26px;color:var(--green);margin-bottom:4px}
+.ben-big-d{font-size:13px;color:var(--muted)}
+
+/* Animation page */
+#ed-canvas .page{animation:pgIn .2s ease}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body class="edit-mode">
+
+<div id="ed-bar">
+  <div id="ed-logo">
+    <div class="dot">🌿</div>
+    <span class="lbl">NosVers</span>
+    <span class="sub">Studio v2</span>
+  </div>
+  <div id="ed-tabs">
+    <div class="ed-tab active" data-page="home" onclick="goPage(this)"><span>🏠</span> Accueil</div>
+    <div class="ed-tab" data-page="extrait" onclick="goPage(this)"><span>💧</span> Extrait Vivant</div>
+    <div class="ed-tab" data-page="engrais" onclick="goPage(this)"><span>🌾</span> Engrais Vert</div>
+    <div class="ed-tab" data-page="atelier" onclick="goPage(this)"><span>🤲</span> Atelier</div>
+    <div class="ed-tab" data-page="about" onclick="goPage(this)"><span>🌿</span> La Ferme</div>
+    <div class="ed-tab" data-page="contact" onclick="goPage(this)"><span>✉️</span> Contact</div>
+  </div>
+  <div id="ed-right">
+    <span id="save-ind">✓ Sauvegardé</span>
+    <div class="mode-grp">
+      <button class="mode-btn on" id="btn-edit" onclick="setMode('edit')">✏️ Éditer</button>
+      <button class="mode-btn" id="btn-prev" onclick="setMode('preview')">👁 Aperçu</button>
+    </div>
+    <button class="ed-btn ghost" onclick="togglePanel()">⚙ Design</button>
+    <button class="ed-btn green" onclick="exportPage()">⬇ Exporter</button>
+  </div>
+</div>
+
+<div id="ed-layout">
+  <div id="ed-panel">
+    <div class="p-sec">
+      <div class="p-ttl">🎨 Couleurs</div>
+      <div class="color-row">
+        <div class="color-cell"><div class="color-sw" style="background:#5A7A2E"><input type="color" value="#5A7A2E" oninput="setColor('--green',this.value)"></div><div class="c-name">Principal</div></div>
+        <div class="color-cell"><div class="color-sw" style="background:#3D5420"><input type="color" value="#3D5420" oninput="setColor('--green-dark',this.value)"></div><div class="c-name">Foncé</div></div>
+        <div class="color-cell"><div class="color-sw" style="background:#EEF4E4"><input type="color" value="#EEF4E4" oninput="setColor('--green-pale',this.value)"></div><div class="c-name">Pâle</div></div>
+        <div class="color-cell"><div class="color-sw" style="background:#C4893D"><input type="color" value="#C4893D" oninput="setColor('--tan',this.value)"></div><div class="c-name">Accent</div></div>
+        <div class="color-cell"><div class="color-sw" style="background:#FEFAF4"><input type="color" value="#FEFAF4" oninput="setColor('--bg',this.value)"></div><div class="c-name">Fond</div></div>
+        <div class="color-cell"><div class="color-sw" style="background:#F0EAD9"><input type="color" value="#F0EAD9" oninput="setColor('--surface',this.value)"></div><div class="c-name">Surface</div></div>
+      </div>
+    </div>
+    <div class="p-sec">
+      <div class="p-ttl">📐 Typographie</div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">Titre Hero</span><span class="sl-val" id="lbl-hero">58px</span></div><input type="range" min="36" max="90" value="58" oninput="setSize('--sz-hero',this.value,'px','lbl-hero')"></div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">H1 Produit</span><span class="sl-val" id="lbl-h1">44px</span></div><input type="range" min="28" max="72" value="44" oninput="setSize('--sz-h1',this.value,'px','lbl-h1')"></div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">H2 Section</span><span class="sl-val" id="lbl-h2">34px</span></div><input type="range" min="20" max="56" value="34" oninput="setSize('--sz-h2',this.value,'px','lbl-h2')"></div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">Corps</span><span class="sl-val" id="lbl-bd">16px</span></div><input type="range" min="13" max="22" value="16" oninput="setSize('--sz-body',this.value,'px','lbl-bd')"></div>
+    </div>
+    <div class="p-sec">
+      <div class="p-ttl">📏 Espacement</div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">Gap sections</span><span class="sl-val" id="lbl-sg">80px</span></div><input type="range" min="40" max="160" value="80" oninput="setSize('--section-gap',this.value,'px','lbl-sg')"></div>
+      <div class="sl-row"><div class="sl-hd"><span class="sl-lbl">Radius cartes</span><span class="sl-val" id="lbl-rg">14px</span></div><input type="range" min="0" max="32" value="14" oninput="setSize('--radius-lg',this.value,'px','lbl-rg')"></div>
+    </div>
+    <div class="p-sec">
+      <div class="p-ttl">💡 Édition</div>
+      <div class="hint-box"><b>Texte</b> — Clic direct pour modifier<br><br><b>Photo</b> — Clic sur l'image → coller URL ou lien Google Drive<br><br><b>Exporter</b> — HTML propre de la page active, prêt pour WordPress</div>
+    </div>
+    <div class="p-sec">
+      <div class="p-ttl">🖼 Photos réelles</div>
+      <div class="hint-box">Pour remplacer une photo par une vraie :<br><br>1. Ouvrez la photo dans Drive<br>2. <b>Partager → Obtenir le lien</b><br>3. Cliquez sur la photo dans le Studio<br>4. Collez le lien</div>
+    </div>
+  </div>
+
+  <div id="ed-canvas-wrap">
+    <div id="ed-canvas"></div>
+  </div>
+</div>
+
+<div id="ed-hint">
+  <span class="hk">Clic</span> Modifier texte &nbsp;·&nbsp;
+  <span class="hk">Clic</span> photo → Remplacer &nbsp;·&nbsp;
+  <span class="hk">Entrée</span> Valider
+</div>
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// REAL CONTENT from nosvers.com
+// ══════════════════════════════════════════════
+const IMGS = {
+  extrait: 'https://nosvers.com/wp-content/uploads/2026/02/Lombrithe-arrosoir-1-600x1067.png',
+  arrosoir: 'https://nosvers.com/wp-content/uploads/2026/02/Lombrithe-arrosoir-600x1067.png',
+  engrais1: 'https://nosvers.com/wp-content/uploads/2026/02/pomelli-image-600x1067.png',
+  engrais2: 'https://nosvers.com/wp-content/uploads/2026/02/Gemini_Generated_Image_edw3yxedw3yxedw3-600x438.png',
+  engrais3: 'https://nosvers.com/wp-content/uploads/2026/02/Capture-decran-du-2026-02-19-20-49-53-600x746.png',
+  logo: 'https://nosvers.com/wp-content/uploads/2026/02/cropped-Capture-decran-du-2026-02-16-20-59-09.png',
+  // Placeholders pour photos non encore uploadées
+  jardin1: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800',
+  jardin2: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800',
+  jardin3: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600',
+  jardin4: 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=600',
+  jardin5: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
+  ferme: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900',
+  africa: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900',
+};
+
+const e = () => `contenteditable="true" data-e="1" spellcheck="false"`;
+const img = (src,alt,cls='') => `<img src="${src}" alt="${alt}" class="${cls}" data-img="1" onclick="replaceImg(this)" loading="lazy">`;
+
+// ══════════════════════════════════════════════
+// NAV & FOOTER
+// ══════════════════════════════════════════════
+const NAV = () => `
+<nav class="nv-nav">
+  <div class="nv-logo">
+    <div class="nv-logo-mark">🌿</div>
+    <span ${e()}>NosVers</span>
+  </div>
+  <ul class="nv-nav-links">
+    <li><a href="#" ${e()}>Boutique</a></li>
+    <li><a href="#" ${e()}>Atelier</a></li>
+    <li><a href="#" ${e()}>Notre Ferme</a></li>
+    <li><a href="#" ${e()}>Contact</a></li>
+  </ul>
+  <div class="nav-btns">
+    <button class="btn-o" ${e()}>Commander</button>
+  </div>
+</nav>`;
+
+const FOOTER = () => `
+<footer class="nv-footer">
+  <div class="ft-grid">
+    <div>
+      <div class="ft-logo"><div class="nv-logo-mark" style="width:28px;height:28px;font-size:12px">🌿</div><span ${e()}>NosVers</span></div>
+      <p class="ft-desc" ${e()}>Ferme lombricole familiale en Dordogne. Humus vivant, vers Eisenia, extrait vivant de lombricompost et semences bio.</p>
+      <div class="ft-soc">
+        <div class="soc-btn">📘</div>
+        <div class="soc-btn">📷</div>
+        <div class="soc-btn">🎬</div>
+      </div>
+    </div>
+    <div>
+      <div class="ft-col-h" ${e()}>Boutique</div>
+      <ul class="ft-links">
+        <li><a href="#" ${e()}>Sol Vivant</a></li>
+        <li><a href="#" ${e()}>Humus de Lombric</a></li>
+        <li><a href="#" ${e()}>Engrais Vert</a></li>
+        <li><a href="#" ${e()}>Vers de Compost</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="ft-col-h" ${e()}>La ferme</div>
+      <ul class="ft-links">
+        <li><a href="#" ${e()}>Notre Ferme</a></li>
+        <li><a href="#" ${e()}>À Propos</a></li>
+        <li><a href="#" ${e()}>Blog</a></li>
+        <li><a href="#" ${e()}>Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="ft-col-h" ${e()}>Légal</div>
+      <ul class="ft-links">
+        <li><a href="#" ${e()}>CGV</a></li>
+        <li><a href="#" ${e()}>Mentions légales</a></li>
+        <li><a href="#" ${e()}>Confidentialité</a></li>
+        <li><a href="#" ${e()}>Livraison & retours</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy" ${e()}>© 2026 NosVers — Ferme lombricole artisanale, Dordogne, France</span>
+    <div class="ft-badges">
+      <span class="ft-badge">Sans chimie</span>
+      <span class="ft-badge">Artisanal</span>
+      <span class="ft-badge">Dordogne</span>
+      <span class="ft-badge">MSA</span>
+    </div>
+  </div>
+</footer>`;
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+function pageHome(){return `
+${NAV()}
+<section class="nv-hero">
+  <div class="hero-content">
+    <div class="hero-tag"><span>🌿</span><span ${e()}>Ferme lombricole · Dordogne</span></div>
+    <h1 class="hero-title" ${e()}>La vie de votre<br>terre commence <em>ici</em></h1>
+    <p class="hero-desc" ${e()}>Humus vivant, vers Eisenia, extrait vivant de lombricompost et semences bio. Ferme artisanale en Dordogne. Fait à la main. Sans chimie.</p>
+    <div class="hero-btns">
+      <button class="btn-g" ${e()}>🛒 Découvrir la boutique</button>
+      <button class="btn-o" ${e()}>Notre ferme →</button>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item"><div class="trust-num" ${e()}>100%</div><div class="trust-lbl" ${e()}>Artisanal & local</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-item"><div class="trust-num" ${e()}>0</div><div class="trust-lbl" ${e()}>Intrant chimique</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-item"><div class="trust-num" ${e()}>48h</div><div class="trust-lbl" ${e()}>Premiers résultats</div></div>
+    </div>
+  </div>
+  <div class="hero-imgs">
+    <div class="hero-img sp2">${img(IMGS.jardin1,'Jardin NosVers Dordogne')}</div>
+    <div class="hero-img">${img(IMGS.extrait,'Extrait Vivant de Lombric')}</div>
+    <div class="hero-img">${img(IMGS.engrais2,'Engrais Vert NosVers')}</div>
+  </div>
+</section>
+
+<div class="nv-conf">
+  <div class="conf-it"><span class="conf-ic">🇫🇷</span><span ${e()}>Produit en Dordogne</span></div>
+  <div class="conf-it"><span class="conf-ic">🤲</span><span ${e()}>Fait à la main, en famille</span></div>
+  <div class="conf-it"><span class="conf-ic">🌱</span><span ${e()}>Zéro chimie</span></div>
+  <div class="conf-it"><span class="conf-ic">⚡</span><span ${e()}>Résultats en 48h</span></div>
+  <div class="conf-it"><span class="conf-ic">📦</span><span ${e()}>Livraison France entière</span></div>
+</div>
+
+<section class="nv-sec">
+  <div class="prod-hdr">
+    <div>
+      <div class="sec-kick" ${e()}>Nos gammes</div>
+      <h2 class="sec-title" ${e()}>Ce que la terre <em>produit</em></h2>
+    </div>
+    <button class="btn-o" ${e()}>Voir tous les produits →</button>
+  </div>
+  <div class="nv-grid feat">
+    <div class="p-card">
+      <div class="p-img tall">
+        <div class="p-badge" ${e()}>Sol Vivant</div>
+        ${img(IMGS.extrait,'Extrait Vivant de Lombric NosVers')}
+      </div>
+      <div class="p-body">
+        <div class="p-cat" ${e()}>Vie du Sol</div>
+        <div class="p-title" ${e()}>Extrait Vivant de Lombric — Version Essentielle</div>
+        <div class="p-desc" ${e()}>Tout le nécessaire pour fabriquer 20 litres d'extrait vivant de lombricompost à la maison. En 24–36h de brassage actif, vous multipliez ×1 000 les micro-organismes bénéfiques de votre sol.</div>
+        <ul class="p-bullets">
+          <li ${e()}>200g lombricompost NosVers + substrats pré-dosés</li>
+          <li ${e()}>Protocole Africa + QR code vidéo inclus</li>
+          <li ${e()}>20L concentrés = 200m² de potager traité</li>
+          <li ${e()}>Résultats visibles en 48h</li>
+        </ul>
+        <div class="p-foot">
+          <div class="p-price" ${e()}>45€</div>
+          <button class="p-btn" ${e()}>Ajouter →</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div class="p-card" style="flex-direction:row">
+        <div class="p-img" style="width:150px;min-width:150px;aspect-ratio:auto">${img(IMGS.arrosoir,'Atelier Sol Vivant avec Africa')}</div>
+        <div class="p-body">
+          <div class="p-cat" ${e()}>Formation</div>
+          <div class="p-title" ${e()}>Atelier Sol Vivant avec Africa</div>
+          <ul class="p-bullets">
+            <li ${e()}>Journée complète sur la ferme</li>
+            <li ${e()}>4 à 8 participants max</li>
+            <li ${e()}>Kit 45€ inclus</li>
+          </ul>
+          <div class="p-foot">
+            <div class="p-price" ${e()}>85€</div>
+            <button class="p-btn" ${e()}>Réserver →</button>
+          </div>
+        </div>
+      </div>
+      <div class="p-card" style="flex-direction:row">
+        <div class="p-img" style="width:150px;min-width:150px;aspect-ratio:auto">${img(IMGS.engrais1,'Pack Engrais Vert NosVers')}</div>
+        <div class="p-body">
+          <div class="p-cat" ${e()}>Semences</div>
+          <div class="p-title" ${e()}>Pack Engrais Vert</div>
+          <ul class="p-bullets">
+            <li ${e()}>Trèfle de Perse + Phacélie + Sarrasin</li>
+            <li ${e()}>Toutes saisons · 500g = 15–25 m²</li>
+          </ul>
+          <div class="p-foot">
+            <div class="p-price" ${e()}>9,90€</div>
+            <button class="p-btn" ${e()}>Commander →</button>
+          </div>
+        </div>
+      </div>
+      <div class="p-card" style="flex-direction:row">
+        <div class="p-img" style="width:150px;min-width:150px;aspect-ratio:auto">${img(IMGS.jardin3,'Vers de Compost Eisenia')}</div>
+        <div class="p-body">
+          <div class="p-cat" ${e()}>Vers vivants</div>
+          <div class="p-title" ${e()}>Vers de Compost</div>
+          <ul class="p-bullets">
+            <li ${e()}>Eisenia fetida/andrei · Adultes & cocons</li>
+            <li ${e()}>Disponibles avril 2026</li>
+          </ul>
+          <div class="p-foot">
+            <div class="p-price" ${e()}>Sur demande</div>
+            <button class="p-btn" ${e()}>Nous écrire →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nv-cit">
+  <div class="cit-txt" ${e()}>"La vraie liberté ne se demande pas — elle se construit. Avec de la terre, des mains, et le temps qu'il faut."</div>
+  <div class="cit-auth" ${e()}>— NosVers · Neuvic, Dordogne</div>
+</div>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Nos engagements</div>
+  <h2 class="sec-title" ${e()}>Ce qui nous <em>différencie</em></h2>
+  <div class="eng-grid">
+    <div class="eng-it"><div class="eng-ic">🔬</div><div class="eng-t" ${e()}>Approche scientifique</div><div class="eng-d" ${e()}>Chaque produit suit un protocole documenté basé sur la microbiologie des sols.</div></div>
+    <div class="eng-it"><div class="eng-ic">🤲</div><div class="eng-t" ${e()}>Fait à la main</div><div class="eng-d" ${e()}>Du producteur directement à votre jardin. Pas d'usine, pas de sous-traitant.</div></div>
+    <div class="eng-it"><div class="eng-ic">📍</div><div class="eng-t" ${e()}>Traçabilité totale</div><div class="eng-d" ${e()}>Chaque lot est documenté. Vous savez exactement d'où vient votre produit.</div></div>
+    <div class="eng-it"><div class="eng-ic">🌿</div><div class="eng-t" ${e()}>Zéro chimie</div><div class="eng-d" ${e()}>Aucun intrant chimique. Notre sol est vivant parce que nous ne le tuons pas.</div></div>
+    <div class="eng-it"><div class="eng-ic">⚡</div><div class="eng-t" ${e()}>Résultats rapides</div><div class="eng-d" ${e()}>L'extrait aérobie agit en 48h. Des résultats concrets dès la première application.</div></div>
+    <div class="eng-it"><div class="eng-ic">📚</div><div class="eng-t" ${e()}>Transmission</div><div class="eng-d" ${e()}>Ateliers ouverts à tous. Vous repartez avec les outils pour continuer seul.</div></div>
+  </div>
+</section>
+
+<section class="nv-atel">
+  <div class="atel-img">${img(IMGS.arrosoir,'Atelier Sol Vivant NosVers')}</div>
+  <div class="atel-content">
+    <div class="sec-kick" ${e()}>Formation pratique</div>
+    <h2 class="sec-title" ${e()}>Atelier Sol Vivant avec África</h2>
+    <p class="sec-desc" ${e()}>Une journée en petits groupes sur la ferme NosVers pour apprendre à préparer votre propre extrait vivant de lombricompost. Formation pratique basée sur les principes de la biologie des sols. 8 personnes maximum.</p>
+    <ul class="atel-prog">
+      <li><span class="prog-n">01</span><span ${e()}>Visite ferme · Biologie des sols · Lombrics Eisenia</span></li>
+      <li><span class="prog-n">02</span><span ${e()}>Préparation complète d'un lot en groupe</span></li>
+      <li><span class="prog-n">03</span><span ${e()}>Application sur les parcelles de la ferme</span></li>
+      <li><span class="prog-n">04</span><span ${e()}>Déjeuner à la ferme inclus · Kit 45€ offert</span></li>
+    </ul>
+    <div class="hero-btns">
+      <button class="btn-g" ${e()}>Réserver sa place · 85 €</button>
+      <button class="btn-o" ${e()}>En savoir plus →</button>
+    </div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Témoignages</div>
+  <h2 class="sec-title" ${e()}>Clients <em>satisfaits</em></h2>
+  <div class="avis-grid">
+    <div class="avis-c">
+      <div class="avis-stars">★★★★★</div>
+      <div class="avis-txt" ${e()}>"L'Extrait Vivant de Lombric a transformé mon potager. Un sol argileux compact — après deux applications, il ressemblait à du terreau."</div>
+      <div class="avis-auth"><div class="avis-av">🌱</div><div><div class="avis-n" ${e()}>Marie-Claire D.</div><div class="avis-l" ${e()}>Maraîchère, Lot-et-Garonne</div></div></div>
+    </div>
+    <div class="avis-c">
+      <div class="avis-stars">★★★★★</div>
+      <div class="avis-txt" ${e()}>"En 48h, mes tomates avaient une couleur différente. Les racines se sont développées comme jamais."</div>
+      <div class="avis-auth"><div class="avis-av">🍅</div><div><div class="avis-n" ${e()}>Jean-Pierre M.</div><div class="avis-l" ${e()}>Jardinier, Périgord</div></div></div>
+    </div>
+    <div class="avis-c">
+      <div class="avis-stars">★★★★★</div>
+      <div class="avis-txt" ${e()}>"La terre est tellement plus souple au printemps. La différence est palpable dès qu'on la travaille."</div>
+      <div class="avis-auth"><div class="avis-av">🤲</div><div><div class="avis-n" ${e()}>Sophie L.</div><div class="avis-l" ${e()}>Jardinière, Dordogne</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Questions fréquentes</div>
+  <h2 class="sec-title" ${e()}>On répond</h2>
+  <div class="faq-wrap">
+    <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>C'est quoi l'Extrait Vivant de Lombric ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Extrait liquide de compost de vers, brassé en aérobiose 24–36h. Multiplie bactéries, champignons, protozoaires bénéfiques. Résultats visibles en 48h.</div></div>
+    <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Vos produits sont-ils chimiques ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Non. Aucun intrant chimique, aucun pesticide. Élevage naturel de vers, pratiques agroécologiques.</div></div>
+    <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Comment livrez-vous les vers vivants ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Boîte aérée avec litière humide. Survivent 3–5 jours. Expédition lundi-mardi. Remplacement gratuit si morts à l'arrivée. Disponibles avril 2026.</div></div>
+    <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Livrez-vous partout en France ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Oui. Semences, kits, humus : Colissimo 2–4j. Vers : lundi-mardi seulement. Extrait vivant frais : Dordogne ± 30km.</div></div>
+    <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Peut-on visiter la ferme ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Oui, sur rendez-vous. Ateliers pratiques avec Africa en Dordogne. contact@nosvers.com</div></div>
+  </div>
+</section>
+
+<section class="nv-ferme">
+  <div class="ferme-img">${img(IMGS.ferme,'Ferme NosVers · Neuvic · Dordogne')}</div>
+  <div class="ferme-c">
+    <div class="sec-kick">Notre histoire</div>
+    <h2 class="sec-title" ${e()}>NosVers — Ferme lombricole familiale en Dordogne</h2>
+    <p class="sec-desc" ${e()}>NosVers n'est pas une entreprise comme les autres. C'est un projet de vie basé sur la résilience et la souveraineté. Nous ne vendons pas de produits pour faire du profit — nous partageons notre excédent de production après avoir couvert nos propres besoins.</p>
+    <button class="ferme-btn" ${e()}>Découvrir la ferme →</button>
+  </div>
+</section>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// EXTRAIT VIVANT
+// ══════════════════════════════════════════════
+function pageExtrait(){return `
+${NAV()}
+<section class="nv-prod-hero">
+  <div class="prod-gallery">${img(IMGS.extrait,'Extrait Vivant de Lombric — Version Essentielle NosVers')}</div>
+  <div class="prod-info">
+    <div class="prod-cat" ${e()}>Sol Vivant · Inoculant biologique</div>
+    <h1 class="prod-title" ${e()}>Extrait Vivant de Lombric</h1>
+    <div class="prod-sub" ${e()}>Version Essentielle — Kit complet</div>
+    <p class="prod-desc" ${e()}>Tout le nécessaire pour fabriquer 20 litres d'extrait vivant de lombricompost à la maison. Lombricompost NosVers, substrats pré-dosés, protocole Africa. En 24–36h de brassage actif, vous multipliez par 1 000 les micro-organismes bénéfiques de votre sol.</p>
+    <ul class="prod-benefits">
+      <li><span class="ben-ic">🫙</span><span ${e()}>200g de lombricompost NosVers — Eisenia fetida/andrei, mûri 6 mois minimum</span></li>
+      <li><span class="ben-ic">🍶</span><span ${e()}>Mélasse non sulfitée 50ml pré-dosée + farine de poisson 20g</span></li>
+      <li><span class="ben-ic">💨</span><span ${e()}>Diffuseur air + tube silicone 50cm alimentaire</span></li>
+      <li><span class="ben-ic">📋</span><span ${e()}>Fiche protocole A5 recto-verso établie par Africa</span></li>
+      <li><span class="ben-ic">🔗</span><span ${e()}>QR code vers la vidéo de démonstration sur la ferme</span></li>
+    </ul>
+    <div class="prod-pricing">
+      <div class="price-main" ${e()}>45 €</div>
+      <div class="price-sub" ${e()}>20L concentrés = 200L dilués à 1:10 = 200m² traités</div>
+      <div class="prod-tags">
+        <span class="prod-tag">✓ Fait à la main</span>
+        <span class="prod-tag">✓ Livraison France</span>
+        <span class="prod-tag">✓ Satisfaction garantie</span>
+      </div>
+    </div>
+    <button class="btn-g" style="width:100%;justify-content:center;padding:14px" ${e()}>🛒 Ajouter au panier</button>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center" ${e()}>Premiers résultats garantis en 48h · Satisfaction ou remboursement</p>
+  </div>
+</section>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>La chaîne complète NosVers</div>
+  <h2 class="sec-title" ${e()}>Ce n'est pas un engrais. C'est un processus.</h2>
+  <p class="sec-desc" ${e()}>L'extrait aérobie de lombricompost est le chaînon entre notre humus vivant et votre sol. En submergeant notre lombricompost dans de l'eau oxygénée avec la bonne nourriture, vous extrayez les micro-organismes et vous les multipliez de façon exponentielle.</p>
+  <div class="compo-grid">
+    <div class="compo-it"><div class="compo-ic">🐛</div><div><div class="compo-t" ${e()}>Nos lombrics Eisenia</div><div class="compo-d" ${e()}>Elevés à la ferme. Eisenia fetida/andrei, les espèces les plus efficaces.</div></div></div>
+    <div class="compo-it"><div class="compo-ic">🌱</div><div><div class="compo-t" ${e()}>Produisent notre lombricompost</div><div class="compo-d" ${e()}>Mûri 6 mois minimum. Richesse microbienne maximale.</div></div></div>
+    <div class="compo-it"><div class="compo-ic">💧</div><div><div class="compo-t" ${e()}>Dont vous extrayez l'extrait aérobie</div><div class="compo-d" ${e()}>×1 000 bactéries, ×100 champignons. Vivant. Prêt à l'emploi.</div></div></div>
+    <div class="compo-it"><div class="compo-ic">🌍</div><div><div class="compo-t" ${e()}>Qui réveille la vie de votre sol</div><div class="compo-d" ${e()}>Résultats visibles en 48h. Durables dans le temps.</div></div></div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Utilisation</div>
+  <h2 class="sec-title" ${e()}>Le processus en 4 étapes</h2>
+  <div class="steps-grid">
+    <div class="step-it"><div class="step-num">01</div><div class="step-t" ${e()}>Préparer</div><div class="step-d" ${e()}>20L d'eau non chlorée dans votre récipient (20–25L, non inclus)</div></div>
+    <div class="step-it"><div class="step-num">02</div><div class="step-t" ${e()}>Mélanger</div><div class="step-d" ${e()}>Ajouter lombricompost + mélasse + farine de poisson du kit</div></div>
+    <div class="step-it"><div class="step-num">03</div><div class="step-t" ${e()}>Brasser 24–36h</div><div class="step-d" ${e()}>Oxygénation active à la pompe à air (débit ≥ 4L/min)</div></div>
+    <div class="step-it"><div class="step-num">04</div><div class="step-t" ${e()}>Appliquer</div><div class="step-d" ${e()}>Dans les 4h suivant l'arrêt de la pompe. Diluer 1:10 avant application.</div></div>
+  </div>
+  <div style="background:var(--tan-light);border-radius:var(--radius-lg);padding:22px 28px;margin-top:32px;border-left:4px solid var(--tan)">
+    <strong style="font-size:14px;color:var(--text)" ${e()}>⏱ La règle des 4 heures</strong>
+    <p style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.6" ${e()}>L'extrait aérobie est un produit vivant. Dès l'arrêt de la pompe, les micro-organismes aérobies commencent à s'épuiser. Préparez la quantité que vous appliquez dans la journée.</p>
+  </div>
+</section>
+
+<div class="nv-cit">
+  <div class="cit-txt" ${e()}>"Nos lombrics Eisenia → produisent notre lombricompost → dont vous extrayez l'extrait aérobie → qui réveille la vie de votre sol."</div>
+  <div class="cit-auth" ${e()}>— La chaîne complète NosVers</div>
+</div>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Aussi disponible</div>
+  <h2 class="sec-title" ${e()}>Service Frais — sur commande</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:36px">
+    <div style="background:var(--white);border-radius:var(--radius-lg);padding:28px;border:2px solid var(--green)">
+      <div class="p-cat" ${e()}>Version Essentielle</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:10px" ${e()}>Kit complet à fabriquer</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:18px" ${e()}>Vous faites le brassage chez vous. Matériel + substrats + protocole inclus.</p>
+      <div style="font-family:'DM Serif Display',serif;font-size:30px;color:var(--green);margin-bottom:18px" ${e()}>45 €</div>
+      <button class="btn-g" style="width:100%;justify-content:center" ${e()}>Commander →</button>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius-lg);padding:28px;border:1px solid rgba(0,0,0,.08)">
+      <div class="p-cat" ${e()}>Service Frais</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:10px" ${e()}>Extrait fabriqué à la ferme</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:18px" ${e()}>Africa prépare l'extraction pour vous. Livraison Dordogne ±30km uniquement. À utiliser le jour même.</p>
+      <div style="font-family:'DM Serif Display',serif;font-size:30px;color:var(--green);margin-bottom:18px" ${e()}>25 €</div>
+      <button class="btn-o" style="width:100%;justify-content:center" ${e()}>Nous contacter →</button>
+    </div>
+  </div>
+</section>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// ENGRAIS VERT
+// ══════════════════════════════════════════════
+function pageEngrais(){return `
+${NAV()}
+<section class="eg-hero">
+  <div class="eg-content">
+    <div class="hero-tag"><span>🌾</span><span ${e()}>Semences bio · Toutes saisons</span></div>
+    <h1 class="hero-title" ${e()}>Pack Engrais Vert NosVers</h1>
+    <p class="hero-desc" ${e()}>Mélange toutes saisons. Trèfle de Perse + Phacélie + Sarrasin. La base polyvalente pour tout jardinier. Fixation d'azote, couverture du sol, nourriture pour vos lombrics.</p>
+    <div class="hero-trust" style="margin-top:24px">
+      <div class="trust-item"><div class="trust-num" ${e()}>3</div><div class="trust-lbl" ${e()}>espèces complémentaires</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-item"><div class="trust-num" ${e()}>500g</div><div class="trust-lbl" ${e()}>= 15–25 m² couverts</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-item"><div class="trust-num" ${e()}>9,90€</div><div class="trust-lbl" ${e()}>le pack</div></div>
+    </div>
+    <div class="hero-btns" style="margin-top:32px">
+      <button class="btn-g" ${e()}>🛒 Commander · 9,90 €</button>
+      <button class="btn-o" ${e()}>Voir d'autres variantes →</button>
+    </div>
+  </div>
+  <div class="eg-img-area">${img(IMGS.engrais1,'Pack Engrais Vert Universel NosVers')}</div>
+</section>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Composition</div>
+  <h2 class="sec-title" ${e()}>3 espèces, 3 rôles complémentaires</h2>
+  <p class="sec-desc" ${e()}>Notre Pack Engrais Vert est une synergie étudiée de trois espèces complémentaires pour couvrir, nourrir et régénérer votre sol.</p>
+  <div class="seeds-grid">
+    <div class="seed-it"><div class="seed-ic">🟡</div><div><div class="seed-t" ${e()}>Trèfle de Perse · 30%</div><div class="seed-d" ${e()}>Fixateur d'azote · Apporte 150–200 kg N/ha gratuitement · Résistant au froid (–15°C)</div></div></div>
+    <div class="seed-it"><div class="seed-ic">🟣</div><div><div class="seed-t" ${e()}>Phacélie · 35%</div><div class="seed-d" ${e()}>Mellifère exceptionnel · Décompacteur puissant · Inhibe les adventices · Floraison spectaculaire</div></div></div>
+    <div class="seed-it"><div class="seed-ic">🟤</div><div><div class="seed-t" ${e()}>Sarrasin · 35%</div><div class="seed-d" ${e()}>Couvrant ultra-rapide · Étouffe adventices en 3 semaines · Mobilise le phosphore · Cycle court 8–10 semaines</div></div></div>
+    <div class="seed-it" style="background:var(--green-pale);border-color:var(--green-light)"><div class="seed-ic">✓</div><div><div class="seed-t" ${e()}>Conservation</div><div class="seed-d" ${e()}>Conserver au sec, à l'abri de la lumière. Utiliser de préférence dans les 2 ans. Semences non hybrides, reproductibles.</div></div></div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Bénéfices</div>
+  <h2 class="sec-title" ${e()}>Ce que ça fait concrètement</h2>
+  <div class="benefits-big">
+    <div class="ben-big"><div class="ben-big-ic">🌿</div><div class="ben-big-n" ${e()}>150–200 UN/ha</div><div class="ben-big-d" ${e()}>Azote fixé gratuitement depuis l'atmosphère</div></div>
+    <div class="ben-big"><div class="ben-big-ic">💧</div><div class="ben-big-n" ${e()}>+50%</div><div class="ben-big-d" ${e()}>Infiltration de l'eau améliorée</div></div>
+    <div class="ben-big"><div class="ben-big-ic">🦠</div><div class="ben-big-n" ${e()}>×5</div><div class="ben-big-d" ${e()}>Vie microbienne multipliée</div></div>
+    <div class="ben-big"><div class="ben-big-ic">🌱</div><div class="ben-big-n" ${e()}>+15–25%</div><div class="ben-big-d" ${e()}>Rendements de la culture suivante</div></div>
+    <div class="ben-big"><div class="ben-big-ic">🚫</div><div class="ben-big-n" ${e()}>–60–80%</div><div class="ben-big-d" ${e()}>Adventices réduites par compétition</div></div>
+    <div class="ben-big"><div class="ben-big-ic">🏔</div><div class="ben-big-n" ${e()}>+40%</div><div class="ben-big-d" ${e()}>Porosité du sol augmentée</div></div>
+  </div>
+</section>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Mode d'emploi</div>
+  <h2 class="sec-title" ${e()}>Comment semer</h2>
+  <div class="steps-grid">
+    <div class="step-it"><div class="step-num">01</div><div class="step-t" ${e()}>Dose</div><div class="step-d" ${e()}>20–30 g/m² à la volée. 500g couvrent 15–25 m².</div></div>
+    <div class="step-it"><div class="step-num">02</div><div class="step-t" ${e()}>Période</div><div class="step-d" ${e()}>Printemps : mars–mai. Automne : août–octobre.</div></div>
+    <div class="step-it"><div class="step-num">03</div><div class="step-t" ${e()}>Griffage</div><div class="step-d" ${e()}>Semis à la volée + griffage léger. Arroser si semis en été sec.</div></div>
+    <div class="step-it"><div class="step-num">04</div><div class="step-t" ${e()}>Valorisation</div><div class="step-d" ${e()}>Faucher avant montée en graines. Enfouir léger ou mulch en surface.</div></div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Gamme complète</div>
+  <h2 class="sec-title" ${e()}>Un pack pour chaque saison</h2>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px">
+    <div class="p-card" style="border:2px solid var(--green)">
+      <div class="p-img" style="background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:40px;height:120px">🌿</div>
+      <div class="p-body"><div class="p-cat" ${e()}>Toutes saisons</div><div class="p-title" ${e()}>Pack Universel</div><div class="p-desc" ${e()}>Trèfle + Phacélie + Sarrasin</div><div class="p-foot"><div class="p-price" ${e()}>9,90€</div><button class="p-btn" ${e()}>Commander</button></div></div>
+    </div>
+    <div class="p-card">
+      <div class="p-img" style="background:#FFF9E6;display:flex;align-items:center;justify-content:center;font-size:40px;height:120px">☀️</div>
+      <div class="p-body"><div class="p-cat" ${e()}>Été</div><div class="p-title" ${e()}>Pack Été</div><div class="p-desc" ${e()}>Adapté aux semis de juin–août</div><div class="p-foot"><div class="p-price" ${e()}>9,90€</div><button class="p-btn" ${e()}>Commander</button></div></div>
+    </div>
+    <div class="p-card">
+      <div class="p-img" style="background:#E8F4E8;display:flex;align-items:center;justify-content:center;font-size:40px;height:120px">🌸</div>
+      <div class="p-body"><div class="p-cat" ${e()}>Printemps</div><div class="p-title" ${e()}>Pack Printemps</div><div class="p-desc" ${e()}>Adapté aux semis de mars–mai</div><div class="p-foot"><div class="p-price" ${e()}>9,90€</div><button class="p-btn" ${e()}>Commander</button></div></div>
+    </div>
+    <div class="p-card">
+      <div class="p-img" style="background:#F9EDE0;display:flex;align-items:center;justify-content:center;font-size:40px;height:120px">🍂</div>
+      <div class="p-body"><div class="p-cat" ${e()}>Automne</div><div class="p-title" ${e()}>Pack Automne</div><div class="p-desc" ${e()}>Résistant au gel, couverture hivernale</div><div class="p-foot"><div class="p-price" ${e()}>9,90€</div><button class="p-btn" ${e()}>Commander</button></div></div>
+    </div>
+  </div>
+</section>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// ATELIER
+// ══════════════════════════════════════════════
+function pageAtelier(){return `
+${NAV()}
+<section class="at-hero">
+  <div class="at-hero-bg" style="background-image:url('${IMGS.arrosoir}')"></div>
+  <div class="at-hero-c">
+    <div class="hero-tag" style="background:rgba(255,255,255,.15);color:#fff;margin:0 auto 28px"><span>🤲</span><span ${e()}>Formation pratique · Ferme NosVers</span></div>
+    <h1 class="at-hero-title" ${e()}>Atelier Sol Vivant<br>avec África</h1>
+    <p class="at-hero-sub" ${e()}>Une journée en petits groupes sur la ferme pour comprendre et préparer votre propre extrait vivant de lombricompost</p>
+    <div class="at-info">
+      <div class="at-info-it"><div class="at-info-val" ${e()}>1 jour</div><div class="at-info-lbl" ${e()}>Durée</div></div>
+      <div class="at-info-it"><div class="at-info-val" ${e()}>4–8</div><div class="at-info-lbl" ${e()}>Participants max</div></div>
+      <div class="at-info-it"><div class="at-info-val" ${e()}>85€</div><div class="at-info-lbl" ${e()}>Par personne</div></div>
+      <div class="at-info-it"><div class="at-info-val" ${e()}>Neuvic</div><div class="at-info-lbl" ${e()}>Dordogne · 24190</div></div>
+    </div>
+    <button class="btn-g" style="font-size:16px;padding:14px 32px" ${e()}>Réserver ma place →</button>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Programme</div>
+  <h2 class="sec-title" ${e()}>Une journée de travail réel</h2>
+  <p class="sec-desc" ${e()}>Ce n'est pas un cours théorique. C'est une journée de travail réel sur la ferme où vous préparez vous-même un lot complet d'extrait aérobie, de A à Z, avec Africa.</p>
+  <div class="at-prog-grid">
+    <div class="at-prog-it"><div class="at-prog-n">9h</div><div><div class="at-prog-t" ${e()}>Visite de la ferme</div><div class="at-prog-d" ${e()}>Présentation des lombrics Eisenia. Biologie des sols : micro-organismes, réseaux trophiques, différence entre lixiviat et extrait aérobie.</div></div></div>
+    <div class="at-prog-it"><div class="at-prog-n">10h</div><div><div class="at-prog-t" ${e()}>Biologie des sols</div><div class="at-prog-d" ${e()}>Pourquoi l'extraction aérobie multiplie les micro-organismes quand le lixiviat ne le fait pas. La chaîne de la vie.</div></div></div>
+    <div class="at-prog-it"><div class="at-prog-n">12h30</div><div><div class="at-prog-t" ${e()}>Déjeuner à la ferme</div><div class="at-prog-d" ${e()}>Repas convivial inclus. Moment d'échange informel avec Africa et les autres participants.</div></div></div>
+    <div class="at-prog-it"><div class="at-prog-n">13h30</div><div><div class="at-prog-t" ${e()}>Préparation complète en groupe</div><div class="at-prog-d" ${e()}>Sélection du lombricompost, calcul des substrats, montage du brasseur. Lecture des signes d'activité.</div></div></div>
+    <div class="at-prog-it"><div class="at-prog-n">15h</div><div><div class="at-prog-t" ${e()}>Application sur les parcelles</div><div class="at-prog-d" ${e()}>Application réelle sur les parcelles de la ferme. Observation des effets. Questions et retours d'expérience.</div></div></div>
+    <div class="at-prog-it"><div class="at-prog-n">17h</div><div><div class="at-prog-t" ${e()}>Fin de journée</div><div class="at-prog-d" ${e()}>Remise du kit Version Essentielle (valeur 45€). Accès au groupe de suivi par messagerie pendant 30 jours.</div></div></div>
+  </div>
+</section>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Ce qui est inclus</div>
+  <h2 class="sec-title" ${e()}>Tout compris à 85 €</h2>
+  <div class="includes-grid">
+    <div class="inc-it"><div class="inc-ic">🎁</div><span ${e()}>Kit Extrait Vivant Version Essentielle (valeur 45€) à emporter</span></div>
+    <div class="inc-it"><div class="inc-ic">📋</div><span ${e()}>Protocole complet imprimé recto-verso</span></div>
+    <div class="inc-it"><div class="inc-ic">🍽️</div><span ${e()}>Déjeuner convivial à la ferme</span></div>
+    <div class="inc-it"><div class="inc-ic">💬</div><span ${e()}>Accès au groupe de suivi par messagerie</span></div>
+    <div class="inc-it"><div class="inc-ic">📞</div><span ${e()}>Accès direct à Africa pendant 30 jours post-formation</span></div>
+    <div class="inc-it"><div class="inc-ic">🔗</div><span ${e()}>Financement VIVEA / CPF en cours de validation</span></div>
+  </div>
+</section>
+
+<section class="africa-section">
+  <div class="africa-img">${img(IMGS.africa,'África · Formatrice · NosVers')}</div>
+  <div class="africa-c">
+    <div class="sec-kick" ${e()}>Votre formatrice</div>
+    <h2 class="sec-title" ${e()}>África</h2>
+    <p class="sec-desc" ${e()}>Experte en agroécologie et permaculture, Africa est le cœur technique de NosVers. Avec plus de 15 ans d'expérience dans la production de lombricompost, elle a développé des méthodes uniques pour transformer les déchets organiques en or noir pour le jardin.</p>
+    <p class="sec-desc" style="margin-top:16px" ${e()}>Sa passion : transmettre son savoir-faire et rendre accessible à tous une agriculture respectueuse du sol vivant. Africa transmet le savoir-faire — pas juste le produit.</p>
+    <div class="africa-sig" ${e()}>"Apprendre à voir ce qui vit sous nos pieds, c'est le début de tout."</div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Informations pratiques</div>
+  <h2 class="sec-title" ${e()}>Comment réserver</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px">
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:32px">
+      <div class="sec-kick" ${e()}>Dates</div>
+      <p style="font-size:15px;color:var(--text);margin-bottom:16px" ${e()}>Dates publiées sur le site. Format privatif disponible sur demande pour groupes.</p>
+      <div class="ct-det"><div class="ct-ic">📍</div><div class="ct-det-t"><h4 ${e()}>Lieu</h4><p ${e()}>Ferme NosVers · Neuvic (24190) · Dordogne</p></div></div>
+      <div class="ct-det"><div class="ct-ic">👥</div><div class="ct-det-t"><h4 ${e()}>Groupe</h4><p ${e()}>4 à 8 participants maximum</p></div></div>
+      <div class="ct-det"><div class="ct-ic">💳</div><div class="ct-det-t"><h4 ${e()}>Financement</h4><p ${e()}>VIVEA / CPF en cours de validation</p></div></div>
+    </div>
+    <div style="background:var(--green-dark);border-radius:var(--radius-lg);padding:32px;color:#fff">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--green-light);margin-bottom:16px" ${e()}>Réservation</div>
+      <p style="font-size:15px;color:rgba(255,255,255,.75);margin-bottom:28px;line-height:1.6" ${e()}>Envoyez-nous un message avec vos dates préférées. Nous confirmons sous 24h.</p>
+      <button class="btn-g" style="width:100%;justify-content:center;margin-bottom:12px" ${e()}>Réserver une place →</button>
+      <p style="font-size:13px;color:rgba(255,255,255,.4);text-align:center" ${e()}>contact@nosvers.com · 07 82 25 92 77</p>
+    </div>
+  </div>
+</section>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// ABOUT (LA FERME)
+// ══════════════════════════════════════════════
+function pageAbout(){return `
+${NAV()}
+<section class="ab-hero">
+  <div class="ab-img">${img(IMGS.ferme,'NosVers · Ferme lombricole · Neuvic · Dordogne')}</div>
+  <div class="ab-c">
+    <div class="sec-kick" ${e()}>Notre histoire</div>
+    <h1 class="sec-title" ${e()}>NosVers n'est pas une entreprise comme les autres</h1>
+    <p class="sec-desc" ${e()}>C'est un projet de vie basé sur la résilience et la souveraineté. Nous ne vendons pas de produits pour faire du profit — nous partageons notre excédent de production après avoir couvert nos propres besoins.</p>
+    <div class="ab-sig" ${e()}>— Angel & África · Fondateurs de NosVers</div>
+  </div>
+</section>
+
+<section class="nv-sec">
+  <div class="sec-kick" ${e()}>Les fondateurs</div>
+  <h2 class="sec-title" ${e()}>Africa & Angel</h2>
+  <div class="team-grid">
+    <div class="team-c">
+      <div class="team-img">${img(IMGS.africa,'África · NosVers')}</div>
+      <div>
+        <div class="team-n" ${e()}>África</div>
+        <div class="team-role" ${e()}>Co-fondatrice · Experte agroécologie</div>
+        <div class="team-bio" ${e()}>Experte en agroécologie et permaculture, Africa est le cœur technique de NosVers. Avec plus de 15 ans d'expérience dans la production de lombricompost, elle a développé des méthodes uniques pour transformer les déchets organiques en or noir pour le jardin. Sa passion : transmettre son savoir-faire.</div>
+      </div>
+    </div>
+    <div class="team-c">
+      <div class="team-img">${img(IMGS.ferme,'Angel · NosVers')}</div>
+      <div>
+        <div class="team-n" ${e()}>Angel</div>
+        <div class="team-role" ${e()}>Fondateur · Ancien militaire OEOP</div>
+        <div class="team-bio" ${e()}>Ancien militaire des opérations spéciales devenu fermier, Angel apporte rigueur et détermination au projet NosVers. Originaire d'Espagne, il a choisi la Dordogne pour construire une vie libre et souveraine avec Africa. Sa philosophie : produire d'abord pour couvrir les besoins réels, vendre ensuite. Jamais l'inverse.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nv-cit">
+  <div class="cit-txt" ${e()}>"Produire d'abord pour couvrir les besoins réels, vendre ensuite. Jamais l'inverse."</div>
+  <div class="cit-auth" ${e()}>— Angel · NosVers</div>
+</div>
+
+<section class="nv-sec nv-sec-alt">
+  <div class="sec-kick" ${e()}>Notre vision</div>
+  <h2 class="sec-title" ${e()}>Ce en quoi nous croyons</h2>
+  <div class="val-grid">
+    <div class="val-it"><div class="val-ic">🌱</div><div class="val-t" ${e()}>Sol vivant</div><div class="val-d" ${e()}>Un sol en bonne santé est un sol vivant. Pas un substrat chimique. Tout ce que nous faisons part de là.</div></div>
+    <div class="val-it"><div class="val-ic">🤲</div><div class="val-t" ${e()}>Travail des mains</div><div class="val-d" ${e()}>La vraie connaissance passe par le faire. Nos produits sont fabriqués à la main. Nos ateliers sont dans la terre.</div></div>
+    <div class="val-it"><div class="val-ic">🏡</div><div class="val-t" ${e()}>Résilience & souveraineté</div><div class="val-d" ${e()}>La vraie liberté ne se demande pas — elle se construit. Avec de la terre, des mains, et le temps qu'il faut.</div></div>
+    <div class="val-it"><div class="val-ic">🔗</div><div class="val-t" ${e()}>Cycles naturels</div><div class="val-d" ${e()}>Rien ne se perd. Tout se transforme. Le déchet devient richesse. La mort devient vie.</div></div>
+    <div class="val-it"><div class="val-ic">👨‍👩‍👧</div><div class="val-t" ${e()}>Famille & transmission</div><div class="val-d" ${e()}>Ce que nous construisons ici, c'est pour que nos enfants aient quelque chose de solide sur quoi s'appuyer.</div></div>
+    <div class="val-it"><div class="val-ic">📍</div><div class="val-t" ${e()}>Neuvic, Dordogne</div><div class="val-d" ${e()}>Pas une marque abstraite. Un endroit réel, une terre réelle, des gens réels. 24190, France.</div></div>
+  </div>
+</section>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// CONTACT
+// ══════════════════════════════════════════════
+function pageContact(){return `
+${NAV()}
+<div class="ct-wrap">
+  <div class="ct-info">
+    <div class="sec-kick" ${e()}>Nous contacter</div>
+    <h1 class="sec-title" ${e()}>Parlons de votre jardin</h1>
+    <p class="sec-desc" ${e()}>Une question sur nos produits, une réservation pour un atelier, ou juste envie d'échanger — nous répondons sous 24h.</p>
+    <div style="margin-top:36px">
+      <div class="ct-det"><div class="ct-ic">📍</div><div class="ct-det-t"><h4 ${e()}>Adresse</h4><p ${e()}>Neuvic · Dordogne · 24190 · France</p></div></div>
+      <div class="ct-det"><div class="ct-ic">✉️</div><div class="ct-det-t"><h4 ${e()}>Email</h4><p ${e()}>contact@nosvers.com</p></div></div>
+      <div class="ct-det"><div class="ct-ic">📱</div><div class="ct-det-t"><h4 ${e()}>Téléphone / WhatsApp</h4><p ${e()}>07 82 25 92 77</p></div></div>
+      <div class="ct-det"><div class="ct-ic">🕐</div><div class="ct-det-t"><h4 ${e()}>Disponibilité</h4><p ${e()}>Réponse sous 24h · Tous les jours</p></div></div>
+    </div>
+  </div>
+  <div class="ct-form-wrap">
+    <div class="sec-kick" ${e()}>Message</div>
+    <h2 class="sec-title" ${e()}>Écrivez-nous</h2>
+    <div style="margin-top:28px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-grp"><label class="form-lbl" ${e()}>Prénom</label><input class="form-inp" type="text" placeholder="Votre prénom"></div>
+        <div class="form-grp"><label class="form-lbl" ${e()}>Nom</label><input class="form-inp" type="text" placeholder="Votre nom"></div>
+      </div>
+      <div class="form-grp"><label class="form-lbl" ${e()}>Email</label><input class="form-inp" type="email" placeholder="votre@email.com"></div>
+      <div class="form-grp"><label class="form-lbl" ${e()}>Sujet</label>
+        <select class="form-inp">
+          <option>Question sur un produit</option>
+          <option>Réservation atelier Sol Vivant</option>
+          <option>Commande / livraison</option>
+          <option>Vers de compost — liste d'attente</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="form-grp"><label class="form-lbl" ${e()}>Message</label><textarea class="form-inp textarea" placeholder="Décrivez votre jardin, vos questions, votre projet..."></textarea></div>
+      <button class="btn-g" style="width:100%;justify-content:center;padding:14px;font-size:15px" ${e()}>Envoyer le message →</button>
+    </div>
+    <div style="margin-top:44px">
+      <div class="sec-kick" ${e()}>FAQ</div>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:20px" ${e()}>Questions fréquentes</h3>
+      <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>C'est quoi l'Extrait Vivant de Lombric ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Extrait liquide de compost de vers, brassé en aérobiose 24–36h. Multiplie bactéries, champignons, protozoaires bénéfiques. Résultats visibles en 48h.</div></div>
+      <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Comment livrez-vous les vers vivants ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Boîte aérée avec litière humide. Survivent 3–5 jours. Expédition lundi-mardi. Remplacement gratuit si morts à l'arrivée. Disponibles avril 2026.</div></div>
+      <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Livrez-vous partout en France ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Oui. Semences, kits, humus : Colissimo 2–4j. Vers : lundi-mardi seulement. Extrait vivant frais : Dordogne ±30km.</div></div>
+      <div class="faq-it" onclick="this.classList.toggle('open')"><div class="faq-q"><span ${e()}>Peut-on visiter la ferme ?</span><span class="faq-ic">+</span></div><div class="faq-a" ${e()}>Oui, sur rendez-vous. Ateliers pratiques avec Africa en Dordogne. contact@nosvers.com · 07 82 25 92 77</div></div>
+    </div>
+  </div>
+</div>
+${FOOTER()}`;}
+
+// ══════════════════════════════════════════════
+// ROUTER & EDITOR
+// ══════════════════════════════════════════════
+const PAGES = {home:pageHome,extrait:pageExtrait,engrais:pageEngrais,atelier:pageAtelier,about:pageAbout,contact:pageContact};
+let currentPage='home',isEditing=true,panelVisible=true;
+
+function goPage(t){
+  document.querySelectorAll('.ed-tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  currentPage=t.dataset.page;
+  renderPage(currentPage);
+  document.getElementById('ed-canvas-wrap').scrollTo(0,0);
+}
+
+function renderPage(id){
+  const c=document.getElementById('ed-canvas');
+  c.innerHTML=`<div class="page">${PAGES[id]()}</div>`;
+  if(isEditing){
+    document.querySelectorAll('[data-e]').forEach(el=>{
+      el.setAttribute('contenteditable','true');
+      el.setAttribute('spellcheck','false');
+      el.addEventListener('focus',showHint);
+      el.addEventListener('blur',onEdit);
+      el.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();el.blur()}});
+    });
+  }
+}
+
+function onEdit(){const s=document.getElementById('save-ind');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2000)}
+
+function setMode(m){
+  isEditing=m==='edit';
+  document.body.classList.toggle('edit-mode',isEditing);
+  document.getElementById('btn-edit').classList.toggle('on',isEditing);
+  document.getElementById('btn-prev').classList.toggle('on',!isEditing);
+  renderPage(currentPage);
+  const h=document.getElementById('ed-hint');
+  if(isEditing){h.classList.add('show');setTimeout(()=>h.classList.remove('show'),3000)}
+  else h.classList.remove('show');
+}
+
+function showHint(){const h=document.getElementById('ed-hint');h.classList.add('show');clearTimeout(window._ht);window._ht=setTimeout(()=>h.classList.remove('show'),3500)}
+
+function togglePanel(){const p=document.getElementById('ed-panel');panelVisible=!panelVisible;p.classList.toggle('hidden',!panelVisible)}
+
+function setColor(v,val){document.documentElement.style.setProperty(v,val)}
+function setSize(v,val,u,lbl){document.documentElement.style.setProperty(v,val+u);document.getElementById(lbl).textContent=val+u}
+
+function replaceImg(el){
+  if(!isEditing)return;
+  const input=prompt('📷 URL de la nouvelle image :\n\nGoogle Drive : Partager → Copier le lien → Coller ici\nURL directe : https://nosvers.com/wp-content/uploads/...\n\nURL actuelle :',el.src);
+  if(!input||!input.trim())return;
+  let url=input.trim();
+  const gd=url.match(/\/file\/d\/([^\/]+)/);
+  if(gd)url=`https://drive.google.com/uc?export=view&id=${gd[1]}`;
+  el.src=url;
+  toast('✓ Image mise à jour');
+}
+
+function exportPage(){
+  const content=document.getElementById('ed-canvas').innerHTML;
+  const vars=document.documentElement.style.cssText;
+  const styles=Array.from(document.styleSheets).filter(s=>{try{return s.cssRules}catch(e){return false}}).flatMap(s=>Array.from(s.cssRules)).filter(r=>{const t=r.selectorText||'';return !t.includes('#ed-')&&!t.includes('.ed-')&&!t.includes('.mode-')&&!t.includes('[data-e]')&&!t.includes('[data-img]')&&!t.includes('.p-sec')&&!t.includes('.p-ttl')&&!t.includes('.sl-')&&!t.includes('.color-')&&!t.includes('.c-name')&&!t.includes('.hint-box')&&!t.includes('#ed-hint')&&!t.includes('#toast')&&!t.includes('.hk')&&!t.includes('#save-ind')&&!t.includes('.mode-btn')&&!t.includes('.mode-grp')&&!t.includes('.ed-btn')}).map(r=>{try{return r.cssText}catch(e){return ''}}).join('\n');
+  const clean=content.replace(/ contenteditable="true"/g,'').replace(/ data-e="1"/g,'').replace(/ spellcheck="false"/g,'').replace(/ data-img="1"/g,'').replace(/ onclick="replaceImg\(this\)"/g,'');
+  const blob=new Blob([`<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>NosVers — ${currentPage}</title>\n<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">\n<style>\n:root{${vars}}\n${styles}\n</style>\n</head>\n<body>\n${clean}\n</body>\n</html>`],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nosvers-${currentPage}.html`;a.click();
+  toast('✓ Exporté : nosvers-'+currentPage+'.html');
+}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3000)}
+
+document.addEventListener('click',e=>{if(e.target.closest('.p-opt')){const g=e.target.closest('.price-opts');if(g)g.querySelectorAll('.p-opt').forEach(o=>o.classList.remove('on'));e.target.closest('.p-opt').classList.add('on')}});
+
+renderPage('home');
+setTimeout(()=>{const h=document.getElementById('ed-hint');h.classList.add('show');setTimeout(()=>h.classList.remove('show'),4500)},500);
+</script>
+</body>
+</html>
