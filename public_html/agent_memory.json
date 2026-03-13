@@ -1,0 +1,50 @@
+{
+  "vers": {
+    "last_consultation": null,
+    "context_summary": "",
+    "pending_tasks": [],
+    "known_issues": [],
+    "references_used": [],
+    "metrics": {
+      "kg_lombrices": null,
+      "humedad_promedio": null,
+      "temperatura_promedio": null
+    }
+  },
+  "compost": {
+    "last_consultation": null,
+    "context_summary": "",
+    "pending_tasks": [],
+    "known_issues": [],
+    "references_used": [],
+    "metrics": {
+      "andains_activos": 0,
+      "temperatura_max": null
+    }
+  },
+  "animaux": {
+    "last_consultation": null,
+    "context_summary": "",
+    "pending_tasks": [],
+    "known_issues": [],
+    "references_used": [],
+    "metrics": {
+      "gallinas": 0,
+      "canards": 0,
+      "brebis": 0,
+      "lapins": 0,
+      "produccion_huevos_dia": null
+    }
+  },
+  "huerto": {
+    "last_consultation": null,
+    "context_summary": "",
+    "pending_tasks": [],
+    "known_issues": [],
+    "references_used": [],
+    "metrics": {
+      "parcelas_activas": 0,
+      "ultimo_riego": null
+    }
+  }
+}

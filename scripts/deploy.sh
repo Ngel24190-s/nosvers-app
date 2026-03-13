@@ -25,27 +25,41 @@ echo "   ✅ Directorios creados"
 # ── 2. Copiar archivos del repo ──────────────────────────
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "📦 Copiando archivos desde repo ($REPO_DIR)..."
+if [ "$(realpath "$REPO_DIR")" = "$(realpath "$NOSVERS")" ]; then
+    echo "   ℹ️  Repo y destino son el mismo directorio — copiando solo a subdirectorios"
+    # Solo copiar archivos que van a subdirectorios distintos del origen
+    cp "$REPO_DIR/api.php" "$NOSVERS/public_html/" 2>/dev/null || true
+    cp "$REPO_DIR/kb_search.php" "$NOSVERS/public_html/" 2>/dev/null || true
+    cp "$REPO_DIR/agent_memory.json" "$NOSVERS/public_html/" 2>/dev/null || true
+    cp "$REPO_DIR/index.html" "$NOSVERS/public_html/" 2>/dev/null || true
+    echo "   ✅ public_html/ (archivos copiados desde raíz)"
+    if [ -d "$REPO_DIR/vault_init" ]; then
+        cp -rn "$REPO_DIR/vault_init/"* "$VAULT/" 2>/dev/null || true
+        echo "   ✅ Vault content inicial"
+    fi
+else
+    echo "📦 Copiando archivos desde repo ($REPO_DIR)..."
 
-# Bot
-cp "$REPO_DIR/bot/bot.py" "$NOSVERS/bot/"
-echo "   ✅ bot/bot.py"
+    # Bot
+    cp "$REPO_DIR/bot/bot.py" "$NOSVERS/bot/"
+    echo "   ✅ bot/bot.py"
 
-# Agentes
-cp "$REPO_DIR/agents/"*.py "$NOSVERS/agents/"
-echo "   ✅ agents/*.py"
+    # Agentes
+    cp "$REPO_DIR/agents/"*.py "$NOSVERS/agents/"
+    echo "   ✅ agents/*.py"
 
-# App granja (api.php y relacionados)
-cp "$REPO_DIR/api.php" "$NOSVERS/public_html/"
-cp "$REPO_DIR/kb_search.php" "$NOSVERS/public_html/" 2>/dev/null || true
-cp "$REPO_DIR/agent_memory.json" "$NOSVERS/public_html/" 2>/dev/null || true
-cp "$REPO_DIR/index.html" "$NOSVERS/public_html/" 2>/dev/null || true
-echo "   ✅ public_html/"
+    # App granja (api.php y relacionados)
+    cp "$REPO_DIR/api.php" "$NOSVERS/public_html/"
+    cp "$REPO_DIR/kb_search.php" "$NOSVERS/public_html/" 2>/dev/null || true
+    cp "$REPO_DIR/agent_memory.json" "$NOSVERS/public_html/" 2>/dev/null || true
+    cp "$REPO_DIR/index.html" "$NOSVERS/public_html/" 2>/dev/null || true
+    echo "   ✅ public_html/"
 
-# Vault content inicial
-if [ -d "$REPO_DIR/vault_init" ]; then
-    cp -rn "$REPO_DIR/vault_init/"* "$VAULT/" 2>/dev/null || true
-    echo "   ✅ Vault content inicial"
+    # Vault content inicial
+    if [ -d "$REPO_DIR/vault_init" ]; then
+        cp -rn "$REPO_DIR/vault_init/"* "$VAULT/" 2>/dev/null || true
+        echo "   ✅ Vault content inicial"
+    fi
 fi
 
 # ── 3. Instalar dependencias del sistema ──────────────────
