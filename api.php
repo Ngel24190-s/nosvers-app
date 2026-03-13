@@ -172,7 +172,18 @@ switch ($action) {
             $userContent = $data['user'];
         }
 
-        $payload = json_encode(['model' => 'claude-sonnet-4-5-20250929', 'max_tokens' => 1200, 'system' => $data['system'], 'messages' => [['role' => 'user', 'content' => $userContent]]]);
+        // Historial conversacional (campo 'messages' opcional desde chat.html)
+        if (!empty($data['messages']) && is_array($data['messages'])) {
+            $msgs = $data['messages'];
+            // Si el último mensaje es user, reemplazar content con el procesado (puede tener imagen)
+            for ($i = count($msgs)-1; $i >= 0; $i--) {
+                if ($msgs[$i]['role'] === 'user') { $msgs[$i]['content'] = $userContent; break; }
+            }
+        } else {
+            $msgs = [['role' => 'user', 'content' => $userContent]];
+        }
+        $model = $data['model'] ?? 'claude-sonnet-4-6';
+        $payload = json_encode(['model' => $model, 'max_tokens' => 1500, 'system' => $data['system'], 'messages' => $msgs]);
         $ch = curl_init('https://api.anthropic.com/v1/messages');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-api-key: ' . CLAUDE_KEY, 'anthropic-version: 2023-06-01'], CURLOPT_TIMEOUT => 60]);
         $resp = curl_exec($ch);
