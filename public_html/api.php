@@ -25,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_GET['action'] ?? '';
 
-if ($action !== 'login') {
+// Actions that don't require auth token
+$public_actions = ['login', 'agente'];
+if (!in_array($action, $public_actions)) {
     $token = $_SERVER['HTTP_X_APP_TOKEN'] ?? '';
     if (!validarToken($token)) {
         http_response_code(401);
