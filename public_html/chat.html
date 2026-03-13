@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>NosVers · Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #F4EFE4;
+  --cream:  #FDFAF4;
+  --dark:   #18180F;
+  --green:  #3D6B20;
+  --glight: #EEF4E8;
+  --gmid:   #5A8A32;
+  --border: rgba(60,50,20,.1);
+  --mid:    #7A7060;
+  --ubg:    #2D5018;
+  --aibg:   #FFFFFF;
+  --sh:     0 2px 16px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--dark);overflow:hidden}
+
+.app{display:flex;flex-direction:column;height:100dvh;max-width:640px;margin:0 auto;background:var(--cream);position:relative}
+
+/* HEADER */
+.hd{background:var(--dark);padding:14px 18px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;overflow:hidden}
+.hd::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 90% 50%,rgba(90,138,50,.18) 0%,transparent 65%);pointer-events:none}
+.hd-av{width:38px;height:38px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:2px solid rgba(255,255,255,.12)}
+.hd-name{font-family:'Playfair Display',serif;font-size:15px;color:#FDFAF4;line-height:1.2}
+.hd-sub{font-size:10px;color:rgba(253,250,244,.38);margin-top:1px}
+.hd-dot{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10px;color:#7AB648}
+.hd-dot::before{content:'';width:6px;height:6px;background:#7AB648;border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* SELECTOR */
+.sel{background:var(--dark);padding:0 18px 12px;display:flex;gap:8px}
+.sel-btn{flex:1;padding:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(253,250,244,.35);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.sel-btn.on{background:var(--green);border-color:var(--green);color:#FDFAF4;font-weight:500}
+
+/* SUGERENCIAS */
+.sugs{padding:10px 14px 0;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.sugs::-webkit-scrollbar{display:none}
+.sug{white-space:nowrap;padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:white;font-size:12px;color:var(--mid);cursor:pointer;transition:all .15s;flex-shrink:0}
+.sug:active{background:var(--glight);border-color:var(--gmid);color:var(--green)}
+
+/* WELCOME */
+.welcome{text-align:center;padding:28px 20px 4px;flex-shrink:0}
+.wl-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--green);margin-bottom:5px}
+.wl-sub{font-size:12px;color:var(--mid);line-height:1.6}
+
+/* MENSAJES */
+.msgs{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:2px}
+.msgs::-webkit-scrollbar-thumb{background:var(--border)}
+
+.msg{display:flex;flex-direction:column;max-width:85%;animation:up .18s ease}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.u{align-self:flex-end;align-items:flex-end}
+.msg.a{align-self:flex-start;align-items:flex-start}
+
+.bub{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.65;word-break:break-word}
+.msg.u .bub{background:var(--ubg);color:#FDFAF4;border-bottom-right-radius:4px}
+.msg.a .bub{background:var(--aibg);color:var(--dark);border-bottom-left-radius:4px;box-shadow:var(--sh)}
+.msg.a .bub b{color:var(--green)}
+.msg.a .bub .sec{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+.ts{font-size:10px;color:rgba(122,112,96,.4);margin-top:3px;padding:0 3px}
+
+/* TYPING */
+.typing .bub{display:flex;gap:4px;align-items:center;padding:13px 16px}
+.dot{width:6px;height:6px;background:var(--mid);border-radius:50%;animation:bo .85s infinite}
+.dot:nth-child(2){animation-delay:.15s}
+.dot:nth-child(3){animation-delay:.3s}
+@keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* INPUT */
+.inp-area{padding:8px 12px 14px;background:var(--cream);border-top:1px solid var(--border);flex-shrink:0}
+.inp-row{display:flex;gap:8px;align-items:flex-end;background:white;border-radius:22px;border:1.5px solid var(--border);padding:7px 7px 7px 15px;box-shadow:var(--sh);transition:border-color .2s}
+.inp-row:focus-within{border-color:var(--gmid)}
+textarea{flex:1;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--dark);background:transparent;line-height:1.5;max-height:110px;min-height:22px;padding:2px 0}
+textarea::placeholder{color:rgba(122,112,96,.45)}
+.send{width:36px;height:36px;background:var(--green);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;color:white}
+.send:active{transform:scale(.93)}
+.send:disabled{background:var(--border);cursor:not-allowed;transform:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="hd">
+  <div class="hd-av">🌿</div>
+  <div style="flex:1">
+    <div class="hd-name">NosVers · Assistant</div>
+    <div class="hd-sub">Ferme Sol Vivant · Dordogne</div>
+  </div>
+  <div class="hd-dot">En ligne</div>
+</div>
+
+<div class="sel">
+  <button class="sel-btn on" id="btn-angel" onclick="setUser('angel')">🔧 Angel</button>
+  <button class="sel-btn" id="btn-africa" onclick="setUser('africa')">🌺 África</button>
+</div>
+
+<div class="sugs" id="sugs"></div>
+
+<div class="welcome" id="welcome">
+  <div class="wl-logo">Bonjour 🌱</div>
+  <div class="wl-sub" id="wl-sub">Escribe tu pregunta.<br>Conozco toda la ferme.</div>
+</div>
+
+<div class="msgs" id="msgs"></div>
+
+<div class="inp-area">
+  <div class="inp-row">
+    <textarea id="inp" rows="1" placeholder="Escribe aquí..." 
+      onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+    <button class="send" id="sbtn" onclick="send()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+</div>
+<script>
+// ── CONTEXTO COMPLETO NosVers ─────────────────────────────
+const CTX_BASE = `Eres el asistente inteligente de NosVers, una ferme lombricole familiale en Neuvic, Dordogne (24190), Francia. Fundadores: Angel (CEO) y África (Directora de Conocimiento). SIRET registrado, MSA cotisant solidaire.
+
+PRODUCTOS ACTIVOS:
+- Extrait Vivant de Lombric — 45€ (kit 20L: lombricompost + mélasse + protéine de poisson + farine de varech + bulleur + guía África)
+- Service Frais (lombricompost fresco) — 25€
+- Pack Engrais Vert — 9,90€ (phacélie, vesce, sarrasin, moutarde blanche, trèfle violet, avoine) — ~13 sachets disponibles
+- Atelier Sol Vivant — 85€/persona
+
+CLUB SOL VIVANT (próximo lanzamiento):
+- 15€/mes · 144€/año · 20 plazas al lanzamiento
+- PDF mensual África + défi + Telegram privado + sorpresa física cada 2 meses
+
+FILOSOFÍA: Sol vivant · Souveraineté alimentaire · Dr. Elaine Ingham Soil Food Web
+LombriThé: multiplicación microorganismos 100-1000× en 24-48h aeróbico
+
+WEB: nosvers.com · WordPress + WooCommerce + Bricks Builder · VPS Hostinger
+GitHub: Ngel24190-s/nosvers-app
+Instagram objetivo: @nosvers.ferme
+
+IDENTIDAD VISUAL (Nerea, la hija): paleta #FEFAF4 + #5A7A2E · Playfair Display + DM Sans · estilo "editorial organique"
+
+ESTADO ACTUAL:
+- 5 posts Instagram S1 listos con copy completo
+- Email enviado a África con 5 preguntas para PDF #1 Club
+- Bot Telegram @nosvers_hq_bot configurado
+- VPS: 72.61.160.108 · Ubuntu 24.04 · 16GB RAM
+- Blog: post ID 458 publicado (estudio Texas A&M vermicultura + micorriza)`;
+
+const CTX_ANGEL = CTX_BASE + `
+
+CONTEXTO ANGEL:
+Eres su Director Ejecutivo digital. Responde SIEMPRE en español. Tono directo, concreto, sin rodeos.
+Angel trabaja en desamiantage (DI ENVIRONNEMENT Sud Ouest) L-V — tiempo escaso.
+Cuando diga algo técnico → da comandos exactos o código funcional.
+Conoces el sistema completo: VPS, GitHub, WordPress API, Telegram bot, agentes cron.
+Acciones sobre nosvers.com → siempre como borrador para aprobación de Angel.
+Para contenido del sitio → en francés.
+
+AGENTES ACTIVOS EN EL VPS:
+- orchestrator.py (cada hora) — coordinador
+- agt01_visual.py — procesa fotos de África
+- agt02_instagram.py (domingos 10h) — genera 5 posts/semana
+- agt04_seo.py (lunes 7h) — blog + keywords
+- agt05_africa.py (cada 6h) — monitoriza emails de África
+- agt06_infoproduct.py — PDFs + Lemon Squeezy (fase 1)`;
+
+const CTX_AFRICA = CTX_BASE + `
+
+CONTEXTO ÁFRICA:
+Responde SIEMPRE en français. Tono cálido, proche, comme une collègue de confiance.
+África gère la ferme au quotidien — elle connaît le sol, les vers, les plantes.
+Aide-la avec: observations du jardin, registres du lombricultivo, idées de contenu, questions sur le sol.
+Si elle décrit quelque chose qu'elle voit → aide à l'interpréter et à le documenter.
+Pour le Club Sol Vivant → aide à structurer son savoir en format PDF.
+Évite tout jargon technique IT. Parle de la ferme, du sol, des vers.`;
+
+// ── SUGERENCIAS ───────────────────────────────────────────
+const SUGS = {
+  angel: [
+    "¿Qué hay pendiente?","Estado del VPS","Genera posts Instagram",
+    "Redacta artículo blog","¿Cómo va el Club?","Ver agentes activos"
+  ],
+  africa: [
+    "Comment vont les vers ?","Aide-moi pour un PDF du Club",
+    "J'ai observé quelque chose","Recette de LombriThé",
+    "Que planter ce mois ?","Idées pour le Club Sol Vivant"
+  ]
+};
+
+// ── ESTADO ────────────────────────────────────────────────
+let user = 'angel', hist = [], busy = false;
+
+function setUser(u) {
+  user = u; hist = [];
+  document.getElementById('btn-angel').className = 'sel-btn' + (u==='angel'?' on':'');
+  document.getElementById('btn-africa').className = 'sel-btn' + (u==='africa'?' on':'');
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('welcome').style.display = '';
+  document.getElementById('wl-sub').innerHTML = u === 'angel'
+    ? 'Escribe tu pregunta.<br>Conozco toda la ferme.'
+    : 'Pose ta question.<br>Je connais toute la ferme.';
+  document.getElementById('inp').placeholder = u === 'angel' ? 'Escribe aquí...' : 'Écris ici...';
+  renderSugs();
+}
+
+function renderSugs() {
+  document.getElementById('sugs').innerHTML =
+    SUGS[user].map(s => `<button class="sug" onclick="go('${s}')">${s}</button>`).join('');
+}
+
+function now() {
+  return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function fmt(t) {
+  return t
+    .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+    .replace(/^#{1,3} (.+)$/gm,'<b>$1</b>')
+    .replace(/^[-•] (.+)$/gm,'• $1')
+    .replace(/\n\n/g,'<div class="sec">') 
+    .replace(/\n/g,'<br>');
+}
+
+function addMsg(role, text) {
+  document.getElementById('welcome').style.display = 'none';
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.innerHTML = `<div class="bub">${role==='u' ? text : fmt(text)}</div><div class="ts">${now()}</div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function showTyping() {
+  document.getElementById('welcome').style.display = 'none';
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg a typing'; d.id = 'ty';
+  d.innerHTML = '<div class="bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideTyping() { const t=document.getElementById('ty'); if(t) t.remove(); }
+
+async function send() {
+  const inp = document.getElementById('inp');
+  const txt = inp.value.trim();
+  if (!txt || busy) return;
+  inp.value = ''; resize(inp);
+  await go(txt);
+}
+
+async function go(txt) {
+  if (busy) return;
+  busy = true;
+  document.getElementById('sbtn').disabled = true;
+  addMsg('u', txt);
+  hist.push({role:'user', content: txt});
+  showTyping();
+
+  try {
+    // Construir mensajes para el historial (máx 12 turnos)
+    const messages = hist.slice(-12);
+
+    const res = await fetch('api.php?action=agente', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-App-Token': getToken()
+      },
+      body: JSON.stringify({
+        system: user === 'angel' ? CTX_ANGEL : CTX_AFRICA,
+        user: txt,
+        messages: messages
+      })
+    });
+
+    hideTyping();
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const data = await res.json();
+    let reply = '';
+
+    if (data.content && Array.isArray(data.content)) {
+      reply = data.content.find(b => b.type === 'text')?.text || '';
+    } else if (data.error) {
+      reply = '⚠️ ' + data.error;
+    }
+
+    if (reply) {
+      addMsg('a', reply);
+      hist.push({role:'assistant', content: reply});
+    }
+
+  } catch(e) {
+    hideTyping();
+    const err = user === 'angel'
+      ? `⚠️ No puedo conectar.\n_${e.message}_`
+      : `⚠️ Connexion impossible.\n_${e.message}_`;
+    addMsg('a', err);
+  }
+
+  busy = false;
+  document.getElementById('sbtn').disabled = false;
+  document.getElementById('inp').focus();
+}
+
+function getToken() {
+  const p = new URLSearchParams(location.search).get('token');
+  if (p) { localStorage.setItem('nv_tok', p); history.replaceState({}, '', location.pathname); return p; }
+  return localStorage.getItem('nv_tok') || '';
+}
+
+function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+function resize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+// ── INIT ──────────────────────────────────────────────────
+renderSugs();
+</script>
+</body>
+</html>

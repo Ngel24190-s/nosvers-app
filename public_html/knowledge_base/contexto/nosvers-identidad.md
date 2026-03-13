@@ -30,4 +30,4 @@ LombriThé: 100-1000× multiplicación microorganismos 24-48h
 ## Stack técnico
 
 - WordPress + WooCommerce · Hostinger VPS
-- Instagram: @nosvers.ferme
+- Instagram: @nosvers

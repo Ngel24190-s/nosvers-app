@@ -43,16 +43,21 @@ function validarToken($token) {
     return isset($users[$user]) && $users[$user] === $pass;
 }
 
-try {
-    $pdo = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'DB connection failed: ' . $e->getMessage()]);
-    exit;
+// DB connection — optional, only needed for farm data actions
+$pdo = null;
+$db_actions = ['login', 'animaux', 'etat_parcelles', 'update_etat'];
+if (in_array($action, $db_actions)) {
+    try {
+        $pdo = new PDO(
+            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+            DB_USER, DB_PASS,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'DB connection failed: ' . $e->getMessage()]);
+        exit;
+    }
 }
 
 switch ($action) {
@@ -172,7 +177,18 @@ switch ($action) {
             $userContent = $data['user'];
         }
 
-        $payload = json_encode(['model' => 'claude-sonnet-4-5-20250929', 'max_tokens' => 1200, 'system' => $data['system'], 'messages' => [['role' => 'user', 'content' => $userContent]]]);
+        // Historial conversacional (campo 'messages' opcional desde chat.html)
+        if (!empty($data['messages']) && is_array($data['messages'])) {
+            $msgs = $data['messages'];
+            // Si el último mensaje es user, reemplazar content con el procesado (puede tener imagen)
+            for ($i = count($msgs)-1; $i >= 0; $i--) {
+                if ($msgs[$i]['role'] === 'user') { $msgs[$i]['content'] = $userContent; break; }
+            }
+        } else {
+            $msgs = [['role' => 'user', 'content' => $userContent]];
+        }
+        $model = $data['model'] ?? 'claude-sonnet-4-6';
+        $payload = json_encode(['model' => $model, 'max_tokens' => 1500, 'system' => $data['system'], 'messages' => $msgs]);
         $ch = curl_init('https://api.anthropic.com/v1/messages');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-api-key: ' . CLAUDE_KEY, 'anthropic-version: 2023-06-01'], CURLOPT_TIMEOUT => 60]);
         $resp = curl_exec($ch);

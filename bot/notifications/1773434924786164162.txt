@@ -1,0 +1,16 @@
+🌿 NosVers · VPS completamente operativo
+
+✅ chat.html funcionando
+✅ API Claude conectada
+✅ Bot Telegram activo
+✅ Agentes + crontabs instalados
+✅ Syncthing corriendo
+✅ Vault poblada
+
+🔗 URLs:
+http://72.61.160.108:8080/chat.html
+https://nosvers-granja.72.61.160.108.nip.io/chat.html
+
+Para que funcione en nosvers.com/granja/ necesitas:
+- Apuntar un subdominio a este VPS, o
+- Subir los archivos al hosting de Hostinger
