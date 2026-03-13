@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: nosvers-vault
+created: 2026-03-13T19:39:55Z
