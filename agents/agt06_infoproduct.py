@@ -1,73 +1,82 @@
 #!/usr/bin/env python3
-"""
-AGT-06 · Infoproductos — PDFs + Lemon Squeezy
-Estado: FASE 1 — activar en M1
-Genera PDFs maquetados del conocimiento de África para el Club Sol Vivant
-"""
+# NosVers - AGT-06 Infoproduct
+# PDFs + Lemon Squeezy. Se activa cuando AGT-05 genera contenido.
+import sys
+sys.path.insert(0, '/home/nosvers/agents')
+from agent_base import NosVersAgent
 
-import os
-import requests
-from datetime import datetime
-from dotenv import load_dotenv
+class InfoproductAgent(NosVersAgent):
 
-load_dotenv('/home/nosvers/.env')
+    def __init__(self):
+        super().__init__('agt06_infoproduct', '📄')
 
-APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
-APP_TOKEN = os.getenv('APP_TOKEN', '')
-ANTHROPIC_KEY = os.getenv('ANTHROPIC_API_KEY', '')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
+    def check_triggers(self):
+        pdf = self.vault_read('club', 'pdf-01-comprendre-votre-sol')
+        memoria = self.get_memory()
+        if pdf and len(pdf) > 200 and 'maquetado' not in memoria:
+            return ['pdf_listo']
+        return []
 
-PDF_OUTPUT = '/home/nosvers/uploads/pdfs/'
+    def process_inbox(self, inbox):
+        if 'PDF' in inbox and ('maquet' in inbox.lower() or 'listo' in inbox.lower()):
+            self.log.info("AGT-05 solicita maquetacion de PDF")
+            self.preparar_maquetacion()
 
+    def preparar_maquetacion(self):
+        pdf = self.vault_read('club', 'pdf-01-comprendre-votre-sol')
+        if not pdf:
+            self.log.info("Sin contenido PDF todavia")
+            return
 
-def vault_read(category, filename):
-    try:
-        r = requests.get(
-            f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
-            headers={'X-App-Token': APP_TOKEN}, timeout=10
+        self.log.info("PDF listo — preparando instrucciones de maquetacion")
+
+        self.save_result(
+            "# PDF #1 - Listo para maquetar\n\n"
+            f"Fecha: {self.ts}\n\n"
+            "## Contenido\n"
+            "Archivo: vault/club/pdf-01-comprendre-votre-sol.md\n\n"
+            "## Pasos de maquetacion\n"
+            "1. Descargar contenido del vault\n"
+            "2. Maquetar con branding NosVers (paleta Nerea: #FEFAF4 + #5A7A2E)\n"
+            "3. Tipografia: Playfair Display titulos + DM Sans cuerpo\n"
+            "4. Exportar PDF max 12 paginas\n"
+            "5. Subir a Lemon Squeezy\n"
+            "6. Configurar entrega automatica por email\n"
+            "7. Anunciar: Instagram + Telegram Club"
         )
-        if r.status_code == 200:
-            return r.json().get('content', '')
-    except Exception:
-        pass
-    return ''
 
+        self.save_memory(f"PDF #1 recibido de AGT-05 en {self.ts}. Pendiente maquetacion manual.")
 
-def notify(msg):
-    if not TELEGRAM_TOKEN:
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=10
+        self.send_message(
+            'orchestrator',
+            'PDF #1 pendiente maquetacion manual',
+            'Contenido listo en vault/club/. Requiere diseno por Nerea antes de publicar en Lemon Squeezy.'
         )
-    except Exception:
-        pass
 
-
-def run():
-    """
-    FASE 1: Placeholder — se activará cuando haya suficiente contenido de África.
-    Flujo futuro:
-    1. Leer conocimiento acumulado de vault (contexto/africa-conocimiento)
-    2. Generar PDF con reportlab/weasyprint
-    3. Subir a Lemon Squeezy via API
-    4. Notificar a Angel
-    """
-    print(f"[{datetime.now()}] AGT-06: FASE 1 — En espera")
-
-    # Verificar si hay contenido suficiente
-    conocimiento = vault_read('contexto', 'africa-conocimiento')
-    if len(conocimiento) > 3000:
-        notify(
-            "📄 *AGT-06*: Hay contenido suficiente de África para generar PDF #1 del Club.\n"
-            "_Esperando activación — confirma con Angel_"
+        self.notify(
+            "*PDF #1 listo para maquetar*\n\n"
+            "Contenido guardado en vault/club/\n\n"
+            "Siguiente paso: maquetar con branding NosVers (Nerea).\n"
+            "Luego sube a Lemon Squeezy."
         )
-    else:
-        print("  Contenido insuficiente para PDF. Esperando más material de África.")
+
+    def run(self):
+        self.log.info("AGT-06 iniciando")
+
+        inbox = self.read_inbox()
+        if inbox and 'PENDIENTE' in inbox:
+            self.process_inbox(inbox)
+            self.mark_inbox_done()
+            return
+
+        triggers = self.check_triggers()
+        if 'pdf_listo' in triggers:
+            self.preparar_maquetacion()
+        else:
+            self.log.info("AGT-06 en espera - sin PDFs para procesar")
+
+        self.log.info("AGT-06 completado")
 
 
 if __name__ == '__main__':
-    run()
+    InfoproductAgent().run()
