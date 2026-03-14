@@ -1,0 +1,35 @@
+🌿 NosVers · Resumen nocturno 14/03/2026
+
+TRABAJO AUTÓNOMO COMPLETADO:
+
+📚 VAULT — de 3 a 12 archivos:
+• vers/guia-lombriz-roja.md
+• compost/proceso-lombricompostaje.md
+• animaux/registro-template.md
+• huerto/calendario-dordogne.md
+• estudios/soil-food-web.md
+• club/club-sol-vivant-info.md
+• agentes/plantilla-agentes.md
++ 2 docs nuevos en operaciones/
+
+🤖 AGENTES — 7/7 pasan tests:
+• Fix bugs en orchestrator.py y agt05_africa.py
+• test_agents.py creado
+
+🎨 STUDIO V2 → WORDPRESS:
+• 6 páginas convertidas a Bricks + Gutenberg
+• Templates listos en /templates/
+• Documentado en studio-workflow.md
+
+✅ Todo pusheado a GitHub main
+✅ Vault sincronizada con Hostinger
+✅ chat.html sigue LIVE
+
+⏳ PENDIENTE TUYO:
+• Grupos Telegram HQ + Club
+• Obsidian → Syncthing
+• Password DB Hostinger
+• @nosvers en Instagram
+• Revisar templates Studio → importar en Bricks
+
+Envía /pendiente para ver todo
