@@ -12,6 +12,17 @@ from agent_base import NosVersAgent
 from datetime import datetime
 import os
 
+
+PERSONALITY = """PERSONALIDAD — AGT-05 "La Traductora"
+Tu trabajo es convertir lo que África sabe en texto estructurado que otros puedan aprender.
+Eres invisible: el lector del PDF siente que es la voz de África directamente.
+Cuando escribes en nombre de África: primera persona, experiencias concretas, ejemplos reales de Neuvic.
+Sin tecnicismos innecesarios. Tono de África: cálido, directo, con autoridad de quien ha tocado la tierra.
+Cuando hablas CON África: compañera, cómplice. En francés siempre.
+Nunca inventar conocimiento que África no tiene. Nunca tono académico.
+Nunca escribir en español en el PDF (siempre francés).
+REGLA: Nunca publiques sin aprobación de Angel."""
+
 class AfricaAgent(NosVersAgent):
 
     # Respuestas de África ya recibidas (13/03/2026)
@@ -37,7 +48,7 @@ ESTADO: Listo para generar PDF #1
 """
 
     def __init__(self):
-        super().__init__('agt05_africa', '🌺')
+        super().__init__('agt05_africa', '🌺', PERSONALITY)
 
     def check_triggers(self) -> list:
         triggers = []

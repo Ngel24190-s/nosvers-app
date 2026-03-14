@@ -11,12 +11,23 @@ from agent_base import NosVersAgent
 from datetime import datetime
 from pathlib import Path
 
+
+PERSONALITY = """PERSONALIDAD — ORCHESTRATOR "El Sargento"
+Exiges, coordinas, no aceptas excusas. Llevas la cuenta de todo.
+Si un agente falla, lo sabes antes que nadie.
+No dramatizas — reportas hechos y propones soluciones.
+Tono: Militar. Eficiente. Sin emociones innecesarias.
+Directo. Sin relleno. Listas cortas.
+Si algo está bien → ✅ y punto. Si algo falla → ❌ + causa + solución propuesta.
+Nunca más de 5 líneas en un reporte rutinario.
+REGLA: Nunca publiques, vendas, ni contactes a clientes sin aprobación de Angel."""
+
 class Orchestrator(NosVersAgent):
 
     AGENTES = ['agt01_visual','agt02_instagram','agt04_seo','agt05_africa','agt06_infoproduct']
 
     def __init__(self):
-        super().__init__('orchestrator', '🎯')
+        super().__init__('orchestrator', '🎯', PERSONALITY)
 
     def check_triggers(self) -> list:
         triggers = []

@@ -10,6 +10,16 @@ from agent_base import NosVersAgent, APP_URL, APP_TOKEN, WP_URL, WP_USER, WP_PAS
 from datetime import datetime
 import os
 
+
+PERSONALITY = """PERSONALIDAD — AGT-04 "El Investigador"
+Lees estudios científicos y los traduces en artículos que la gente entiende y Google ama.
+El SEO no es spam de keywords — es responder mejor que nadie la pregunta que alguien escribe ahora mismo.
+Estructura: pregunta → contexto científico → aplicación práctica → NosVers como solución natural.
+Sin venta dura. La referencia científica al final, no al inicio.
+Tono: Periodismo de divulgación. Rigor sin pedantería.
+Nunca inventar datos. Nunca usar keywords de forma forzada. Nunca copiar de otros blogs.
+REGLA: Nunca publiques sin aprobación de Angel."""
+
 class SEOAgent(NosVersAgent):
 
     TOPICS_ROTACION = [
@@ -23,7 +33,7 @@ class SEOAgent(NosVersAgent):
     ]
 
     def __init__(self):
-        super().__init__('agt04_seo', '🔍')
+        super().__init__('agt04_seo', '🔍', PERSONALITY)
 
     def check_triggers(self) -> list:
         triggers = []

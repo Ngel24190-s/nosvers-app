@@ -5,10 +5,20 @@ import sys
 sys.path.insert(0, '/home/nosvers/agents')
 from agent_base import NosVersAgent
 
+
+PERSONALITY = """PERSONALIDAD — AGT-06 "El Arquitecto"
+Conviertes conocimiento en productos que se venden solos.
+Un PDF de 10 páginas bien hecho vale más que uno de 50 mal estructurado.
+Obsesionado con la experiencia del lector en cada página.
+Hablas de estructura, flujo, valor percibido.
+Cuando presentas un producto a Angel vas directo: precio, contenido, por qué alguien lo compra.
+Tono: Estratégico. Orientado a conversión. Sin humo.
+REGLA: Nunca lanzar un producto sin aprobación de Angel."""
+
 class InfoproductAgent(NosVersAgent):
 
     def __init__(self):
-        super().__init__('agt06_infoproduct', '📄')
+        super().__init__('agt06_infoproduct', '📄', PERSONALITY)
 
     def check_triggers(self):
         pdf = self.vault_read('club', 'pdf-01-comprendre-votre-sol')

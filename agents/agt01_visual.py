@@ -8,13 +8,25 @@ from pathlib import Path
 import base64, json, re
 import requests as req
 
+
+PERSONALITY = """PERSONALIDAD — AGT-01 "El Ojo"
+Obsesionado con la luz natural y la tierra visible.
+Ves una foto y en 3 segundos sabes si vale o no.
+No procesas basura — si la foto no tiene potencial, lo dices sin rodeos.
+Conoces la identidad visual de Nerea de memoria.
+Hablas como un fotógrafo de campo. Concreto y visual.
+Cuando analizas una foto describes exactamente qué ves y qué cambias.
+Tono: Artesanal. Preciso. Con criterio estético claro.
+Nunca publicar una foto borrosa, con flash, o de fondo artificial.
+REGLA: Nunca publiques sin aprobación de Angel."""
+
 class VisualAgent(NosVersAgent):
 
     UPLOADS = Path('/home/nosvers/uploads/africa')
     VISUELS = Path('/home/nosvers/uploads/visuels')
 
     def __init__(self):
-        super().__init__('agt01_visual', '📷')
+        super().__init__('agt01_visual', '📷', PERSONALITY)
         self.UPLOADS.mkdir(parents=True, exist_ok=True)
         self.VISUELS.mkdir(parents=True, exist_ok=True)
 

@@ -17,14 +17,18 @@ APP_TOKEN   = os.getenv('APP_TOKEN', '')
 TG_TOKEN    = os.getenv('TELEGRAM_TOKEN', '')
 ANGEL_ID    = os.getenv('ANGEL_CHAT_ID', '5752097691')
 CLAUDE_KEY  = os.getenv('ANTHROPIC_API_KEY', '')
+WP_URL      = os.getenv('WP_URL', '')
+WP_USER     = os.getenv('WP_USER', '')
+WP_PASS     = os.getenv('WP_PASS', '')
 
 
 class NosVersAgent:
     """Clase base para todos los agentes de NosVers."""
 
-    def __init__(self, name: str, icon: str = "🤖"):
+    def __init__(self, name: str, icon: str = "🤖", personality: str = ""):
         self.name  = name
         self.icon  = icon
+        self.personality = personality
         self.vault = VAULT
         self.log   = self._setup_log()
         self.ts    = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -128,7 +132,9 @@ class NosVersAgent:
             self.log.error("ANTHROPIC_API_KEY no configurada")
             return ''
         context = self.get_context()
+        personality_block = f"\n{self.personality}\n" if self.personality else ""
         system = f"""Eres el agente {self.name} de NosVers, ferme lombricole en Dordogne, Francia.
+{personality_block}
 {context}
 {contexto_extra}"""
         try:

@@ -333,6 +333,39 @@ switch ($action) {
         echo json_encode(['ok' => true, 'files' => $result, 'total' => count($result)]);
         break;
 
+    case 'upload_photo':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $image_b64 = $data['image'] ?? '';
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['category'] ?? 'general'));
+        $caption = $data['caption'] ?? '';
+        $user = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['user'] ?? 'unknown'));
+
+        if (!$image_b64) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No image data']);
+            break;
+        }
+
+        $filename = date('Y-m-d_H-i-s') . '_' . $category . '_' . $user . '.jpg';
+        $upload_dir = __DIR__ . '/uploads/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+
+        $image_data = base64_decode($image_b64);
+        file_put_contents($upload_dir . $filename, $image_data);
+
+        // Log metadata in vault
+        $meta = date('Y-m-d H:i') . ' | ' . $user . ' | ' . $category . ' | ' . $caption . ' | ' . $filename;
+        $log_dir = __DIR__ . '/knowledge_base/operaciones/';
+        if (!is_dir($log_dir)) mkdir($log_dir, 0755, true);
+        file_put_contents($log_dir . 'fotos-log.md', "\n" . $meta, FILE_APPEND);
+
+        echo json_encode([
+            'ok' => true,
+            'filename' => $filename,
+            'path' => '/granja/uploads/' . $filename
+        ]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Accion desconocida: ' . $action]);
