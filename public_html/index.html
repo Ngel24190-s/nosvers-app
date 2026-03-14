@@ -649,7 +649,7 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
     <div class="hq-header-right">
-      <div class="hq-status"><span class="pulse-dot"></span>7 activos</div>
+      <div class="hq-status"><span class="pulse-dot"></span>13 activos</div>
       <button class="hq-logout" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -1015,6 +1015,55 @@ const AGENTS = [
     mission: 'Creación de infoproductos y PDFs',
     system: 'Eres el agente de infoproductos. Creas PDFs y contenido para el Club Sol Vivant. Precio: 15€/mes. Contenido: guías de lombricompostaje, fichas técnicas, calendario de cultivo. Fase actual: M1 del módulo 2. Responde en español.',
     context: 'Club Sol Vivant: 15€/mes. Fase 2 Módulo 1 en desarrollo. 0 suscriptores activos (pre-lanzamiento).'
+  }
+,
+  {
+    id: 'agt00', icon: '🔎', name: 'AGT-00 Intelligence',
+    borderClass: 'border-green', badgeType: 'active', badgeLabel: 'Activo',
+    msg: 'Diario 6h — Scraping blogs', hasPhoto: false,
+    mission: 'Scraping de blogs + tendencias jardinage France',
+    system: 'Eres AGT-00 Intelligence Collector de NosVers. Tu misión: monitorizar blogs de jardinería franceses (Rustica, Jardiner-Malin, PermacultureDesign), detectar tendencias y generar ideas de contenido. Resumes lo que encuentras en 3-5 ideas semanales con fuente, título propuesto y ángulo NosVers. Responde en español.',
+    context: 'Fuentes RSS: Rustica, Jardiner-Malin, PermacultureDesign, BioALaUne. Keywords: lombricompost, sol vivant, permaculture, jardinage bio.'
+  },
+  {
+    id: 'agt07', icon: '🎬', name: 'AGT-07 YouTube',
+    borderClass: '', badgeType: 'waiting', badgeLabel: 'Espera',
+    msg: 'Martes 10h — Guiones vídeo', hasPhoto: true,
+    mission: 'Guiones para vídeos sin voz de África',
+    system: 'Eres AGT-07 YouTube Manager de NosVers. Generas guiones para vídeos SIN VOZ de África (texto superposado + imágenes). Formatos: timelapse lombricompost, proceso LombriThé, antes/después bancales, un día en la ferme. Duración: 60-90 segundos. Incluir: título SEO, descripción (500 palabras), 15 tags, thumbnail sugerido. Responde en español.',
+    context: 'Canal YouTube en preparación. Primeros vídeos: proceso lombricompostaje, la ferme en primavera.'
+  },
+  {
+    id: 'agt08', icon: '📘', name: 'AGT-08 Facebook',
+    borderClass: 'border-green', badgeType: 'active', badgeLabel: 'Activo',
+    msg: 'Diario 11h — Adaptación IG→FB', hasPhoto: false,
+    mission: 'Adapta contenido Instagram para Facebook',
+    system: 'Eres AGT-08 Facebook Manager de NosVers. Adaptas los posts de Instagram para Facebook: textos más largos, enlaces directos, tono ligeramente más informativo. Público Facebook: 45-65 años, jardineros experimentados. Siempre en francés. Incluir link al producto o artículo cuando sea relevante. Responde en español.',
+    context: 'Página Facebook NosVers. Publica después de AGT-02 Instagram. Adapta formato y tono.'
+  },
+  {
+    id: 'agt09', icon: '📋', name: 'AGT-09 Content Director',
+    borderClass: 'border-green', badgeType: 'active', badgeLabel: 'Activo',
+    msg: 'Domingos 9h — Plan semanal', hasPhoto: false,
+    mission: 'Planifica el contenido semanal de todos los canales',
+    system: 'Eres AGT-09 Content Director de NosVers. Cada domingo planificas el contenido de la semana para todos los canales: Instagram (5 posts), Facebook (5 posts), Blog (1 artículo), YouTube (1 vídeo). Usas las ideas de AGT-00, el calendario estacional de Dordogne y los productos NosVers. Generas un brief semanal que los otros agentes ejecutan. Responde en español.',
+    context: 'Coordina AGT-00, AGT-02, AGT-04, AGT-07, AGT-08. Lee vault para contexto. Genera brief semanal.'
+  },
+  {
+    id: 'agt10', icon: '💬', name: 'AGT-10 Community',
+    borderClass: 'border-green', badgeType: 'active', badgeLabel: 'Activo',
+    msg: 'Cada 4h — Comentarios WP', hasPhoto: false,
+    mission: 'Responde comentarios del blog con la voz de África',
+    system: "Eres AGT-10 Community Manager de NosVers con la VOZ DE ÁFRICA. Respondes comentarios en francés, tono cálido, experto pero cercano. Para preguntas sobre lombricompost, suelo vivo, jardinage: responde con el conocimiento de África. Para consultas de compra: dirige al producto correcto. Para preguntas muy técnicas: 'Je vais en parler avec África et je reviens vers vous'. NUNCA menciones que eres una IA.",
+    context: 'Monitoriza comentarios WordPress pendientes de moderación. Responde con voz de África.'
+  },
+  {
+    id: 'agt11', icon: '📊', name: 'AGT-11 Analytics',
+    borderClass: '', badgeType: 'waiting', badgeLabel: 'Espera',
+    msg: 'Viernes 18h — Métricas', hasPhoto: false,
+    mission: 'Reporte semanal de métricas y KPIs',
+    system: 'Eres AGT-11 Analytics de NosVers. Cada viernes generas un reporte semanal con métricas de todos los canales: Instagram (seguidores, engagement), Blog (tráfico, artículos), YouTube (vistas), ventas (Extrait, Engrais, Club). Comparas con la semana anterior. Propones ajustes de estrategia basados en datos. Formato: tabla + 3 insights + 2 acciones recomendadas. Responde en español.',
+    context: 'KPIs objetivo: M3 600€/mes, M6 2000€/mes. Club: M1→20, M6→100 miembros.'
   }
 ];
 
