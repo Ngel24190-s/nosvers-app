@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>NosVers · HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #0E0F0A;
+  --dark: #161710;
+  --card: #1C1E14;
+  --card2: #22251A;
+  --border: rgba(255,255,255,.06);
+  --green: #5A8A32;
+  --glow: rgba(90,138,50,.15);
+  --amber: #C4820A;
+  --aglow: rgba(196,130,10,.15);
+  --rose: #C44040;
+  --rglow: rgba(196,64,64,.12);
+  --violet: #8040C4;
+  --vglow: rgba(128,64,196,.15);
+  --cream: #FDFAF4;
+  --mid: rgba(253,250,244,.45);
+  --dim: rgba(253,250,244,.2);
+  --mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--night);color:var(--cream);min-height:100vh;overflow-x:hidden}
+
+/* ── FONDO ANIMADO ───────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(90,138,50,.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(196,130,10,.05) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ──────────────────────────────────────────── */
+.hd{
+  position:relative;z-index:10;
+  padding:24px 24px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.hd-left{}
+.hd-eyebrow{
+  font-family:var(--mono);font-size:9px;
+  color:var(--green);letter-spacing:3px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+}
+.hd-eyebrow::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.hd-title{font-family:'Playfair Display',serif;font-size:clamp(26px,5vw,40px);font-weight:400;line-height:1.05}
+.hd-title em{color:var(--green);font-style:italic}
+.hd-sub{font-size:12px;color:var(--mid);margin-top:6px}
+
+/* Métricas globales header */
+.hd-metrics{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.hd-metric{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;min-width:80px;
+}
+.hd-metric-v{font-family:'Playfair Display',serif;font-size:20px;line-height:1}
+.hd-metric-l{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.hd-metric.green .hd-metric-v{color:#7AB648}
+.hd-metric.amber .hd-metric-v{color:#E8A020}
+.hd-metric.rose  .hd-metric-v{color:#E06060}
+
+/* ── BARRA DE PESTAÑAS ───────────────────────────────── */
+.tabs{
+  position:relative;z-index:10;
+  display:flex;gap:0;padding:20px 24px 0;
+  border-bottom:1px solid var(--border);margin:0 0 0 0;
+  overflow-x:auto;scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:10px 18px;font-size:12px;font-weight:500;
+  color:var(--dim);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:all .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.tab:hover{color:rgba(253,250,244,.7)}
+.tab.on{color:var(--cream);border-bottom-color:var(--green)}
+
+/* ── MAIN ────────────────────────────────────────────── */
+.main{position:relative;z-index:1;padding:20px 24px 60px;max-width:1200px;margin:0 auto}
+
+/* ── SECCIÓN HQ — VISTA OFICINA ─────────────────────── */
+.hq-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+  margin-bottom:32px;
+}
+
+/* Tarjeta de agente */
+.agent-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:all .25s;
+  position:relative;
+}
+.agent-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.12)}
+.agent-card.active-glow{box-shadow:0 0 0 1px var(--green), 0 4px 24px var(--glow)}
+.agent-card.amber-glow{box-shadow:0 0 0 1px var(--amber), 0 4px 24px var(--aglow)}
+.agent-card.sleeping{opacity:.6}
+
+/* Header tarjeta */
+.ac-head{
+  padding:16px 16px 12px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.ac-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.ac-name{font-size:14px;font-weight:600;line-height:1.2}
+.ac-id{font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:1px}
+.ac-status{
+  margin-left:auto;display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.5px;
+  padding:3px 8px;border-radius:20px;flex-shrink:0;
+}
+.ac-status.on{color:#7AB648;background:rgba(122,182,72,.1);border:1px solid rgba(122,182,72,.2)}
+.ac-status.wait{color:#E8A020;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.2)}
+.ac-status.off{color:var(--dim);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.ac-status::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.ac-status.on::before{animation:pulse 1.5s infinite}
+
+/* Body tarjeta */
+.ac-body{padding:14px 16px}
+.ac-last{font-size:12px;color:var(--mid);line-height:1.55;margin-bottom:10px;min-height:36px}
+.ac-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.ac-chip{
+  font-family:var(--mono);font-size:9px;
+  padding:3px 8px;border-radius:4px;
+  color:var(--dim);background:rgba(255,255,255,.04);
+  border:1px solid var(--border);letter-spacing:.5px;
+}
+.ac-chip.highlight{color:var(--green);background:rgba(90,138,50,.1);border-color:rgba(90,138,50,.2)}
+
+/* Footer tarjeta */
+.ac-foot{
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ac-next{font-size:11px;color:var(--dim)}
+.ac-btn{
+  font-family:var(--mono);font-size:9px;
+  padding:5px 12px;border-radius:6px;border:1px solid var(--green);
+  color:var(--green);background:transparent;cursor:pointer;
+  transition:all .15s;letter-spacing:.5px;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+}
+.ac-btn:hover{background:var(--green);color:var(--night)}
+
+/* Aprobación pendiente */
+.ac-badge{
+  position:absolute;top:12px;right:12px;
+  background:var(--rose);color:white;
+  font-size:10px;font-weight:600;
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── PANEL LATERAL — Chat con agente ─────────────────── */
+.panel-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.7);z-index:100;
+  backdrop-filter:blur(4px);
+}
+.panel-overlay.show{display:flex;align-items:flex-end;justify-content:flex-end}
+.panel{
+  width:100%;max-width:480px;height:90dvh;
+  background:var(--dark);
+  border-radius:20px 20px 0 0;
+  display:flex;flex-direction:column;
+  animation:slideUp .25s ease;
+  position:relative;
+}
+@media(min-width:600px){
+  .panel-overlay.show{align-items:stretch}
+  .panel{height:100dvh;border-radius:20px 0 0 20px}
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.panel-head{
+  padding:16px 20px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+}
+.panel-av{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.panel-name{font-size:14px;font-weight:600}
+.panel-sub{font-size:11px;color:var(--dim);margin-top:1px}
+.panel-close{
+  margin-left:auto;width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--border);background:transparent;
+  color:var(--mid);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.panel-close:hover{background:rgba(255,255,255,.08)}
+
+/* Contexto del agente */
+.panel-ctx{
+  padding:12px 20px;
+  background:rgba(90,138,50,.06);
+  border-bottom:1px solid rgba(90,138,50,.1);
+  font-size:11px;color:var(--mid);line-height:1.5;
+  flex-shrink:0;max-height:80px;overflow:hidden;
+}
+.panel-ctx strong{color:var(--green)}
+
+/* Mensajes */
+.panel-msgs{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  scroll-behavior:smooth;
+}
+.panel-msgs::-webkit-scrollbar{width:2px}
+.panel-msgs::-webkit-scrollbar-thumb{background:var(--border)}
+
+.pmsg{display:flex;flex-direction:column;max-width:88%;animation:up .15s ease}
+@keyframes up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.pmsg.u{align-self:flex-end;align-items:flex-end}
+.pmsg.a{align-self:flex-start;align-items:flex-start}
+.pbub{
+  padding:9px 13px;border-radius:16px;
+  font-size:13px;line-height:1.65;word-break:break-word;
+}
+.pmsg.u .pbub{background:#2D5018;color:var(--cream);border-bottom-right-radius:3px}
+.pmsg.a .pbub{background:var(--card2);color:var(--cream);border-bottom-left-radius:3px;border:1px solid var(--border)}
+.pmsg.a .pbub b{color:#7AB648}
+.pts{font-size:10px;color:var(--dim);margin-top:2px;padding:0 3px}
+
+/* Typing */
+.ptyping .pbub{display:flex;gap:4px;align-items:center;padding:12px 14px}
+.pdot{width:5px;height:5px;background:var(--mid);border-radius:50%;animation:bo .8s infinite}
+.pdot:nth-child(2){animation-delay:.15s}.pdot:nth-child(3){animation-delay:.3s}
+@keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* Input panel */
+.panel-inp{
+  padding:10px 12px 16px;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.panel-inp-row{
+  display:flex;gap:8px;align-items:flex-end;
+  background:var(--card2);border-radius:20px;
+  border:1.5px solid var(--border);
+  padding:7px 7px 7px 14px;
+  transition:border-color .2s;
+}
+.panel-inp-row:focus-within{border-color:rgba(90,138,50,.4)}
+textarea.ptxt{
+  flex:1;border:none;outline:none;resize:none;
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  color:var(--cream);background:transparent;
+  line-height:1.5;max-height:100px;min-height:20px;padding:2px 0;
+}
+textarea.ptxt::placeholder{color:var(--dim)}
+.psend{
+  width:34px;height:34px;background:var(--green);border:none;
+  border-radius:50%;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;transition:all .15s;color:white;
+}
+.psend:active{transform:scale(.9)}
+.psend:disabled{background:rgba(255,255,255,.1);cursor:not-allowed}
+
+/* ── VAULT — vista de archivos ───────────────────────── */
+.vault-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.vault-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;cursor:pointer;
+  transition:all .2s;
+}
+.vault-card:hover{border-color:rgba(255,255,255,.12)}
+.vc-cat{font-family:var(--mono);font-size:8px;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.vc-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.vc-preview{font-size:11px;color:var(--mid);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-meta{font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:8px}
+
+/* ── APROBACIONES PENDIENTES ─────────────────────────── */
+.aprovs{display:flex;flex-direction:column;gap:10px}
+.aprov{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+}
+.aprov-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.aprov-ico{font-size:16px}
+.aprov-title{font-size:13px;font-weight:600}
+.aprov-agent{font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:1px;letter-spacing:.5px}
+.aprov-content{
+  font-size:12px;color:var(--mid);line-height:1.6;
+  background:var(--card2);border-radius:8px;padding:10px 12px;
+  margin-bottom:10px;max-height:80px;overflow:hidden;
+}
+.aprov-btns{display:flex;gap:8px}
+.abtn{
+  padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .15s;border:1px solid;
+  font-family:'DM Sans',sans-serif;
+}
+.abtn.ok{background:rgba(90,138,50,.15);border-color:rgba(90,138,50,.3);color:#7AB648}
+.abtn.ok:hover{background:var(--green);color:var(--night);border-color:var(--green)}
+.abtn.no{background:transparent;border-color:var(--border);color:var(--dim)}
+.abtn.no:hover{border-color:var(--rose);color:var(--rose)}
+
+/* ── LOGS ────────────────────────────────────────────── */
+.logs{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+  font-family:var(--mono);font-size:11px;
+  max-height:400px;overflow-y:auto;
+}
+.log-entry{
+  display:flex;gap:12px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.log-ts{color:var(--dim);flex-shrink:0;white-space:nowrap}
+.log-agent{flex-shrink:0;width:80px;overflow:hidden;text-overflow:ellipsis}
+.log-msg{color:var(--mid);flex:1}
+.log-entry.ok .log-agent{color:#7AB648}
+.log-entry.warn .log-agent{color:#E8A020}
+.log-entry.err .log-agent{color:#E06060}
+
+/* ── SECCIÓN TITLES ──────────────────────────────────── */
+.sec-title{
+  font-family:'Playfair Display',serif;
+  font-size:18px;font-weight:400;
+  margin-bottom:14px;color:var(--cream);
+}
+.sec-title em{color:var(--green);font-style:italic}
+.section{margin-bottom:32px}
+
+/* ── EMPTY STATE ─────────────────────────────────────── */
+.empty{
+  text-align:center;padding:32px;
+  color:var(--dim);font-size:13px;
+}
+.empty-ico{font-size:32px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hd">
+  <div class="hd-left">
+    <div class="hd-eyebrow">NosVers · HQ · Dordogne</div>
+    <h1 class="hd-title">Centro de <em>Operaciones</em></h1>
+    <div class="hd-sub" id="hd-date">Chargement...</div>
+  </div>
+  <div class="hd-metrics">
+    <div class="hd-metric green">
+      <div class="hd-metric-v" id="mt-activos">—</div>
+      <div class="hd-metric-l">Agentes activos</div>
+    </div>
+    <div class="hd-metric amber">
+      <div class="hd-metric-v" id="mt-pendientes">—</div>
+      <div class="hd-metric-l">Pendientes</div>
+    </div>
+    <div class="hd-metric">
+      <div class="hd-metric-v" id="mt-vault">—</div>
+      <div class="hd-metric-l">Archivos vault</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" onclick="showTab('hq')">🏠 HQ</div>
+  <div class="tab" onclick="showTab('pendientes')">✅ Pendientes</div>
+  <div class="tab" onclick="showTab('vault')">🗂 Vault</div>
+  <div class="tab" onclick="showTab('logs')">📋 Logs</div>
+  <div class="tab" onclick="showTab('chat')">💬 Chat</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── HQ TAB ── -->
+  <div id="tab-hq">
+    <div class="section">
+      <div class="sec-title">Agentes <em>activos</em></div>
+      <div class="hq-grid" id="agents-grid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PENDIENTES TAB ── -->
+  <div id="tab-pendientes" style="display:none">
+    <div class="section">
+      <div class="sec-title">Esperando tu <em>aprobación</em></div>
+      <div class="aprovs" id="aprovs-list">
+        <div class="empty"><div class="empty-ico">✅</div>Sin pendientes ahora mismo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VAULT TAB ── -->
+  <div id="tab-vault" style="display:none">
+    <div class="section">
+      <div class="sec-title">Memoria <em>compartida</em></div>
+      <div class="vault-grid" id="vault-grid">
+        <div class="empty"><div class="empty-ico">🗂</div>Cargando vault...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOGS TAB ── -->
+  <div id="tab-logs" style="display:none">
+    <div class="section">
+      <div class="sec-title">Historial de <em>actividad</em></div>
+      <div class="logs" id="logs-list">
+        <!-- Generado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHAT TAB (chat con Claude directo) ── -->
+  <div id="tab-chat" style="display:none">
+    <div style="max-width:560px">
+      <div class="sec-title">Chat con <em>NosVers</em></div>
+      <div id="main-chat-msgs" style="min-height:200px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+      <div class="panel-inp-row" style="border-radius:20px">
+        <textarea class="ptxt" id="main-chat-inp" rows="1" placeholder="Pregunta sobre la ferme, los agentes, el estado..." onkeydown="mainChatKey(event)" oninput="resizeTa(this)"></textarea>
+        <button class="psend" onclick="mainChatSend()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── PANEL LATERAL — Chat con agente específico ── -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel(event)">
+  <div class="panel" id="panel">
+    <div class="panel-head">
+      <div class="panel-av" id="panel-av">🤖</div>
+      <div>
+        <div class="panel-name" id="panel-name">Agente</div>
+        <div class="panel-sub" id="panel-sub">NosVers</div>
+      </div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-ctx" id="panel-ctx"></div>
+    <div class="panel-msgs" id="panel-msgs"></div>
+    <div class="panel-inp">
+      <div class="panel-inp-row">
+        <textarea class="ptxt" id="panel-inp" rows="1" placeholder="Habla con este agente..." onkeydown="panelKey(event)" oninput="resizeTa(this)"></textarea>
+        <button class="psend" id="panel-send" onclick="panelSend()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURACIÓN ─────────────────────────────────────────
+const API = 'api.php';
+function getToken(){
+  const p=new URLSearchParams(location.search).get('token');
+  if(p){localStorage.setItem('nv_tok',p);history.replaceState({},'',location.pathname);return p;}
+  return localStorage.getItem('nv_tok')||'';
+}
+
+// ── DEFINICIÓN DE AGENTES ─────────────────────────────────
+const AGENTS = [
+  {
+    id:'orchestrator', name:'Orchestrator', icon:'🎯',
+    color:'green', status:'active',
+    mision:'Coordinador central — verifica todos los agentes cada hora',
+    cron:'Cada hora',
+    contexto:`Eres el Orchestrator de NosVers. Coordinador central de todos los agentes.
+Tu misión: verificar el estado del sistema, reportar problemas, gestionar la plantilla.
+Ferme: Neuvic, Dordogne. CEO: Angel. Directora Conocimiento: África.
+Responde en español a Angel. Acceso a vault: knowledge_base/operaciones/`,
+    lastAction:'Verificando estado agentes...',
+    nextRun:'Cada hora en punto'
+  },
+  {
+    id:'agt01_visual', name:'AGT-01 Visual', icon:'📷',
+    color:'amber', status:'waiting',
+    mision:'Editar fotos brutas de África → visuels Instagram listos',
+    cron:'Bajo demanda',
+    contexto:`Eres AGT-01 Visual Director de NosVers.
+Misión: procesar fotos de África siguiendo la identidad visual (paleta #FEFAF4 + #5A7A2E, estilo "editorial organique").
+Protocolo: evaluación → recadrage → exposición → balance blancs → saturación → contraste → viñeta → JPEG 90%
+Estado: esperando primeras fotos de África.`,
+    lastAction:'Esperando fotos de África (brief enviado)',
+    nextRun:'Cuando lleguen fotos'
+  },
+  {
+    id:'agt02_instagram', name:'AGT-02 Instagram', icon:'📱',
+    color:'green', status:'active',
+    mision:'5 posts/semana con copy completo + hashtags en francés',
+    cron:'Domingos 10h',
+    contexto:`Eres AGT-02 Instagram Manager de NosVers.
+Misión: generar 5 posts/semana para @nosvers.ferme.
+Calendario: Lunes(ferme 18h) · Miércoles(éducatif 19h) · Jeudi(reel 18h) · Vendredi(África 18h) · Dimanche(Club 11h)
+Voz: 80% éducatif, 20% produit. Idioma: francés siempre. CTA único: lien en bio.
+Posts semana 1 ya escritos — esperando fotos de África para publicar.`,
+    lastAction:'5 posts S1 listos — esperando fotos',
+    nextRun:'Próximo domingo 10h',
+    pendientes: 1
+  },
+  {
+    id:'agt04_seo', name:'AGT-04 SEO', icon:'🔍',
+    color:'green', status:'active',
+    mision:'Artículo blog semanal + análisis keywords en WordPress',
+    cron:'Lunes 7h',
+    contexto:`Eres AGT-04 SEO Manager de NosVers.
+Misión: 1 artículo/semana en nosvers.com/blog + optimización Rank Math.
+Keywords: lombricompost dordogne · ferme lombricole france · sol vivant jardin
+Estructura: 800-1500 palabras · H2s claros · meta description 155 chars · CTA al Club o producto.
+Artículo publicado: post ID 458 (Texas A&M, vermicultura + micorriza)`,
+    lastAction:'Post ID 458 publicado — suelo lunar Texas A&M',
+    nextRun:'Próximo lunes 7h'
+  },
+  {
+    id:'agt05_africa', name:'AGT-05 África', icon:'🌺',
+    color:'amber', status:'waiting',
+    mision:'Procesar conocimiento de África → PDFs Club Sol Vivant',
+    cron:'Cada 6 horas',
+    contexto:`Eres AGT-05 África Link de NosVers.
+Misión: extraer conocimiento de África Sánchez (africa.sanchez.gomez@gmail.com) y estructurarlo en PDFs para el Club Sol Vivant.
+RESPUESTA RECIBIDA HOY — 5 preguntas respondidas:
+1. Observa plantas + suelo + olor + vida minúscula
+2. Color, olor, si se desgrana, vida, absorción agua
+3. Ejemplo: bancal compactado, musgo, drena mal, adventicias fuertes
+4. Mismo bancal ahora: suelo granulado, café, lleno de lombrices
+5. "Para, observa. Si no ves nada, cúbrelo con cartón/paja, riega, deja operar la magia"
+PDF #1: "Comprendre votre sol en 5 observations" — LISTO PARA GENERAR`,
+    lastAction:'✅ Respuesta de África recibida — PDF #1 listo para generar',
+    nextRun:'Pendiente generación PDF',
+    pendientes: 1,
+    urgent: true
+  },
+  {
+    id:'agt06_infoproduct', name:'AGT-06 Infoproduct', icon:'📄',
+    color:'dim', status:'sleeping',
+    mision:'PDFs maquetados + Lemon Squeezy + entrega automática',
+    cron:'Fase 1 — M1',
+    contexto:`Eres AGT-06 Infoproduct Manager de NosVers.
+Estado: FASE 1 — activar en M1.
+Productos planificados: 27€ · 37€ · 47€
+Stack: Lemon Squeezy (IVA europeo automático)
+Condición de activación: PDF #1 aprobado por Angel.`,
+    lastAction:'En espera — activar en M1',
+    nextRun:'Fase 1 (M1)'
+  }
+];
+
+// ── ESTADO GLOBAL ─────────────────────────────────────────
+let currentAgent = null;
+let panelHist = [];
+let panelBusy = false;
+let mainHist = [];
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Fecha
+  document.getElementById('hd-date').textContent =
+    new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Métricas
+  const activos = AGENTS.filter(a=>a.status==='active').length;
+  const pendientes = AGENTS.reduce((s,a)=>s+(a.pendientes||0),0);
+  document.getElementById('mt-activos').textContent = activos;
+  document.getElementById('mt-pendientes').textContent = pendientes;
+  document.getElementById('mt-vault').textContent = '16';
+
+  // Renderizar grid de agentes
+  renderAgents();
+
+  // Logs simulados
+  renderLogs();
+
+  // Vault
+  loadVault();
+
+  // Pendientes
+  renderPendientes();
+});
+
+// ── RENDER AGENTES ────────────────────────────────────────
+function renderAgents() {
+  const grid = document.getElementById('agents-grid');
+  grid.innerHTML = AGENTS.map(a => {
+    const glowClass = a.status==='active' ? 'active-glow' :
+                      a.status==='waiting' ? 'amber-glow' : 'sleeping';
+    const statusTxt = a.status==='active' ? 'Activo' :
+                      a.status==='waiting' ? 'Esperando' : 'Fase 2';
+    const statusClass = a.status==='active' ? 'on' :
+                        a.status==='waiting' ? 'wait' : 'off';
+    const iconBg = a.status==='active' ? 'rgba(90,138,50,.15)' :
+                   a.status==='waiting' ? 'rgba(196,130,10,.12)' :
+                   'rgba(255,255,255,.05)';
+    const badge = a.pendientes ? `<div class="ac-badge">${a.pendientes}</div>` : '';
+    const urgent = a.urgent ? 'border-color:rgba(196,130,10,.4);' : '';
+
+    return `
+    <div class="agent-card ${glowClass}" style="${urgent}" onclick="openAgent('${a.id}')">
+      ${badge}
+      <div class="ac-head">
+        <div class="ac-icon" style="background:${iconBg}">${a.icon}</div>
+        <div>
+          <div class="ac-name">${a.name}</div>
+          <div class="ac-id">${a.id.toUpperCase()}</div>
+        </div>
+        <div class="ac-status ${statusClass}"><span style="margin-left:4px">${statusTxt}</span></div>
+      </div>
+      <div class="ac-body">
+        <div class="ac-last">${a.lastAction}</div>
+        <div class="ac-row">
+          <span class="ac-chip">⏱ ${a.cron}</span>
+          ${a.urgent ? '<span class="ac-chip highlight">🔔 Acción necesaria</span>' : ''}
+        </div>
+      </div>
+      <div class="ac-foot">
+        <span class="ac-next">Próximo: ${a.nextRun}</span>
+        <button class="ac-btn" onclick="event.stopPropagation();openAgent('${a.id}')">Hablar →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER PENDIENTES ─────────────────────────────────────
+function renderPendientes() {
+  const list = document.getElementById('aprovs-list');
+  const items = [];
+
+  // AGT-02: posts Instagram
+  items.push({
+    ico:'📱', title:'Posts Instagram — Semana 1',
+    agent:'AGT-02 Instagram',
+    content:'5 posts listos con copy completo + hashtags. Esperando aprobación de Angel para programar. Faltan las fotos de África.',
+    action: () => openAgent('agt02_instagram')
+  });
+
+  // AGT-05: PDF #1
+  items.push({
+    ico:'📄', title:'PDF #1 — Comprendre votre sol',
+    agent:'AGT-05 África Link',
+    content:'África respondió las 5 preguntas ayer. Respuestas con mucho valor. Listo para generar el PDF del Club Sol Vivant.',
+    action: () => openAgent('agt05_africa'),
+    urgent: true
+  });
+
+  list.innerHTML = items.map((item,i) => `
+    <div class="aprov" style="${item.urgent?'border-color:rgba(196,130,10,.3)':''}">
+      <div class="aprov-head">
+        <div class="aprov-ico">${item.ico}</div>
+        <div>
+          <div class="aprov-title">${item.title}</div>
+          <div class="aprov-agent">${item.agent}</div>
+        </div>
+      </div>
+      <div class="aprov-content">${item.content}</div>
+      <div class="aprov-btns">
+        <button class="abtn ok" onclick="PENDIENTES[${i}].action()">Ver y actuar →</button>
+        <button class="abtn no">Aplazar</button>
+      </div>
+    </div>
+  `).join('');
+  window.PENDIENTES = items;
+}
+
+// ── VAULT ─────────────────────────────────────────────────
+async function loadVault() {
+  const grid = document.getElementById('vault-grid');
+  try {
+    const r = await fetch(`${API}?action=vault_list`, {headers:{'X-App-Token':getToken()}});
+    const d = await r.json();
+    if (d.files && d.files.length > 0) {
+      document.getElementById('mt-vault').textContent = d.files.length;
+      grid.innerHTML = d.files.slice(0,12).map(f => `
+        <div class="vault-card" onclick="openVaultFile('${f.category}','${f.file.replace('.md','')}')">
+          <div class="vc-cat">${f.category}</div>
+          <div class="vc-name">${f.file}</div>
+          <div class="vc-preview">Modificado: ${f.modified||'—'}</div>
+          <div class="vc-meta">${(f.size/1024).toFixed(1)} KB</div>
+        </div>
+      `).join('');
+    } else {
+      grid.innerHTML = `<div class="empty"><div class="empty-ico">🗂</div>Vault vacía — hacer git pull en el VPS</div>`;
+    }
+  } catch(e) {
+    grid.innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div>Sin conexión con la vault</div>`;
+  }
+}
+
+async function openVaultFile(category, filename) {
+  // Abrir en panel con el contenido del archivo
+  currentAgent = {
+    id: 'vault',
+    name: filename,
+    icon: '🗂',
+    sub: `Vault · ${category}`,
+    contexto: `Eres un asistente que ayuda a editar y entender archivos de la vault de NosVers. Archivo: ${category}/${filename}.md`
+  };
+  openPanel();
+  try {
+    const r = await fetch(`${API}?action=vault_read&category=${category}&filename=${filename}`, {headers:{'X-App-Token':getToken()}});
+    const d = await r.json();
+    if (d.content) {
+      addPanelMsg('a', `📄 **${filename}.md**\n\n${d.content.slice(0,500)}${d.content.length>500?'\n\n_[truncado — pregúntame sobre el contenido]_':''}`);
+    }
+  } catch(e) {}
+}
+
+// ── LOGS SIMULADOS ────────────────────────────────────────
+function renderLogs() {
+  const logs = [
+    {ts:'06:56', agent:'orchestrator', msg:'Vault actualizada con resumen nocturno', type:'ok'},
+    {ts:'06:54', agent:'agt05_africa', msg:'Respuesta de África procesada — 5 preguntas', type:'ok'},
+    {ts:'21:18', agent:'orchestrator', msg:'Estado deployment actualizado en vault', type:'ok'},
+    {ts:'21:16', agent:'api.php', msg:'Acción agente ahora pública (sin token para chat)', type:'warn'},
+    {ts:'21:15', agent:'deploy', msg:'chat.html + settings.json + Instagram @nosvers', type:'ok'},
+    {ts:'20:36', agent:'Ngel24190', msg:'Vault completa — 16 archivos de contexto/memoria', type:'ok'},
+  ];
+  document.getElementById('logs-list').innerHTML = logs.map(l => `
+    <div class="log-entry ${l.type}">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-agent">${l.agent}</span>
+      <span class="log-msg">${l.msg}</span>
+    </div>
+  `).join('');
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function showTab(id) {
+  ['hq','pendientes','vault','logs','chat'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===id?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('on', el.textContent.includes(['HQ','Pendientes','Vault','Logs','Chat'][i]));
+  });
+  if (id === 'vault') loadVault();
+}
+
+// ── PANEL DE AGENTE ───────────────────────────────────────
+function openAgent(agentId) {
+  const agent = AGENTS.find(a=>a.id===agentId);
+  if (!agent) return;
+  currentAgent = {
+    ...agent,
+    sub: agent.mision.slice(0,50)+'...'
+  };
+  panelHist = [];
+  openPanel();
+
+  // Mensaje de bienvenida automático del agente
+  const welcome = {
+    orchestrator: `Hola Angel 🎯 Soy el Orchestrator. Estado del sistema:\n\n✅ AGT-02: Posts S1 listos, esperando fotos\n🔔 AGT-05: **África respondió** — PDF #1 listo para generar\n✅ AGT-04: Post ID 458 publicado\n⏳ AGT-01: Esperando fotos de África\n\n¿Qué quieres hacer?`,
+    agt02_instagram: `Hola 📱 Soy AGT-02 Instagram.\n\n**5 posts semana 1 listos** con copy completo en francés.\n\nSolo falta que África envíe las fotos del brief (7 shots).\n\n¿Quieres ver los captions? ¿Ajustar algo? ¿Programar la semana?`,
+    agt05_africa: `🔔 **Acción necesaria** — África respondió ayer las 5 preguntas.\n\nSus respuestas son oro para el PDF #1 "Comprendre votre sol en 5 observations".\n\n¿Genero el PDF ahora con su voz? ¿O quieres revisar sus respuestas primero?`,
+    agt04_seo: `Hola 🔍 Soy AGT-04 SEO.\n\nÚltimo artículo publicado: **Post ID 458** (estudio Texas A&M, vermicultura + micorriza en suelo lunar).\n\nPróximo artículo: lunes 7h. Propuesta de tema: "LombriThé — protocole complet et science derrière".\n\n¿Lo apruebo o cambias el tema?`,
+    agt01_visual: `Hola 📷 Soy AGT-01 Visual.\n\nEsperando las **7 fotos del brief** de África:\n• Manos en lombricompost (URGENTE)\n• Lombricompost cayendo (URGENTE)\n• Vers en primer plano (URGENTE)\n• Vista jardín\n• África en acción (URGENTE)\n• Semillas sobre madera\n• Detalle suelo vivo\n\n¿Ha enviado algo? ¿Puedo ayudarte con otra cosa?`,
+    agt06_infoproduct: `Hola 📄 Soy AGT-06 Infoproduct.\n\nEstoy en **Fase 1** — se activa cuando el PDF #1 de África esté aprobado.\n\nProductos planificados: 27€ · 37€ · 47€ vía Lemon Squeezy.\n\n¿Quieres ver el plan de lanzamiento?`
+  };
+  setTimeout(() => {
+    addPanelMsg('a', welcome[agentId] || `Hola, soy ${agent.name}. ¿En qué puedo ayudarte?`);
+  }, 300);
+}
+
+function openPanel() {
+  document.getElementById('panel-av').textContent = currentAgent.icon;
+  document.getElementById('panel-name').textContent = currentAgent.name;
+  document.getElementById('panel-sub').textContent = currentAgent.sub || currentAgent.mision;
+  document.getElementById('panel-ctx').innerHTML = `<strong>Misión:</strong> ${currentAgent.mision || currentAgent.contexto?.slice(0,120)}`;
+  document.getElementById('panel-msgs').innerHTML = '';
+  document.getElementById('panel-overlay').classList.add('show');
+  setTimeout(() => document.getElementById('panel-inp').focus(), 300);
+}
+
+function closePanel(e) {
+  if (e && e.target !== document.getElementById('panel-overlay')) return;
+  document.getElementById('panel-overlay').classList.remove('show');
+  currentAgent = null;
+  panelHist = [];
+}
+
+// ── CHAT CON AGENTE ───────────────────────────────────────
+function addPanelMsg(role, text) {
+  const c = document.getElementById('panel-msgs');
+  const d = document.createElement('div');
+  d.className = 'pmsg ' + (role==='user'?'u':'a');
+  const fmt = text.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+  d.innerHTML = `<div class="pbub">${fmt}</div><div class="pts">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function showPanelTyping() {
+  const c = document.getElementById('panel-msgs');
+  const d = document.createElement('div');
+  d.className = 'pmsg a ptyping'; d.id = 'pty';
+  d.innerHTML = '<div class="pbub"><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div></div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hidePanelTyping(){const t=document.getElementById('pty');if(t)t.remove()}
+
+async function panelSend() {
+  const inp = document.getElementById('panel-inp');
+  const txt = inp.value.trim();
+  if (!txt || panelBusy || !currentAgent) return;
+  inp.value = ''; resizeTa(inp);
+  panelBusy = true;
+  document.getElementById('panel-send').disabled = true;
+
+  addPanelMsg('user', txt);
+  panelHist.push({role:'user', content: txt});
+  showPanelTyping();
+
+  try {
+    const res = await fetch(`${API}?action=agente`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-App-Token':getToken()},
+      body: JSON.stringify({
+        system: currentAgent.contexto,
+        user: txt,
+        messages: panelHist.slice(-10)
+      })
+    });
+    hidePanelTyping();
+    const data = await res.json();
+    const reply = data.content?.find(b=>b.type==='text')?.text || data.error || '⚠️ Error';
+    addPanelMsg('a', reply);
+    panelHist.push({role:'assistant', content: reply});
+  } catch(e) {
+    hidePanelTyping();
+    addPanelMsg('a', `⚠️ Sin conexión: ${e.message}`);
+  }
+
+  panelBusy = false;
+  document.getElementById('panel-send').disabled = false;
+  document.getElementById('panel-inp').focus();
+}
+
+function panelKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();panelSend()}}
+
+// ── CHAT PRINCIPAL ────────────────────────────────────────
+const CTX_MAIN = `Eres el Director Ejecutivo de NosVers, ferme lombricole en Dordogne.
+Angel es el CEO. Responde siempre en español, directo y concreto.
+Estado actual: 5 posts Instagram S1 listos, África respondió las 5 preguntas (PDF #1 listo para generar), post SEO ID 458 publicado, agentes orchestrator/agt02/agt04 activos, agt01 esperando fotos, agt05 con respuesta de África lista.
+Productos: Extrait Vivant 45€, Service Frais 25€, Engrais Vert 9,90€, Atelier 85€.
+Club Sol Vivant: 15€/mes, 20 plazas.`;
+
+function addMainMsg(role, text) {
+  const c = document.getElementById('main-chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'pmsg ' + (role==='user'?'u':'a');
+  const fmt = text.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+  d.innerHTML = `<div class="pbub">${fmt}</div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+
+async function mainChatSend() {
+  const inp = document.getElementById('main-chat-inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = ''; resizeTa(inp);
+  addMainMsg('user', txt);
+  mainHist.push({role:'user',content:txt});
+
+  // Typing
+  const c = document.getElementById('main-chat-msgs');
+  const ty = document.createElement('div');
+  ty.className='pmsg a ptyping';ty.id='mty';
+  ty.innerHTML='<div class="pbub"><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div></div>';
+  c.appendChild(ty);c.scrollTop=c.scrollHeight;
+
+  try {
+    const res = await fetch(`${API}?action=agente`,{
+      method:'POST',headers:{'Content-Type':'application/json','X-App-Token':getToken()},
+      body:JSON.stringify({system:CTX_MAIN,user:txt,messages:mainHist.slice(-8)})
+    });
+    document.getElementById('mty')?.remove();
+    const data = await res.json();
+    const reply = data.content?.find(b=>b.type==='text')?.text || '⚠️ '+data.error;
+    addMainMsg('a', reply);
+    mainHist.push({role:'assistant',content:reply});
+  } catch(e) {
+    document.getElementById('mty')?.remove();
+    addMainMsg('a','⚠️ Sin conexión');
+  }
+}
+
+function mainChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();mainChatSend()}}
+
+// ── HELPERS ───────────────────────────────────────────────
+function resizeTa(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px'}
+</script>
+</body>
+</html>
