@@ -1095,7 +1095,7 @@ let spPendingImage = null;
 let afPendingImage = null;
 let directorHistory = [];
 let generalChatHistory = [];
-let spChatHistories = {};
+let spChatHistories = JSON.parse(localStorage.getItem('nv_agent_chats') || '{}');
 let africaChatHistory = [];
 let africaHist = [];
 let africaPhoto = null;
@@ -1293,6 +1293,10 @@ function appendSPMsg(role, content, save = true) {
   if (save && currentSPAgent) {
     if (!spChatHistories[currentSPAgent.id]) spChatHistories[currentSPAgent.id] = [];
     spChatHistories[currentSPAgent.id].push({ role, content });
+    // Persistir (máx 50 msgs por agente)
+    const h = spChatHistories[currentSPAgent.id];
+    if (h.length > 50) spChatHistories[currentSPAgent.id] = h.slice(-50);
+    localStorage.setItem('nv_agent_chats', JSON.stringify(spChatHistories));
   }
 }
 
