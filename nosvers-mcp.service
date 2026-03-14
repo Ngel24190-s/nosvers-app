@@ -1,0 +1,14 @@
+[Unit]
+Description=NosVers MCP Server
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/nosvers
+ExecStart=/home/nosvers/venv/bin/python3 /home/nosvers/mcp_server.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/home/nosvers/.env
+
+[Install]
+WantedBy=multi-user.target

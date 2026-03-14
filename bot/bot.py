@@ -35,6 +35,17 @@ VAULT_DIR = Path('/home/nosvers/public_html/knowledge_base')
 AGENTS_DIR = Path('/home/nosvers/agents')
 VENV_PY = '/home/nosvers/venv/bin/python3'
 
+# Claude bidireccional — historial por chat
+chat_histories = {}
+
+SYSTEM_NOSVERS = """Eres el Director Ejecutivo de NosVers, ferme lombricole en Neuvic, Dordogne.
+Angel es el CEO. Responde SIEMPRE en español, directo y concreto.
+Tienes acceso via MCP al VPS, vault, agentes y WordPress.
+Estado: 7 agentes activos, vault operativa, MCP conectado.
+Productos: Extrait Vivant 45€, Engrais Vert 9.90€, Atelier 85€, Club Sol Vivant 15€/mes.
+Cuando Angel pregunte algo técnico del VPS → responde que lo ejecutarás via MCP en la próxima sesión Claude.ai.
+Para consultas, contenido, estrategia → responde directamente."""
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('nosvers_bot')
 
@@ -427,17 +438,80 @@ async def web_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Responde a mensajes de texto de Angel."""
+    """Telegram bidireccional: Angel escribe lo que sea → Claude responde con contexto NosVers."""
     if not is_authorized(update.effective_user.id):
         return
     await deliver_notifications(update)
-    await update.message.reply_text(
-        "Usa comandos para interactuar:\n"
-        "/statut /pendiente /vault /agentes /web\n"
-        "/run agente — ejecutar agente\n"
-        "/ask pregunta — preguntar a Claude\n"
-        "/logs agente — ver logs"
-    )
+
+    if not ANTHROPIC_API_KEY:
+        await update.message.reply_text("⚠️ ANTHROPIC_API_KEY no configurada en .env")
+        return
+
+    chat_id = str(update.message.chat.id)
+    if chat_id not in chat_histories:
+        chat_histories[chat_id] = []
+
+    # Añadir mensaje de Angel al historial
+    chat_histories[chat_id].append({"role": "user", "content": update.message.text})
+
+    # Mantener solo últimos 10 mensajes (5 intercambios)
+    chat_histories[chat_id] = chat_histories[chat_id][-10:]
+
+    # Indicador de escritura
+    await update.message.reply_chat_action("typing")
+
+    # Cargar contexto vault
+    vault_context = ""
+    for md_file in ['contexto/nosvers-identidad.md', 'contexto/angel-filosofia.md', 'operaciones/semana-actual.md']:
+        filepath = VAULT_DIR / md_file
+        if filepath.exists():
+            try:
+                vault_context += f"\n--- {md_file} ---\n{filepath.read_text()[:2000]}\n"
+            except Exception:
+                pass
+
+    system_prompt = SYSTEM_NOSVERS
+    if vault_context:
+        system_prompt += f"\n\nContexto actual:\n{vault_context}"
+
+    try:
+        r = requests.post(
+            'https://api.anthropic.com/v1/messages',
+            headers={
+                'x-api-key': ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+            },
+            json={
+                'model': 'claude-sonnet-4-6',
+                'max_tokens': 1000,
+                'system': system_prompt,
+                'messages': chat_histories[chat_id]
+            },
+            timeout=60
+        )
+
+        if r.status_code == 200:
+            reply = r.json()['content'][0]['text']
+
+            # Guardar respuesta en historial
+            chat_histories[chat_id].append({"role": "assistant", "content": reply})
+            chat_histories[chat_id] = chat_histories[chat_id][-10:]
+
+            # Telegram tiene límite de 4096 caracteres
+            if len(reply) > 4000:
+                reply = reply[:4000] + "\n\n_(truncado — continúa en Claude.ai)_"
+
+            try:
+                await update.message.reply_text(reply, parse_mode="Markdown")
+            except Exception:
+                # Si falla Markdown, enviar sin formato
+                await update.message.reply_text(reply)
+        else:
+            await update.message.reply_text(f"⚠️ Claude API: {r.status_code} — {r.text[:200]}")
+
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ Error: {str(e)[:200]}")
 
 
 def main():

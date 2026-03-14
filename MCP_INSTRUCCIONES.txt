@@ -1,0 +1,28 @@
+
+=== NosVers MCP Server ===
+
+Para instalar el servicio systemd:
+  cp /home/nosvers/nosvers-mcp.service /etc/systemd/system/
+  systemctl daemon-reload
+  systemctl enable nosvers-mcp
+  systemctl start nosvers-mcp
+
+Para añadir la ruta /mcp en Nginx:
+  Ver /home/nosvers/nginx-mcp.conf
+
+Para conectar en Claude.ai:
+  Settings → Profile → Integrations → Add MCP Server
+  URL: https://nosvers.com/mcp
+  Token: nosvers-mcp-2026
+
+Herramientas disponibles:
+  sistema_estado       → estado VPS completo
+  ejecutar_comando     → bash en el VPS
+  vault_leer/escribir/listar → gestión vault
+  agentes_estado       → estado de todos los agentes
+  agente_ejecutar      → lanzar agente manualmente
+  agente_logs          → ver logs de agente
+  wp_crear_post        → crear post WordPress
+  git_pull_vps         → git pull del repo
+  deploy_vps           → deploy completo
+  telegram_enviar      → notificar a Angel

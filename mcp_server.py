@@ -414,5 +414,5 @@ Herramientas disponibles:
     log.info(f"   Token: {MCP_TOKEN}")
     log.info("   Instrucciones: /home/nosvers/MCP_INSTRUCCIONES.txt")
 
-    app = mcp.get_asgi_app()
+    app = mcp.http_app()
     uvicorn.run(app, host="0.0.0.0", port=8765, log_level="warning")
