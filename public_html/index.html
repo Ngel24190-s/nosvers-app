@@ -615,6 +615,7 @@ a{text-decoration:none;color:inherit}
   background:rgba(0,0,0,.15);padding:1px 5px;border-radius:4px;font-size:12px;
   font-family:'SF Mono',monospace;
 }
+@keyframes bo{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -894,40 +895,67 @@ a{text-decoration:none;color:inherit}
      AFRICA VIEW
      ═══════════════════════════════════════════════════════════ -->
 <div id="africaView">
-  <!-- Header -->
-  <div class="af-header">
-    <div class="af-header-left">
-      <div class="af-avatar">🌺</div>
-      <div class="af-brand">
-        <div class="af-brand-name">Bonjour África</div>
-        <div class="af-brand-sub">NosVers · La ferme</div>
+<div class="section" id="sec-africa" style="padding:0">
+  <!-- Header África -->
+  <div style="background:#f4efe4;padding:12px 16px 10px;border-radius:0 0 16px 16px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:#7A3A6A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">🌺</div>
+      <div style="flex:1">
+        <div style="font-size:14px;color:#1c1510;font-weight:600">Hola África</div>
+        <div style="font-size:10px;color:rgba(0,0,0,.4)">NosVers · La ferme · Dordogne</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <div style="width:5px;height:5px;background:#5A8A32;border-radius:50%"></div>
+        <span style="font-size:9px;color:#5A8A32">en ligne</span>
       </div>
     </div>
-    <button class="af-logout" onclick="doLogout()">Sortir</button>
   </div>
 
-  <!-- Chat area -->
-  <div class="af-chat-area">
-    <div class="af-messages" id="afMessages"></div>
+  <!-- Accesos rápidos -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+    <button onclick="document.getElementById('africa-file').click()" style="background:white;border-radius:12px;border:0.5px solid #e0d8cc;padding:12px 8px;text-align:center;cursor:pointer;font-family:inherit">
+      <div style="font-size:20px;margin-bottom:4px">📷</div>
+      <div style="font-size:12px;color:#1c1510;font-weight:500">Foto del día</div>
+      <div style="font-size:10px;color:rgba(0,0,0,.4)">Subir al sistema</div>
+    </button>
+    <button onclick="africaChatGo('Montre-moi le PDF #1 du Club Sol Vivant')" style="background:white;border-radius:12px;border:0.5px solid #e0d8cc;padding:12px 8px;text-align:center;cursor:pointer;font-family:inherit">
+      <div style="font-size:20px;margin-bottom:4px">📄</div>
+      <div style="font-size:12px;color:#1c1510;font-weight:500">Mon PDF</div>
+      <div style="font-size:10px;color:rgba(0,0,0,.4)">Club Sol Vivant</div>
+    </button>
+  </div>
+  <input type="file" id="africa-file" accept="image/*" capture="environment" style="display:none" onchange="onAfricaPhotoSelect(event)">
 
-    <!-- Quick buttons -->
-    <div class="af-quick">
-      <button class="af-quick-btn" onclick="document.getElementById('afFileInput').click()">
-        <span>📷</span> Photo
-      </button>
-      <button class="af-quick-btn" onclick="showAfricaPDF()">
-        <span>📄</span> Mon PDF
-      </button>
-    </div>
+  <!-- Preview foto África -->
+  <div id="africa-photo-bar" style="display:none;background:#f0ead8;border-radius:10px;padding:8px 12px;margin-bottom:8px;align-items:center;gap:8px">
+    <img id="africa-photo-thumb" style="width:40px;height:40px;border-radius:8px;object-fit:cover" src="" alt="">
+    <span id="africa-photo-name" style="font-size:11px;color:rgba(0,0,0,.4);flex:1"></span>
+    <button onclick="clearAfricaPhoto()" style="background:transparent;border:none;color:rgba(0,0,0,.4);cursor:pointer;font-size:15px">✕</button>
   </div>
 
-  <!-- Input -->
-  <div class="af-input-area">
-    <input type="file" accept="image/*" capture="environment" class="hidden-file" id="afFileInput" onchange="handleAfricaPhoto(event)">
-    <button class="af-photo-btn" onclick="document.getElementById('afFileInput').click()">📷</button>
-    <textarea class="af-textarea" id="afInput" rows="1" placeholder="Écris ou envoie une photo..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAfricaChat()}"></textarea>
-    <button class="af-send" onclick="sendAfricaChat()">▶</button>
+  <!-- Chat África -->
+  
+  <!-- Photo preview bar -->
+  <div id="africa-photo-bar" style="display:none;padding:6px 12px;background:rgba(122,58,106,.08);border-radius:10px;margin-bottom:8px;align-items:center;gap:8px">
+    <img id="africa-photo-thumb" style="width:36px;height:36px;border-radius:6px;object-fit:cover" src="" alt="">
+    <span id="africa-photo-name" style="font-size:11px;color:#7A3A6A;flex:1">Foto lista</span>
+    <button onclick="clearAfricaPhoto()" style="background:transparent;border:none;color:#7A3A6A;cursor:pointer;font-size:14px">✕</button>
   </div>
+  <div id="africa-msgs" style="min-height:160px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;scroll-behavior:smooth"></div>
+
+  <!-- Input África -->
+  <div style="display:flex;gap:7px;align-items:flex-end;background:white;border-radius:20px;border:1px solid #e0d8cc;padding:7px 7px 7px 14px">
+    <textarea id="africa-inp" rows="1"
+      style="flex:1;border:none;outline:none;resize:none;font-family:inherit;font-size:14px;color:#1c1510;background:transparent;line-height:1.5;max-height:100px;min-height:20px;padding:2px 0"
+      placeholder="Écris ou envoie une photo..."
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();africaChatSend()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button onclick="africaChatSend()" style="width:34px;height:34px;background:#7A3A6A;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -1023,6 +1051,9 @@ let directorHistory = [];
 let generalChatHistory = [];
 let spChatHistories = {};
 let africaChatHistory = [];
+let africaHist = [];
+let africaPhoto = null;
+const CTX_AFRICA_APP = CTX_AFRICA;
 let eggCount = 0;
 let checklistItems = [];
 let journalEntries = [];
@@ -1369,141 +1400,91 @@ function renderGeneralChat() {
 function showAfricaView() {
   document.getElementById('africaView').classList.add('active');
   document.getElementById('angelView').classList.remove('active');
-
   // Welcome message
   if (africaChatHistory.length === 0) {
-    const welcome = "Bonjour África ! 🌺 Comment puis-je t'aider aujourd'hui ? Tu peux m'envoyer une photo, poser une question sur les vers, le compost ou le jardin...";
-    africaChatHistory.push({ role: 'ai', content: welcome });
+    africaAddMsg('ai', "Bonjour África ! 🌺 Comment puis-je t\'aider aujourd\'hui ?\nTu peux m\'envoyer une photo, poser une question sur les vers, le compost ou le jardin...");
   }
-  renderAfricaChat();
 }
 
-function renderAfricaChat() {
-  const msgs = document.getElementById('afMessages');
-  msgs.innerHTML = '';
-  africaChatHistory.forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'af-msg ' + (m.role === 'user' ? 'user' : 'ai');
-    div.innerHTML = formatMessage(m.content);
-    msgs.appendChild(div);
-  });
+function africaAddMsg(role, txt) {
+  africaChatHistory.push({role, content: txt});
+  const msgs = document.getElementById('africa-msgs');
+  const div = document.createElement('div');
+  div.style.cssText = role === 'user'
+    ? 'align-self:flex-end;background:#7A3A6A;color:white;padding:8px 12px;border-radius:14px 14px 4px 14px;max-width:80%;font-size:13px;line-height:1.5;animation:fadeUp .3s ease'
+    : 'align-self:flex-start;background:white;color:#1c1510;border:0.5px solid #e0d8cc;padding:8px 12px;border-radius:14px 14px 14px 4px;max-width:85%;font-size:13px;line-height:1.5;animation:fadeUp .3s ease';
+  div.innerHTML = formatMessage(txt);
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function sendAfricaChat() {
-  const input = document.getElementById('afInput');
-  const text = input.value.trim();
-  if (!text && !afPendingImage) return;
-  input.value = '';
-
-  const displayText = text || '📷 Photo envoyée';
-  africaChatHistory.push({ role: 'user', content: displayText });
-  renderAfricaChat();
-
-  const body = { system: CTX_AFRICA, user: text || 'Analyse cette image en détail.' };
-  if (afPendingImage) {
-    body.image_base64 = afPendingImage.base64;
-    body.image_type = afPendingImage.type;
-    afPendingImage = null;
-  }
-
-  // Typing indicator
-  const msgs = document.getElementById('afMessages');
-  const typing = document.createElement('div');
-  typing.className = 'typing-indicator light-typing';
-  typing.innerHTML = '<span></span><span></span><span></span>';
-  msgs.appendChild(typing);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  apiCall('agente', body)
-    .then(data => {
-      typing.remove();
-      const reply = extractReply(data, 'Pas de réponse');
-      africaChatHistory.push({ role: 'ai', content: reply });
-      renderAfricaChat();
-    })
-    .catch(e => {
-      typing.remove();
-      africaChatHistory.push({ role: 'ai', content: 'Erreur: ' + e.message });
-      renderAfricaChat();
-    });
-}
-
-function handleAfricaPhoto(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+function onAfricaPhotoSelect(e) {
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(ev) {
-    const base64 = ev.target.result.split(',')[1];
-    afPendingImage = { base64, type: file.type };
-    // Show preview & auto-send
-    africaChatHistory.push({ role: 'user', content: '📷 Photo envoyée' });
-    renderAfricaChat();
-
-    const body = {
-      system: CTX_AFRICA,
-      user: 'Analyse cette photo en détail.',
-      image_base64: base64,
-      image_type: file.type
-    };
-    afPendingImage = null;
-
-    const msgs = document.getElementById('afMessages');
-    const typing = document.createElement('div');
-    typing.className = 'typing-indicator light-typing';
-    typing.innerHTML = '<span></span><span></span><span></span>';
-    msgs.appendChild(typing);
-    msgs.scrollTop = msgs.scrollHeight;
-
-    // Also upload
-    uploadPhoto(base64, 'observation', 'Photo de la ferme', 'africa');
-
-    apiCall('agente', body)
-      .then(data => {
-        typing.remove();
-        const reply = extractReply(data, 'Pas de réponse');
-        africaChatHistory.push({ role: 'ai', content: reply });
-        renderAfricaChat();
-      })
-      .catch(err => {
-        typing.remove();
-        africaChatHistory.push({ role: 'ai', content: 'Erreur: ' + err.message });
-        renderAfricaChat();
-      });
+  reader.onload = ev => {
+    africaPhoto = { base64: ev.target.result.split(',')[1], type: file.type, name: file.name };
+    document.getElementById('africa-photo-thumb').src = ev.target.result;
+    document.getElementById('africa-photo-name').textContent = file.name;
+    document.getElementById('africa-photo-bar').style.display = 'flex';
   };
   reader.readAsDataURL(file);
   e.target.value = '';
 }
 
-function showAfricaPDF() {
-  africaChatHistory.push({ role: 'user', content: "Montre-moi le PDF du Club Sol Vivant" });
-  renderAfricaChat();
-
-  const msgs = document.getElementById('afMessages');
-  const typing = document.createElement('div');
-  typing.className = 'typing-indicator light-typing';
-  typing.innerHTML = '<span></span><span></span><span></span>';
-  msgs.appendChild(typing);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  apiCall('agente', {
-    system: CTX_AFRICA,
-    user: "África demande à voir le PDF #1 du Club Sol Vivant. Donne-lui un résumé du contenu et le lien si disponible."
-  })
-  .then(data => {
-    typing.remove();
-    const reply = extractReply(data, "Le PDF #1 est en cours de préparation. Je te tiendrai informée dès qu'il sera prêt !");
-    africaChatHistory.push({ role: 'ai', content: reply });
-    renderAfricaChat();
-  })
-  .catch(e => {
-    typing.remove();
-    africaChatHistory.push({ role: 'ai', content: "Le PDF #1 du Club Sol Vivant est en cours de finalisation. Je te préviendrai dès qu'il sera disponible ! 📄" });
-    renderAfricaChat();
-  });
+function clearAfricaPhoto() {
+  africaPhoto = null;
+  document.getElementById('africa-photo-bar').style.display = 'none';
 }
 
-// ──────────────────────────────────────────────────────
+async function africaChatSend() {
+  const inp = document.getElementById('africa-inp');
+  const txt = inp.value.trim(); const photo = africaPhoto;
+  if (!txt && !photo) return;
+  inp.value = ''; inp.style.height = 'auto'; clearAfricaPhoto();
+  africaAddMsg('user', txt || '(photo jointe)');
+  africaHist.push({role:'user', content: txt || 'Analyse cette image.'});
+  // typing
+  const c = document.getElementById('africa-msgs');
+  const ty = document.createElement('div');
+  ty.id='africa-ty';ty.style.cssText='align-self:flex-start';
+  ty.innerHTML='<div style="background:white;border:0.5px solid #e0d8cc;border-radius:14px;padding:10px 13px;display:flex;gap:3px"><div style="width:5px;height:5px;background:#aaa;border-radius:50%;animation:bo .8s infinite"></div><div style="width:5px;height:5px;background:#aaa;border-radius:50%;animation:bo .8s .15s infinite"></div><div style="width:5px;height:5px;background:#aaa;border-radius:50%;animation:bo .8s .3s infinite"></div></div>';
+  c.appendChild(ty); c.scrollTop=c.scrollHeight;
+  try {
+    const payload = { system: CTX_AFRICA_APP, user: txt || 'Analyse cette image de la ferme.', messages: africaHist.slice(-8) };
+    if (photo && photo.type.startsWith('image/')) {
+      payload.user_content = [
+        { type:'image', source:{ type:'base64', media_type: photo.type, data: photo.base64 } },
+        { type:'text', text: txt || 'Analyse cette image de la ferme NosVers.' }
+      ];
+    }
+    const res = await fetch(API_URL+'?action=agente',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    document.getElementById('africa-ty')?.remove();
+    const data = await res.json();
+    const reply = data.content?.find(b=>b.type==='text')?.text || '⚠️ Erreur de connexion';
+    africaAddMsg('ai', reply);
+    africaHist.push({role:'assistant', content:reply});
+    // Guardar observación en vault si hay foto
+    if (photo) saveAfricaObservation(txt, reply);
+  } catch(e) { document.getElementById('africa-ty')?.remove(); africaAddMsg('ai','⚠️ Connexion impossible'); }
+}
+
+async function africaChatGo(txt) {
+  document.getElementById('africa-inp').value = txt;
+  await africaChatSend();
+}
+
+async function saveAfricaObservation(pregunta, respuesta) {
+  const fecha = new Date().toISOString().split('T')[0];
+  const entry = `\n\n## ${fecha} — Observación África\n**Consulta:** ${pregunta||'(foto)'}\n**Análisis:** ${respuesta}`;
+  try {
+    await fetch(API_URL+'?action=vault_write', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ category:'contexto', filename:'africa-conocimiento', content: entry, mode:'append' })
+    });
+  } catch(e) {}
+}
+
+
 // WEATHER
 // ──────────────────────────────────────────────────────
 function fetchMeteo() {
