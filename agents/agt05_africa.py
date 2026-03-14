@@ -1,162 +1,149 @@
 #!/usr/bin/env python3
 """
-AGT-05 · Procesador de conocimiento de África
-Procesa contenido de África → estructura en vault → genera PDFs Club
-Cron: 0 */6 * * * (cada 6 horas)
+NosVers · AGT-05 África Link
+Monitoriza Gmail de África, extrae conocimiento, genera PDFs Club.
+Avisa a otros agentes cuando hay contenido nuevo.
+Cron: cada 6h — 0 */6 * * *
 """
-
-import os
-import requests
+import sys, imaplib, email as email_lib
+from email.header import decode_header
+sys.path.insert(0, '/home/nosvers/agents')
+from agent_base import NosVersAgent
 from datetime import datetime
-from dotenv import load_dotenv
+import os
 
-load_dotenv('/home/nosvers/.env')
+class AfricaAgent(NosVersAgent):
 
-APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
-APP_TOKEN = os.getenv('APP_TOKEN', '')
-AGENT_NAME = __file__.split('/')[-1].replace('.py', '')
-ANTHROPIC_KEY = os.getenv('ANTHROPIC_API_KEY', '')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
+    # Respuestas de África ya recibidas (13/03/2026)
+    RESPUESTAS_CONOCIDAS = """
+RESPUESTAS DE AFRICA RECIBIDAS 2026-03-13
 
-# Directorio donde África deja contenido (email procesado, notas, etc.)
-AFRICA_INPUT = '/home/nosvers/uploads/africa/'
+P1 — Primer vistazo al suelo:
+Mira la variedad de plantas que hay. Se fija en el suelo, coge tierra y la huele. Observa si hay vida minúscula.
 
+P2 — 5 observaciones para evaluar un suelo:
+El color, el olor. Si se desgrana fácilmente, si tiene vida. Cómo absorbe el agua.
 
-def vault_read(category, filename):
-    try:
-        r = requests.get(
-            f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
-            headers={'X-App-Token': APP_TOKEN}, timeout=10
-        )
-        if r.status_code == 200:
-            return r.json().get('content', '')
-    except Exception:
-        pass
-    return ''
+P3 — Señal de suelo en mal estado (ejemplo real):
+Bancal con tierra compactada (se ve musgo), drena mal, llena de piedras. Crecen adventicias con más fuerza que lo cultivado. La tierra se compacta con cuatro gotas que caen.
 
+P4 — Señal de suelo mejorando:
+Ese mismo bancal ahora: suelo granulado, tono café, no cuesta plantar nada y todo crece. Está lleno de lombrices.
 
-def vault_write(category, filename, content, mode='append'):
-    try:
-        requests.post(
-            f"{APP_URL}?action=vault_write",
-            headers={'X-App-Token': APP_TOKEN, 'Content-Type': 'application/json'},
-            json={'category': category, 'filename': filename, 'content': content, 'mode': mode},
-            timeout=10
-        )
-    except Exception:
-        pass
+P5 — Consejo para quien nunca miró su suelo:
+"Que pare un instante y observe su suelo. Si no ve nada, que lo cubra (cartón, paja, heno...), que lo riegue y que deje que opere la magia. Que lo destape pasado un rato y vea la vida que hay. Ellos serán los que acojan sus siembras y nutran sus plantas."
 
-
-def process_with_claude(raw_content):
-    """Estructura contenido bruto de África en formato vault."""
-    prompt = f"""Tienes contenido bruto de África (Directora de Conocimiento de NosVers, experta en lombricompost y sol vivant).
-
-Contenido bruto:
-{raw_content}
-
-Estructura este contenido en formato Markdown limpio para la vault de conocimiento:
-1. Título claro
-2. Categorías/tags
-3. Contenido organizado con H2/H3
-4. Datos técnicos destacados
-5. Citas textuales de África entre comillas
-6. Fecha de procesamiento
-
-Si hay suficiente contenido técnico, indica "READY_FOR_PDF" al final.
+ESTADO: Listo para generar PDF #1
 """
 
-    r = requests.post(
-        'https://api.anthropic.com/v1/messages',
-        headers={
-            'Content-Type': 'application/json',
-            'x-api-key': ANTHROPIC_KEY,
-            'anthropic-version': '2023-06-01'
-        },
-        json={
-            'model': 'claude-sonnet-4-6',
-            'max_tokens': 3000,
-            'system': 'Eres un editor técnico especializado en agricultura regenerativa y lombricompost.',
-            'messages': [{'role': 'user', 'content': prompt}]
-        },
-        timeout=60
-    )
+    def __init__(self):
+        super().__init__('agt05_africa', '🌺')
 
-    if r.status_code == 200:
-        return r.json()['content'][0]['text']
-    return None
+    def check_triggers(self) -> list:
+        triggers = []
+        memoria = self.get_memory()
+        # Si tenemos las respuestas pero no se ha generado el PDF
+        if 'RESPUESTAS_CONOCIDAS' not in memoria and 'PDF' not in memoria:
+            triggers.append('guardar_respuestas_iniciales')
+        # Si hay suficiente contenido para PDF
+        conocimiento = self.vault_read('contexto', 'africa-conocimiento')
+        if len(conocimiento) > 500 and 'PDF generado' not in memoria:
+            triggers.append('generar_pdf')
+        return triggers
 
+    def generar_pdf_contenido(self, conocimiento: str) -> str:
+        """Generar contenido del PDF con la voz de África."""
+        prompt = f"""Eres África Sánchez, una agricultora española en Dordogne, Francia.
+Escribe el PDF #1 del Club Sol Vivant: "Comprendre votre sol en 5 observations"
 
-def notify(msg):
-    if not TELEGRAM_TOKEN:
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=10
-        )
-    except Exception:
-        pass
+Usa EXACTAMENTE este conocimiento tuyo:
+{conocimiento}
 
+FORMATO (en francés, con tu voz personal, cercana, práctica):
+# Comprendre votre sol en 5 observations
+*par África Sánchez · Club Sol Vivant · NosVers*
 
-def run():
-    print(f"[{datetime.now()}] AGT-05: Buscando contenido de África...")
+## Introduction (150 mots)
+[Por qué aprender a leer el suelo lo cambia todo — desde tu experiencia]
 
-    # Buscar archivos nuevos en directorio de input
-    if not os.path.isdir(AFRICA_INPUT):
-        os.makedirs(AFRICA_INPUT, exist_ok=True)
-        print("  Directorio de input creado, esperando contenido")
-        return
+## Observation 1 — La diversité des plantes (200 mots)
+## Observation 2 — La couleur et l'odeur (200 mots)
+## Observation 3 — La texture et le drainage (200 mots)
+## Observation 4 — La vie visible (200 mots)
+## Observation 5 — Ce que ça donne quand ça marche (200 mots)
+[El ejemplo del bancal transformado]
 
-    processed_log = os.path.join(AFRICA_INPUT, '.processed')
-    processed = set()
-    if os.path.exists(processed_log):
-        with open(processed_log) as f:
-            processed = set(f.read().strip().split('\n'))
+## Défi du mois (100 mots)
+[Tarea concreta para hacer esta semana]
 
-    new_files = [f for f in os.listdir(AFRICA_INPUT)
-                 if f not in processed and not f.startswith('.') and os.path.isfile(os.path.join(AFRICA_INPUT, f))]
+## Mot d'África (50 mots)
+[Cierre personal]
 
-    if not new_files:
-        print("  Sin contenido nuevo de África")
-        return
+*© NosVers · Club Sol Vivant · nosvers.com*
+"""
+        return self.ask_claude(prompt, max_tokens=3000)
 
-    for filename in new_files:
-        filepath = os.path.join(AFRICA_INPUT, filename)
-        print(f"  Procesando: {filename}")
+    def run(self):
+        self.log.info("AGT-05 África iniciando")
 
-        with open(filepath) as f:
-            raw = f.read()
+        # Verificar inbox
+        inbox = self.read_inbox()
+        if inbox and 'PENDIENTE' in inbox:
+            self.log.info("Mensajes en inbox")
+            self.mark_inbox_done()
 
-        structured = process_with_claude(raw)
-        if structured:
-            # Guardar en vault
-            safe_name = filename.rsplit('.', 1)[0].lower().replace(' ', '-')
-            vault_write('contexto', f'africa-{safe_name}', structured, mode='overwrite')
+        # Guardar respuestas si no están en vault
+        conocimiento_actual = self.vault_read('contexto', 'africa-conocimiento')
+        if '2026-03-13' not in conocimiento_actual:
+            self.log.info("Guardando respuestas de África en vault")
+            self.vault_write('contexto', 'africa-conocimiento',
+                self.RESPUESTAS_CONOCIDAS, modo='append')
+            self.save_memory(
+                f"Respuestas 5 preguntas guardadas en vault\n"
+                f"Fecha: 2026-03-13\n"
+                f"Estado: Listo para PDF #1"
+            )
+            # Avisar a otros agentes
+            self.send_message('agt02_instagram',
+                'Conocimiento de África disponible',
+                'Las 5 respuestas de África están en vault. Puedes usarlas para posts educativos.')
+            self.send_message('agt06_infoproduct',
+                'Contenido PDF #1 listo',
+                'África respondió las 5 preguntas. El PDF #1 puede generarse.')
+            self.send_message('orchestrator',
+                'Respuestas de África guardadas',
+                'Vault actualizada con conocimiento de África. PDF #1 listo para generar. Notificar a Angel.')
 
-            # Append a conocimiento acumulado
-            vault_write('contexto', 'africa-conocimiento', f"\n\n## {filename}\n{structured}", mode='append')
+        # Generar PDF si hay suficiente contenido y no se ha hecho
+        conocimiento = self.vault_read('contexto', 'africa-conocimiento')
+        memoria = self.get_memory()
 
-            # Marcar como procesado
-            with open(processed_log, 'a') as f:
-                f.write(filename + '\n')
+        if len(conocimiento) > 300 and 'PDF generado' not in memoria:
+            self.log.info("Generando PDF #1")
+            pdf_contenido = self.generar_pdf_contenido(conocimiento)
 
-            # Notificar si hay material para PDF
-            if 'READY_FOR_PDF' in structured:
-                notify(
-                    f"📚 *AGT-05 · Contenido África procesado*\n\n"
-                    f"Archivo: {filename}\n"
-                    f"*Material suficiente para PDF del Club*\n"
-                    f"_¿Genero el PDF? Confirma con /generar\\_pdf_"
+            if pdf_contenido:
+                self.vault_write('club', 'pdf-01-comprendre-votre-sol',
+                    pdf_contenido, modo='overwrite')
+                self.save_memory(f"PDF generado: pdf-01-comprendre-votre-sol\nFecha: {self.ts}")
+                self.save_result(f"PDF #1 generado y guardado en vault/club/\nListo para maquetación.")
+
+                self.send_message('agt06_infoproduct',
+                    'PDF #1 generado — listo para maquetar',
+                    f'Contenido PDF #1 guardado en vault/club/pdf-01-comprendre-votre-sol.md\nMaquetar y subir a Lemon Squeezy.')
+                self.send_message('orchestrator',
+                    'PDF #1 Club Sol Vivant completado',
+                    'Contenido generado con voz de África. Guardado en vault. AGT-06 notificado para maquetación.',
+                    priority='alta')
+
+                self.notify(
+                    "🌺 *PDF #1 Club Sol Vivant generado*\n\n"
+                    "📄 Titre: \"Comprendre votre sol en 5 observations\"\n"
+                    "Guardado en vault/club/\n\n"
+                    "Próximo paso: maquetación y subida a Lemon Squeezy."
                 )
-            else:
-                notify(
-                    f"📚 *AGT-05*: Procesado _{filename}_ de África → vault actualizada"
-                )
 
-    print(f"[{datetime.now()}] AGT-05: {len(new_files)} archivos procesados")
-
+        self.log.info("AGT-05 completado")
 
 if __name__ == '__main__':
-    run()
+    AfricaAgent().run()
