@@ -1,152 +1,154 @@
 #!/usr/bin/env python3
 """
 NosVers · Orchestrator
-Coordinador central — verifica estado de agentes y notifica a Angel
-Cron: 0 * * * * (cada hora)
+Coordinador central. Lee el estado de todos los agentes,
+detecta bloqueos, activa agentes proactivamente, reporta a Angel.
+Cron: cada hora — 0 * * * *
 """
-
-import os
-import json
-import subprocess
-import requests
+import sys, os
+sys.path.insert(0, '/home/nosvers/agents')
+from agent_base import NosVersAgent
 from datetime import datetime
-from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv('/home/nosvers/.env')
+class Orchestrator(NosVersAgent):
 
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
-APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
-APP_TOKEN = os.getenv('APP_TOKEN', '')
-AGENT_NAME = __file__.split('/')[-1].replace('.py', '')
-AGENTS_DIR = '/home/nosvers/agents'
-LOG_FILE = '/home/nosvers/agents/orchestrator.log'
+    AGENTES = ['agt01_visual','agt02_instagram','agt04_seo','agt05_africa','agt06_infoproduct']
 
+    def __init__(self):
+        super().__init__('orchestrator', '🎯')
 
-def log(msg):
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f"[{timestamp}] {msg}"
-    print(line)
-    with open(LOG_FILE, 'a') as f:
-        f.write(line + '\n')
+    def check_triggers(self) -> list:
+        triggers = []
+        hora = datetime.now().hour
+        dow  = datetime.now().weekday()  # 0=lunes, 6=domingo
 
+        # Domingo 10h → Instagram
+        if dow == 6 and hora == 10:
+            triggers.append(('run_agent', 'agt02_instagram', 'Generación semanal posts'))
 
-# ── VAULT HELPERS ─────────────────────────────────────────
-def vault_read(category, filename):
-    """Leer un archivo de la vault del agente"""
-    try:
-        r = requests.get(f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
-                         headers={'X-App-Token': APP_TOKEN}, timeout=10)
-        if r.status_code == 200:
-            return r.json().get('content', '')
-    except Exception as e:
-        log(f"vault_read error: {e}")
-    return ''
+        # Lunes 7h → SEO
+        if dow == 0 and hora == 7:
+            triggers.append(('run_agent', 'agt04_seo', 'Artículo blog semanal'))
 
+        # Cada 6h → verificar África
+        if hora % 6 == 0:
+            triggers.append(('run_agent', 'agt05_africa', 'Check email África'))
 
-def vault_write(category, filename, content, mode='append'):
-    """Escribir en la vault del agente"""
-    try:
-        requests.post(f"{APP_URL}?action=vault_write",
-                      headers={'Content-Type': 'application/json', 'X-App-Token': APP_TOKEN},
-                      json={'category': category, 'filename': filename, 'content': content, 'mode': mode},
-                      timeout=10)
-    except Exception as e:
-        log(f"vault_write error: {e}")
+        # Verificar inboxes de todos los agentes
+        for ag in self.AGENTES:
+            inbox = self.vault_read(f'agentes/{ag}', '_inbox')
+            if inbox and 'PENDIENTE' in inbox:
+                triggers.append(('notify_inbox', ag, f'Tiene mensajes pendientes'))
 
+        return triggers
 
-def save_memoria(entry):
-    """Guardar entrada en la memoria del agente"""
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M')
-    vault_write(f'agentes/{AGENT_NAME}', '_memoria', f'\n## {ts}\n{entry}', mode='append')
+    def collect_status(self) -> dict:
+        """Recoger estado de todos los agentes desde su vault."""
+        status = {}
+        for ag in self.AGENTES:
+            memoria = self.vault_read(f'agentes/{ag}', '_memoria')
+            resultado = self.vault_read(f'agentes/{ag}', '_resultado')
+            inbox = self.vault_read(f'agentes/{ag}', '_inbox')
+            log_file = Path(f'/home/nosvers/logs/{ag}.log')
+            ultimo_log = ''
+            if log_file.exists():
+                lines = log_file.read_text().strip().split('\n')
+                ultimo_log = lines[-1] if lines else ''
+            status[ag] = {
+                'memoria_len': len(memoria),
+                'tiene_resultado': bool(resultado.strip()),
+                'inbox_pendiente': 'PENDIENTE' in inbox if inbox else False,
+                'ultimo_log': ultimo_log[-80:] if ultimo_log else 'Sin logs'
+            }
+        return status
 
+    def run_agent(self, nombre: str):
+        """Lanzar un sub-agente."""
+        import subprocess
+        venv_py = '/home/nosvers/venv/bin/python3'
+        py = venv_py if Path(venv_py).exists() else 'python3'
+        ag_path = Path(f'/home/nosvers/agents/{nombre}.py')
+        if not ag_path.exists():
+            self.log.warning(f"Agente no instalado: {nombre}")
+            return
+        self.log.info(f"Lanzando: {nombre}")
+        subprocess.Popen([py, str(ag_path)],
+                        stdout=open(f'/home/nosvers/logs/{nombre}.log','a'),
+                        stderr=subprocess.STDOUT)
 
-def save_resultado(content):
-    """Guardar ultimo resultado del agente"""
-    vault_write(f'agentes/{AGENT_NAME}', '_resultado', content, mode='overwrite')
-# ──────────────────────────────────────────────────────────
+    def build_report(self, status: dict, triggers: list) -> str:
+        """Construir reporte para Angel."""
+        ts = datetime.now().strftime('%d/%m/%Y %H:%M')
+        lines = [f"🎯 *Orchestrator NosVers*\n📅 {ts}\n"]
 
+        for ag, s in status.items():
+            ico = "✅" if not s['inbox_pendiente'] else "🔔"
+            lines.append(f"{ico} *{ag}*")
+            if s['inbox_pendiente']:
+                lines.append(f"  → Tiene mensajes pendientes")
+            lines.append(f"  → {s['ultimo_log']}")
 
-def notify(msg):
-    if not TELEGRAM_TOKEN:
-        log("WARN: No TELEGRAM_TOKEN, skip notify")
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=10
-        )
-    except Exception as e:
-        log(f"ERROR notify: {e}")
+        if triggers:
+            lines.append("\n*Acciones ejecutadas:*")
+            for t in triggers:
+                lines.append(f"• {t[1]}: {t[2]}")
 
+        # Semana actual
+        semana = self.vault_read('operaciones', 'semana-actual')
+        pendientes = [l for l in semana.split('\n') if '- [ ]' in l]
+        if pendientes:
+            lines.append(f"\n*Pendientes semana ({len(pendientes)}):*")
+            for p in pendientes[:3]:
+                lines.append(f"• {p.replace('- [ ]','').strip()}")
 
-def check_services():
-    """Verifica servicios del sistema."""
-    results = []
+        return '\n'.join(lines)
 
-    # Bot Telegram
-    ret = subprocess.run(['systemctl', 'is-active', 'nosvers-bot'], capture_output=True, text=True)
-    bot_status = ret.stdout.strip()
-    results.append(('Bot Telegram', bot_status == 'active', bot_status))
+    def run(self):
+        self.log.info("=== ORCHESTRATOR INICIANDO ===")
 
-    # Vault
-    vault_path = '/home/nosvers/public_html/knowledge_base'
-    vault_ok = os.path.isdir(vault_path)
-    results.append(('Vault', vault_ok, 'OK' if vault_ok else 'no encontrada'))
+        # 1. Leer inbox propio
+        inbox = self.read_inbox()
+        if inbox and 'PENDIENTE' in inbox:
+            self.log.info("Orchestrator tiene mensajes en inbox")
+            resultado = self.ask_claude(
+                f"Analiza estos mensajes de agentes y determina acciones:\n{inbox[:1000]}",
+                "Eres el orchestrator. Responde con acciones concretas en formato JSON."
+            )
+            if resultado:
+                self.save_memory(f"Inbox procesado: {resultado[:200]}")
 
-    # App granja
-    try:
-        r = requests.get(f"{APP_URL}?action=vault_list",
-                         headers={'X-App-Token': APP_TOKEN}, timeout=10)
-        results.append(('App granja', r.status_code == 200, f"HTTP {r.status_code}"))
-    except Exception as e:
-        results.append(('App granja', False, str(e)[:50]))
+        # 2. Recoger estado
+        status = self.collect_status()
 
-    return results
+        # 3. Verificar triggers y ejecutar
+        triggers = self.check_triggers()
+        ejecutados = []
+        for trigger in triggers:
+            tipo, agente, razon = trigger
+            if tipo == 'run_agent':
+                self.run_agent(agente)
+                ejecutados.append(trigger)
+                self.log.info(f"Agente lanzado: {agente} — {razon}")
+            elif tipo == 'notify_inbox':
+                self.run_agent(agente)  # Lanzar para que procese su inbox
+                ejecutados.append(trigger)
 
+        # 4. Guardar estado en vault
+        status_txt = "\n".join([
+            f"## {ag}: {'🔔 inbox' if s['inbox_pendiente'] else '✅ ok'} — {s['ultimo_log']}"
+            for ag, s in status.items()
+        ])
+        self.vault_write('operaciones', 'estado-agentes', status_txt, modo='overwrite')
+        self.save_memory(f"Check completado. Triggers: {len(ejecutados)}. Agentes: {list(status.keys())}")
 
-def check_agent_memory():
-    """Lee el estado de los agentes desde agent_memory.json."""
-    memory_path = '/home/nosvers/public_html/agent_memory.json'
-    if not os.path.exists(memory_path):
-        return {}
-    with open(memory_path) as f:
-        return json.load(f)
+        # 5. Reportar a Angel (solo si hay algo importante)
+        if ejecutados or any(s['inbox_pendiente'] for s in status.values()):
+            report = self.build_report(status, ejecutados)
+            self.notify(report)
 
-
-def run():
-    log("=== Orchestrator check ===")
-
-    services = check_services()
-    memory = check_agent_memory()
-
-    all_ok = all(ok for _, ok, _ in services)
-
-    # Solo notificar si hay problemas o cada 6 horas (0, 6, 12, 18h)
-    hour = datetime.now().hour
-    should_notify = not all_ok or hour % 6 == 0
-
-    if should_notify:
-        msg = f"🤖 *Orchestrator · {datetime.now().strftime('%d/%m %H:%M')}*\n\n"
-        for name, ok, detail in services:
-            icon = "✅" if ok else "❌"
-            msg += f"{icon} {name}: {detail}\n"
-
-        if memory:
-            msg += "\n*Agentes:*\n"
-            for agent, data in memory.items():
-                last = data.get('last_vault_write', 'nunca')
-                msg += f"· {agent}: {last}\n"
-
-        notify(msg)
-
-    for name, ok, detail in services:
-        status = "OK" if ok else "FAIL"
-        log(f"  {name}: {status} ({detail})")
-
-    log("=== Check completado ===")
-
+        self.mark_inbox_done()
+        self.log.info("=== ORCHESTRATOR COMPLETADO ===")
 
 if __name__ == '__main__':
-    run()
+    Orchestrator().run()
