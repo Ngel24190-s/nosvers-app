@@ -14,54 +14,11 @@ from dotenv import load_dotenv
 
 load_dotenv('/home/nosvers/.env')
 
-# ── VAULT HELPER — leer/escribir contexto del agente ─────
-import os, requests as _req
-from datetime import datetime
-
-APP_URL  = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
-APP_TOKEN = os.getenv('APP_TOKEN', '')
-AGENT_NAME = __file__.split('/')[-1].replace('.py','')
-
-def vault_read(category, filename):
-    """Leer un archivo de la vault del agente"""
-    try:
-        r = _req.get(f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
-                    headers={'X-App-Token': APP_TOKEN}, timeout=10)
-        if r.status_code == 200:
-            return r.json().get('content', '')
-    except Exception as e:
-        log(f"vault_read error: {e}")
-    return ''
-
-def vault_write(category, filename, content, mode='append'):
-    """Escribir en la vault del agente"""
-    try:
-        _req.post(f"{APP_URL}?action=vault_write",
-                 headers={'Content-Type':'application/json','X-App-Token': APP_TOKEN},
-                 json={'category': category, 'filename': filename, 'content': content, 'mode': mode},
-                 timeout=10)
-    except Exception as e:
-        log(f"vault_write error: {e}")
-
-def get_contexto():
-    """Leer el contexto predeterminado de este agente"""
-    return vault_read(f'agentes/{AGENT_NAME}', '_contexto')
-
-def save_memoria(entry):
-    """Guardar entrada en la memoria del agente"""
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M')
-    vault_write(f'agentes/{AGENT_NAME}', '_memoria', f'\n## {ts}\n{entry}', mode='append')
-
-def save_resultado(content):
-    """Guardar último resultado del agente"""
-    vault_write(f'agentes/{AGENT_NAME}', '_resultado', content, mode='overwrite')
-# ─────────────────────────────────────────────────────────
-
-
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
 APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
 APP_TOKEN = os.getenv('APP_TOKEN', '')
+AGENT_NAME = __file__.split('/')[-1].replace('.py', '')
 AGENTS_DIR = '/home/nosvers/agents'
 LOG_FILE = '/home/nosvers/agents/orchestrator.log'
 
@@ -72,6 +29,42 @@ def log(msg):
     print(line)
     with open(LOG_FILE, 'a') as f:
         f.write(line + '\n')
+
+
+# ── VAULT HELPERS ─────────────────────────────────────────
+def vault_read(category, filename):
+    """Leer un archivo de la vault del agente"""
+    try:
+        r = requests.get(f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
+                         headers={'X-App-Token': APP_TOKEN}, timeout=10)
+        if r.status_code == 200:
+            return r.json().get('content', '')
+    except Exception as e:
+        log(f"vault_read error: {e}")
+    return ''
+
+
+def vault_write(category, filename, content, mode='append'):
+    """Escribir en la vault del agente"""
+    try:
+        requests.post(f"{APP_URL}?action=vault_write",
+                      headers={'Content-Type': 'application/json', 'X-App-Token': APP_TOKEN},
+                      json={'category': category, 'filename': filename, 'content': content, 'mode': mode},
+                      timeout=10)
+    except Exception as e:
+        log(f"vault_write error: {e}")
+
+
+def save_memoria(entry):
+    """Guardar entrada en la memoria del agente"""
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M')
+    vault_write(f'agentes/{AGENT_NAME}', '_memoria', f'\n## {ts}\n{entry}', mode='append')
+
+
+def save_resultado(content):
+    """Guardar ultimo resultado del agente"""
+    vault_write(f'agentes/{AGENT_NAME}', '_resultado', content, mode='overwrite')
+# ──────────────────────────────────────────────────────────
 
 
 def notify(msg):

@@ -147,14 +147,106 @@ class StudioParser(HTMLParser):
             self.current_section['content'] += data
 
 
-def extract_pages_simple(html_content):
+def extract_pages_from_js(html_content):
     """
-    Fallback: extract pages by splitting on common patterns.
-    Works even if Studio HTML doesn't use data-page attributes.
+    Extract pages from Studio V2 JavaScript template literal functions.
+    Studio V2 defines pages as: function pageXxx(){return `...`;}
+    The content is in JS template literals, not static HTML.
     """
     pages = []
 
-    # Try to find page markers in comments or data attributes
+    # Pattern: function pageXxx(){return `...content...`;}
+    # Match function names like pageHome, pageExtrait, etc.
+    func_pattern = re.compile(
+        r'function\s+page(\w+)\s*\(\s*\)\s*\{return\s*`(.*?)`;\s*\}',
+        re.DOTALL
+    )
+
+    for match in func_pattern.finditer(html_content):
+        func_name = match.group(1)  # Home, Extrait, Engrais, etc.
+        raw_content = match.group(2)
+
+        # Clean JS template expressions: ${NAV()}, ${FOOTER()}, ${img(...)}, ${e()}
+        # Remove NAV() and FOOTER() calls
+        clean = re.sub(r'\$\{NAV\(\)\}', '', raw_content)
+        clean = re.sub(r'\$\{FOOTER\(\)\}', '', clean)
+
+        # Replace ${img(IMGS.xxx,'alt text','class')} with actual <img> tags
+        def replace_img(m):
+            args = m.group(1)
+            # Parse img arguments: IMGS.key, 'alt', 'class'
+            parts = re.findall(r"IMGS\.(\w+)|'([^']*)'|\"([^\"]*)\"", args)
+            src_key = parts[0][0] if parts else ''
+            alt = parts[1][1] if len(parts) > 1 else ''
+            # Map known IMGS keys to URLs
+            img_urls = {
+                'extrait': 'https://nosvers.com/wp-content/uploads/2026/02/Lombrithe-arrosoir-1-600x1067.png',
+                'arrosoir': 'https://nosvers.com/wp-content/uploads/2026/02/Lombrithe-arrosoir-600x1067.png',
+                'engrais1': 'https://nosvers.com/wp-content/uploads/2026/02/pomelli-image-600x1067.png',
+                'engrais2': 'https://nosvers.com/wp-content/uploads/2026/02/Gemini_Generated_Image_edw3yxedw3yxedw3-600x438.png',
+                'engrais3': 'https://nosvers.com/wp-content/uploads/2026/02/Capture-decran-du-2026-02-19-20-49-53-600x746.png',
+                'logo': 'https://nosvers.com/wp-content/uploads/2026/02/cropped-Capture-decran-du-2026-02-16-20-59-09.png',
+                'jardin1': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800',
+                'jardin2': 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800',
+                'jardin3': 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600',
+                'jardin4': 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=600',
+                'jardin5': 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
+                'ferme': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900',
+                'africa': 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900',
+            }
+            src = img_urls.get(src_key, f'https://nosvers.com/wp-content/uploads/placeholder-{src_key}.jpg')
+            return f'<img src="{src}" alt="{alt}" loading="lazy">'
+
+        clean = re.sub(r'\$\{img\(([^)]+)\)\}', replace_img, clean)
+
+        # Remove ${e()} (contenteditable attributes for editor mode)
+        clean = re.sub(r'\s*\$\{e\(\)\}', '', clean)
+
+        # Remove any remaining ${...} JS expressions
+        clean = re.sub(r'\$\{[^}]+\}', '', clean)
+
+        # Clean up editor-only attributes
+        clean = re.sub(r'\s*contenteditable="true"', '', clean)
+        clean = re.sub(r'\s*data-e="1"', '', clean)
+        clean = re.sub(r'\s*spellcheck="false"', '', clean)
+        clean = re.sub(r'\s*data-img="1"', '', clean)
+        clean = re.sub(r'\s*onclick="[^"]*"', '', clean)
+
+        page_name = func_name.lower()
+        # Map function names to readable page names
+        name_map = {
+            'home': 'Accueil',
+            'extrait': 'Extrait Vivant',
+            'engrais': 'Engrais Vert',
+            'atelier': 'Atelier Sol Vivant',
+            'about': 'La Ferme',
+            'contact': 'Contact',
+        }
+        display_name = name_map.get(page_name, func_name)
+
+        pages.append({
+            'name': display_name,
+            'slug': page_name,
+            'html': clean.strip()
+        })
+
+    return pages
+
+
+def extract_pages_simple(html_content):
+    """
+    Extract pages from Studio V2 HTML.
+    First tries JS template literal extraction (Studio V2 format),
+    then falls back to static HTML patterns.
+    """
+    # Studio V2 format: pages defined as JS functions
+    pages = extract_pages_from_js(html_content)
+    if pages:
+        return pages
+
+    # Fallback patterns for static HTML
+    pages = []
+
     # Pattern 1: <!-- PAGE: name -->
     comment_pages = re.findall(
         r'<!--\s*PAGE:\s*(.+?)\s*-->(.*?)(?=<!--\s*PAGE:|$)',
@@ -162,7 +254,7 @@ def extract_pages_simple(html_content):
     )
     if comment_pages:
         for name, content in comment_pages:
-            pages.append({'name': name.strip(), 'html': content.strip()})
+            pages.append({'name': name.strip(), 'slug': re.sub(r'[^a-z0-9-]', '-', name.strip().lower()).strip('-'), 'html': content.strip()})
         return pages
 
     # Pattern 2: data-page="name"
@@ -172,7 +264,7 @@ def extract_pages_simple(html_content):
     )
     if data_pages:
         for name, content in data_pages:
-            pages.append({'name': name.strip(), 'html': content.strip()})
+            pages.append({'name': name.strip(), 'slug': re.sub(r'[^a-z0-9-]', '-', name.strip().lower()).strip('-'), 'html': content.strip()})
         return pages
 
     # Pattern 3: sections with id
@@ -182,11 +274,11 @@ def extract_pages_simple(html_content):
     )
     if sections:
         for name, content in sections:
-            pages.append({'name': name.strip(), 'html': content.strip()})
+            pages.append({'name': name.strip(), 'slug': re.sub(r'[^a-z0-9-]', '-', name.strip().lower()).strip('-'), 'html': content.strip()})
         return pages
 
     # Fallback: treat entire content as one page
-    pages.append({'name': 'homepage', 'html': html_content})
+    pages.append({'name': 'homepage', 'slug': 'homepage', 'html': html_content})
     return pages
 
 
@@ -387,7 +479,7 @@ def main():
     for page in pages:
         name = page['name']
         html = page['html']
-        safe_name = re.sub(r'[^a-z0-9-]', '-', name.lower()).strip('-')
+        safe_name = page.get('slug', re.sub(r'[^a-z0-9-]', '-', name.lower()).strip('-'))
 
         print(f"📄 Procesando: {name}")
 
