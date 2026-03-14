@@ -1310,6 +1310,10 @@ function sendSPMessage() {
   if (spPendingImage) {
     body.image_base64 = spPendingImage.base64;
     body.image_type = spPendingImage.type;
+    // FIX 1: Guardar foto antes de enviar al agente
+    const cat = currentSPAgent.id.includes('02') ? 'instagram' : 
+                currentSPAgent.id.includes('05') ? 'vers' : 'general';
+    savePhotoBeforeProcess(spPendingImage.base64, spPendingImage.type, cat, text);
     spPendingImage = null;
   }
 
@@ -1326,6 +1330,15 @@ function sendSPMessage() {
       typing.remove();
       const reply = extractReply(data);
       appendSPMsg('ai', reply);
+      // FIX 2: Si es AGT-02 y hay contenido, guardar caption en vault
+      if (currentSPAgent && currentSPAgent.id.includes('02') && reply.length > 50) {
+        const fecha = new Date().toISOString().split('T')[0];
+        apiCall('vault_write', {
+          category: 'agentes', filename: 'agt02-posts-pendientes',
+          content: '\n\n## ' + fecha + ' — Post generado\n\n' + reply,
+          mode: 'append'
+        }).catch(() => {});
+      }
     })
     .catch(e => {
       typing.remove();
@@ -1805,6 +1818,23 @@ function uploadPhoto(base64, category, caption, user) {
     caption: caption || '',
     user: user || currentUser
   }).catch(() => {}); // Silent fail for upload
+}
+
+// Guardar foto + generar caption si es AGT-02
+async function savePhotoBeforeProcess(base64, type, category, caption) {
+  try {
+    await fetch(API_URL + '?action=upload_photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-App-Token': currentToken || '' },
+      body: JSON.stringify({
+        image: base64,
+        image_type: type,
+        category: category || 'general',
+        caption: caption || '',
+        user: currentUser || 'unknown'
+      })
+    });
+  } catch(e) { console.log('Photo save error:', e); }
 }
 
 // ──────────────────────────────────────────────────────

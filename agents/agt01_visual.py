@@ -12,6 +12,51 @@ import requests as req
 from dotenv import load_dotenv
 load_dotenv('/home/nosvers/.env')
 
+from PIL import Image, ImageEnhance, ImageDraw, ImageFont
+
+def editar_para_instagram(input_path, output_path=None):
+    """Edita foto siguiendo protocolo visual NosVers: 4:5, exposición, calidez, viñeta, texto."""
+    img = Image.open(input_path).convert('RGB')
+    w, h = img.size
+    
+    # Recortar a 4:5 centrado
+    target_ratio = 4 / 5
+    current_ratio = w / h
+    if current_ratio > target_ratio:
+        new_w = int(h * target_ratio)
+        left = (w - new_w) // 2
+        img = img.crop((left, 0, left + new_w, h))
+    else:
+        new_h = int(w / target_ratio)
+        top = (h - new_h) // 2
+        img = img.crop((0, top, w, top + new_h))
+    
+    img = img.resize((1080, 1350), Image.LANCZOS)
+    img = ImageEnhance.Brightness(img).enhance(1.15)
+    
+    # Calidez
+    r, g, b = img.split()
+    r = r.point(lambda i: min(255, int(i * 1.05)))
+    b = b.point(lambda i: int(i * 0.95))
+    img = Image.merge('RGB', (r, g, b))
+    
+    img = ImageEnhance.Color(img).enhance(1.15)
+    img = ImageEnhance.Contrast(img).enhance(1.10)
+    
+    # Texto @nosvers.ferme
+    draw = ImageDraw.Draw(img)
+    try:
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 24)
+    except:
+        font = ImageFont.load_default()
+    draw.rectangle([(0, 1290), (1080, 1350)], fill=(0, 0, 0, 100))
+    draw.text((30, 1305), "@nosvers.ferme · Dordogne 🌿", fill=(253, 250, 244), font=font)
+    
+    if not output_path:
+        output_path = str(input_path).rsplit('.', 1)[0] + '_edited.jpg'
+    img.save(output_path, 'JPEG', quality=90, optimize=True)
+    return output_path
+
 PERSONALITY = """PERSONALIDAD — AGT-01 "El Ojo"
 Obsesionado con la luz natural y la tierra visible.
 Ves una foto y en 3 segundos sabes si vale o no.
@@ -159,11 +204,14 @@ Responde SOLO en JSON:
             analysis = self.analyze_photo(foto)
             
             if analysis.get('apta_instagram'):
-                # Copiar a carpeta instagram
-                import shutil
-                dest = self.INSTAGRAM / foto.name
-                shutil.copy2(foto, dest)
-                self.log.info(f"→ Instagram: {foto.name}")
+                # Editar y copiar a carpeta instagram
+                try:
+                    edited = editar_para_instagram(str(foto), str(self.INSTAGRAM / foto.name))
+                    self.log.info(f"→ Instagram (editada): {foto.name}")
+                except Exception as e:
+                    import shutil
+                    shutil.copy2(foto, self.INSTAGRAM / foto.name)
+                    self.log.info(f"→ Instagram (sin editar): {foto.name} — {e}")
             
             resultados.append(f"📷 {foto.name}: {'✅ IG' if analysis.get('apta_instagram') else '—'} | {analysis.get('categoria','?')} | {analysis.get('luz','?')}")
             self.mark_processed(foto.name)
