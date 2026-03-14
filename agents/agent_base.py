@@ -125,6 +125,33 @@ class NosVersAgent:
         """Guardar último resultado (overwrite)."""
         self.vault_write(f'agentes/{self.name}', '_resultado', resultado, modo='overwrite')
 
+
+    # ── PHOTOS ─────────────────────────────────────────────
+    def get_latest_photos(self, category=None, limit=10):
+        """Obtener últimas fotos disponibles desde el log de la vault."""
+        log_path = self.vault / 'operaciones' / 'fotos-log.md'
+        if not log_path.exists():
+            return []
+        entries = log_path.read_text().strip().split('\n')
+        photos = []
+        for entry in reversed(entries):
+            if not entry.strip() or entry.startswith('#'):
+                continue
+            parts = entry.split(' | ')
+            if len(parts) >= 5:
+                if category is None or parts[2].strip() == category:
+                    photos.append({
+                        'date': parts[0].strip(),
+                        'user': parts[1].strip(),
+                        'category': parts[2].strip(),
+                        'caption': parts[3].strip(),
+                        'filename': parts[4].strip(),
+                        'url': f'https://nosvers.com/granja/uploads/{parts[4].strip()}'
+                    })
+            if len(photos) >= limit:
+                break
+        return photos
+
     # ── CLAUDE API ─────────────────────────────────────────
     def ask_claude(self, prompt: str, contexto_extra: str = '', max_tokens: int = 1500) -> str:
         """Llamar a Claude con contexto del agente + vault."""
