@@ -1,133 +1,119 @@
 #!/usr/bin/env python3
 """
-AGT-02 · Generador de posts Instagram
-Genera 5 posts/semana con copy + hashtags basados en la identidad NosVers
-Cron: 0 10 * * 0 (domingos 10h)
+NosVers · AGT-02 Instagram
+Genera 5 posts/semana con copy completo en francés.
+Guarda en vault para aprobación de Angel.
+Cron: domingos 10h — 0 10 * * 0
 """
+import sys
+sys.path.insert(0, '/home/nosvers/agents')
+from agent_base import NosVersAgent
+from datetime import datetime, timedelta
 
-import os
-import json
-import requests
-from datetime import datetime
-from dotenv import load_dotenv
+class InstagramAgent(NosVersAgent):
 
-load_dotenv('/home/nosvers/.env')
+    DIAS = {0:'Lunes 18h', 2:'Miércoles 19h', 3:'Jueves 18h', 4:'Viernes 18h', 6:'Domingo 11h'}
+    TIPOS = {0:'🏡 Ferme/Présentation', 2:'📚 Éducatif (carrousel)', 3:'🎬 Reel 15-30s', 4:'🌺 Humain/África', 6:'🎯 Produit/Club'}
 
-APP_URL = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
-APP_TOKEN = os.getenv('APP_TOKEN', '')
-ANTHROPIC_KEY = os.getenv('ANTHROPIC_API_KEY', '')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-ANGEL_CHAT_ID = os.getenv('ANGEL_CHAT_ID', '5752097691')
+    def __init__(self):
+        super().__init__('agt02_instagram', '📱')
 
+    def check_triggers(self) -> list:
+        triggers = []
+        # Verificar si hay fotos de África disponibles
+        africa_memoria = self.vault_read('agentes/agt05_africa', '_memoria')
+        if 'fotos' in africa_memoria.lower() or 'photos' in africa_memoria.lower():
+            triggers.append('fotos_disponibles')
+        # Verificar si faltan posts esta semana
+        resultado = self.vault_read('agentes/agt02_instagram', '_resultado')
+        if not resultado or 'semana' not in resultado.lower():
+            triggers.append('posts_pendientes')
+        return triggers
 
-def vault_read(category, filename):
-    try:
-        r = requests.get(
-            f"{APP_URL}?action=vault_read&category={category}&filename={filename}",
-            headers={'X-App-Token': APP_TOKEN}, timeout=10
-        )
-        if r.status_code == 200:
-            return r.json().get('content', '')
-    except Exception:
-        pass
-    return ''
+    def generar_posts(self) -> str:
+        """Generar 5 posts usando Claude con contexto completo."""
+        contexto_identidad = self.vault_read('contexto', 'nosvers-identidad')
+        contexto_africa = self.vault_read('agentes/agt05_africa', '_memoria')
+        memoria_propia = self.get_memory()
 
+        # Semana actual para contexto estacional
+        semana_num = datetime.now().isocalendar()[1]
+        mes = datetime.now().strftime('%B')
 
-def vault_write(category, filename, content, mode='overwrite'):
-    try:
-        requests.post(
-            f"{APP_URL}?action=vault_write",
-            headers={'X-App-Token': APP_TOKEN, 'Content-Type': 'application/json'},
-            json={'category': category, 'filename': filename, 'content': content, 'mode': mode},
-            timeout=10
-        )
-    except Exception:
-        pass
+        prompt = f"""Genera 5 posts Instagram completos para @nosvers.ferme para la semana que viene.
 
+CONTEXTO DE LA FERME:
+{contexto_identidad[:500]}
 
-def generate_posts(identidad, filosofia, semana):
-    """Usa Claude para generar 5 posts Instagram."""
-    prompt = f"""Genera 5 posts para Instagram de @nosvers.ferme para esta semana.
+CONOCIMIENTO DE ÁFRICA (usar su voz):
+{contexto_africa[:400]}
 
-IDENTIDAD DE MARCA:
-{identidad}
+HISTORIAL POSTS ANTERIORES:
+{memoria_propia[-300:] if memoria_propia else 'Primeros posts'}
 
-FILOSOFÍA:
-{filosofia}
+REQUISITOS:
+- Semana {semana_num}, mes: {mes}
+- Idioma: FRANCÉS siempre
+- 80% éducatif, 20% produit
+- CTA único por post: "lien en bio"
+- 28 hashtags mix (micro/medio/macro)
+- Cada post: caption completa + hashtags + horario + tipo de visual necesario
 
-CONTEXTO SEMANA:
-{semana}
+FORMATO para cada post:
+---POST [N] — [DÍA/HORA]---
+TIPO: [tipo de contenido]
+VISUAL: [descripción del visual necesario]
+CAPTION:
+[caption completa]
+HASHTAGS:
+[hashtags]
+---"""
 
-Para cada post genera:
-1. Copy principal (máx 150 palabras, tono directo, sin positivismo vacío)
-2. Call to action
-3. 15-20 hashtags relevantes (mezcla FR/ES)
-4. Sugerencia visual (qué foto/video usar)
+        return self.ask_claude(prompt, max_tokens=3000)
 
-Formato: POST 1, POST 2... etc.
-Idioma principal: Francés con toques de español para autenticidad.
-"""
+    def process_inbox(self, inbox: str):
+        """Procesar mensajes de otros agentes."""
+        if 'fotos disponibles' in inbox.lower():
+            self.log.info("AGT-01 informó de fotos disponibles — regenerando posts con visuales")
+            posts = self.generar_posts()
+            if posts:
+                self.save_result(posts)
+                self.send_message('orchestrator', 'Posts regenerados con fotos',
+                    'Posts Instagram actualizados con los nuevos visuales de África. Listo para aprobación.')
 
-    r = requests.post(
-        'https://api.anthropic.com/v1/messages',
-        headers={
-            'Content-Type': 'application/json',
-            'x-api-key': ANTHROPIC_KEY,
-            'anthropic-version': '2023-06-01'
-        },
-        json={
-            'model': 'claude-sonnet-4-6',
-            'max_tokens': 3000,
-            'system': 'Eres el community manager de NosVers, una ferme en Dordogne. Generas contenido auténtico, directo, sin florituras.',
-            'messages': [{'role': 'user', 'content': prompt}]
-        },
-        timeout=60
-    )
+    def run(self):
+        self.log.info("AGT-02 Instagram iniciando")
 
-    if r.status_code == 200:
-        return r.json()['content'][0]['text']
-    return f"Error generando posts: HTTP {r.status_code}"
+        # Leer inbox
+        inbox = self.read_inbox()
+        if inbox and 'PENDIENTE' in inbox:
+            self.process_inbox(inbox)
+            self.mark_inbox_done()
+            return
 
+        # Generar posts semanales
+        self.log.info("Generando posts semana siguiente")
+        posts = self.generar_posts()
 
-def notify(msg):
-    if not TELEGRAM_TOKEN:
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=10
-        )
-    except Exception:
-        pass
+        if not posts:
+            self.log.error("Claude no generó posts")
+            self.send_message('orchestrator', 'ERROR generando posts',
+                'AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.', priority='alta')
+            return
 
+        # Guardar en vault para aprobación
+        self.save_result(posts)
+        self.save_memory(f"Posts generados semana {datetime.now().isocalendar()[1]}")
 
-def run():
-    print(f"[{datetime.now()}] AGT-02: Generando posts Instagram...")
+        # Informar al orchestrator
+        self.send_message('orchestrator', 'Posts listos para aprobación',
+            f'5 posts semana {datetime.now().isocalendar()[1]} generados y guardados en vault.\nagentes/agt02_instagram/_resultado.md')
 
-    identidad = vault_read('contexto', 'nosvers-identidad')
-    filosofia = vault_read('contexto', 'angel-filosofia')
-    semana = vault_read('operaciones', 'semana-actual')
+        # Notificar a Angel
+        preview = posts[:400] if posts else 'Error'
+        self.notify(f"📱 *5 posts generados para la semana*\n\nGuardados en vault para tu aprobación.\n\nPreview:\n{preview}...")
 
-    if not identidad:
-        print("ERROR: No se pudo leer nosvers-identidad de la vault")
-        return
-
-    posts = generate_posts(identidad, filosofia, semana)
-
-    # Guardar en vault
-    vault_write('agentes', 'agt02-posts-pendientes', posts)
-
-    # Notificar a Angel para aprobación
-    preview = posts[:500] + "..." if len(posts) > 500 else posts
-    notify(
-        f"📸 *AGT-02 · Posts Instagram generados*\n\n"
-        f"{preview}\n\n"
-        f"_5 posts listos para revisión en vault: agentes/agt02-posts-pendientes.md_"
-    )
-
-    print(f"[{datetime.now()}] AGT-02: Posts generados y guardados")
-
+        self.log.info("AGT-02 completado")
 
 if __name__ == '__main__':
-    run()
+    InstagramAgent().run()
