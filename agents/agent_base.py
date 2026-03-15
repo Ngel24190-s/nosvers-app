@@ -215,3 +215,25 @@ class NosVersAgent:
     def process_inbox(self, inbox: str):
         """Procesar mensajes del inbox. Sobrescribir si se necesita lógica específica."""
         self.log.info(f"Procesando inbox: {len(inbox)} chars")
+
+    # ── IMAGE SERVICE ──────────────────────────────────────
+    def get_images(self, category: str = None, search: str = None) -> dict:
+        """Get images from all sources (Drive, WP Media, local uploads)."""
+        try:
+            sys.path.insert(0, '/home/nosvers/agents')
+            from image_service import get_all_images
+            return get_all_images(category=category, search=search)
+        except Exception as e:
+            self.log.warning(f"Image service error: {e}")
+            return {'drive': [], 'drive_legacy': [], 'wordpress': [], 'local': [], 'total': 0}
+
+    def download_image(self, url: str, dest: str = None) -> str:
+        """Download an image from any URL."""
+        try:
+            from image_service import download_image
+            if not dest:
+                dest = f'/tmp/nosvers_{self.name}_{int(datetime.now().timestamp())}.jpg'
+            return download_image(url, dest)
+        except Exception as e:
+            self.log.error(f"Image download error: {e}")
+            return ''
