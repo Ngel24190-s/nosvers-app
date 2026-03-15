@@ -424,3 +424,144 @@ Herramientas disponibles:
 
     app = mcp.http_app()
     uvicorn.run(app, host="0.0.0.0", port=8765, log_level="warning")
+
+# ── NUEVAS HERRAMIENTAS — EVOLVE 2026-03-15 ──────────────
+
+@mcp.tool()
+def drive_listar(carpeta: str = "root") -> str:
+    """Listar imágenes en carpetas Google Drive de NosVers.
+    
+    Args:
+        carpeta: root | instagram | vers | huerto | general | jardin | produits | gusanos | cultures | contexto_ia | biodiversite | animaux | africa | neuvic
+    """
+    api_key = os.getenv('GOOGLE_API_KEY', '')
+    if not api_key:
+        return "❌ GOOGLE_API_KEY no configurada"
+    
+    # Map folder names to IDs
+    folders = {}
+    for key, val in os.environ.items():
+        if key.startswith('DRIVE_FOLDER_') or key.startswith('DRIVE_LEGACY_'):
+            name = key.replace('DRIVE_FOLDER_', '').replace('DRIVE_LEGACY_', '').lower()
+            if name != 'id':  # skip DRIVE_FOLDER_ID
+                folders[name] = val
+    folders['root'] = os.getenv('DRIVE_FOLDER_ID', os.getenv('DRIVE_LEGACY_ROOT', ''))
+    
+    folder_id = folders.get(carpeta, '')
+    if not folder_id:
+        return f"❌ Carpeta '{carpeta}' no encontrada. Disponibles: {', '.join(sorted(folders.keys()))}"
+    
+    try:
+        url = f"https://www.googleapis.com/drive/v3/files?q='{folder_id}'+in+parents&key={api_key}&fields=files(id,name,mimeType)&pageSize=50"
+        r = req.get(url, timeout=15)
+        data = r.json()
+        files = data.get('files', [])
+        if not files:
+            return f"📁 {carpeta}: vacía"
+        
+        result = f"📁 **{carpeta}** — {len(files)} archivos\n\n"
+        for f in files:
+            icon = "📁" if "folder" in f.get('mimeType', '') else "🖼️"
+            result += f"{icon} {f['name']} (`{f['id']}`)\n"
+        return result
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+
+@mcp.tool()
+def drive_descargar(file_id: str, nombre: str = "") -> str:
+    """Descargar imagen de Google Drive al VPS.
+    
+    Args:
+        file_id: ID del archivo en Drive
+        nombre: nombre para guardar (opcional)
+    """
+    try:
+        dest = f"/home/nosvers/uploads/{nombre or file_id + '.jpg'}"
+        r = req.get(f"https://drive.google.com/uc?id={file_id}&export=download", timeout=30)
+        if r.status_code != 200:
+            return f"❌ Error descargando: HTTP {r.status_code}"
+        Path(dest).parent.mkdir(parents=True, exist_ok=True)
+        with open(dest, 'wb') as f:
+            f.write(r.content)
+        return f"✅ Descargado: {dest} ({len(r.content)} bytes)"
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+
+@mcp.tool()
+def deploy_hostinger(archivo_local: str, destino: str) -> str:
+    """Deploy archivo del VPS a Hostinger via SCP.
+    
+    Args:
+        archivo_local: ruta en el VPS (ej: /home/nosvers/index.html)
+        destino: ruta en Hostinger relativa a public_html (ej: granja/index.html o wp-content/themes/nosvers-v2/style.css)
+    """
+    import subprocess
+    dest_full = f"domains/nosvers.com/public_html/{destino}"
+    cmd = f"sshpass -p 'Angelnosvers26!' scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -P 65002 {archivo_local} u859094205@nosvers.com:{dest_full}"
+    try:
+        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
+        if r.returncode == 0:
+            return f"✅ Desplegado: {archivo_local} → {dest_full}"
+        return f"❌ Error SCP: {r.stderr}"
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+
+@mcp.tool()
+def wp_listar_paginas() -> str:
+    """Listar todas las páginas publicadas de WordPress."""
+    import subprocess
+    cmd = """sshpass -p 'Angelnosvers26!' ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 65002 u859094205@nosvers.com 'cd domains/nosvers.com/public_html && wp --path=. post list --post_type=page --post_status=publish --fields=ID,post_title,post_name --format=table 2>/dev/null'"""
+    try:
+        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
+        lines = [l for l in r.stdout.split('\n') if l.strip() and 'Success' not in l and 'cache' not in l.lower()]
+        return '\n'.join(lines) if lines else "No pages found"
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+
+@mcp.tool()
+def fotos_inventario() -> str:
+    """Inventario completo de fotos disponibles en todas las fuentes."""
+    api_key = os.getenv('GOOGLE_API_KEY', '')
+    result = "📸 **Inventario de fotos NosVers**\n\n"
+    
+    # Drive folders
+    folders = {}
+    for key, val in os.environ.items():
+        if (key.startswith('DRIVE_FOLDER_') or key.startswith('DRIVE_LEGACY_')) and val and len(val) > 10:
+            name = key.replace('DRIVE_FOLDER_', '').replace('DRIVE_LEGACY_', '').lower()
+            if name != 'id':
+                folders[name] = val
+    
+    result += "**Google Drive:**\n"
+    total = 0
+    if api_key:
+        for name, fid in sorted(folders.items()):
+            try:
+                url = f"https://www.googleapis.com/drive/v3/files?q='{fid}'+in+parents+and+mimeType+contains+'image'&key={api_key}&fields=files(id)&pageSize=100"
+                r = req.get(url, timeout=10)
+                count = len(r.json().get('files', []))
+                total += count
+                result += f"  📁 {name}: {count} images\n"
+            except:
+                result += f"  📁 {name}: error\n"
+    else:
+        result += "  ⚠️ GOOGLE_API_KEY no configurada\n"
+    
+    # Local uploads
+    uploads = Path('/home/nosvers/uploads')
+    local_count = 0
+    if uploads.exists():
+        for d in uploads.iterdir():
+            if d.is_dir():
+                count = len(list(d.glob('*.*')))
+                if count > 0:
+                    result += f"\n**Local ({d.name}):** {count} files"
+                    local_count += count
+    
+    result += f"\n\n**Total:** {total + local_count} images disponibles"
+    return result
+
