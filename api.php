@@ -326,6 +326,35 @@ switch ($action) {
         echo json_encode(['ok' => true, 'files' => $result, 'total' => count($result)]);
         break;
 
+
+    // ============================================================
+    //  UPLOAD PHOTO
+    // ============================================================
+    case 'upload_photo':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $image = $data['image'] ?? '';
+        $type = $data['type'] ?? 'image/jpeg';
+        $user = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['user'] ?? 'unknown'));
+        $note = $data['note'] ?? '';
+        if (empty($image)) { http_response_code(400); echo json_encode(['error' => 'No image']); break; }
+        $imageData = base64_decode($image);
+        if ($imageData === false) { http_response_code(400); echo json_encode(['error' => 'Invalid base64']); break; }
+        $ext = 'jpg';
+        if (strpos($type, 'png') !== false) $ext = 'png';
+        elseif (strpos($type, 'webp') !== false) $ext = 'webp';
+        $uploadDir = __DIR__ . '/uploads/' . $user;
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        $filename = date('Y-m-d_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $filepath = $uploadDir . '/' . $filename;
+        if (file_put_contents($filepath, $imageData) === false) { http_response_code(500); echo json_encode(['error' => 'Save failed']); break; }
+        try {
+            $stmt = $pdo->prepare("INSERT INTO journal (domain, action, completed) VALUES (:d, :a, 1)");
+            $stmt->execute([':d' => $user, ':a' => 'Photo: ' . $filename . ($note ? ' - ' . $note : '')]);
+        } catch (Exception $e) {}
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+        echo json_encode(['ok' => true, 'filename' => $filename, 'url' => $baseUrl . '/granja/uploads/' . $user . '/' . $filename, 'size' => strlen($imageData)]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Accion desconocida: ' . $action]);
