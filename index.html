@@ -2102,6 +2102,67 @@ body.africa-mode .main-content { margin-left: 0 !important; }
 .africa-photo-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
 .africa-logout { display: block; margin: 2rem auto 1rem; background: none; border: 2px solid #E8D0E4; color: #7A3A6A; padding: 0.6rem 2rem; border-radius: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
+
+/* Saved fiches from agents */
+.saved-fiche {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.saved-fiche:hover { box-shadow: 0 4px 16px rgba(90,122,46,0.1); }
+.saved-fiche-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--primary-pale);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.saved-fiche-header:hover { background: rgba(90,122,46,0.12); }
+.saved-fiche-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+.saved-fiche-date { font-size: 0.7rem; color: var(--muted); }
+.saved-fiche-actions { display: flex; gap: 6px; }
+.saved-fiche-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.saved-fiche-actions button:hover { background: rgba(0,0,0,0.06); }
+.saved-fiche-body {
+  padding: 1rem;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  display: none;
+}
+.saved-fiche.open .saved-fiche-body { display: block; }
+.saved-fiche-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+}
+
 </style>
 </head>
 <body>
@@ -2498,7 +2559,8 @@ body.africa-mode .main-content { margin-left: 0 !important; }
     </div>
     <div class="resp-body" id="respBody"></div>
     <div class="resp-footer">
-      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()">💾 Guardar en contexto</button>
+      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()">💾 Contexto</button>
+      <button class="btn-action btn-secondary" onclick="saveToFiches()">📋 Fiches</button>
       <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copiar</button>
       <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Nota</button>
     </div>
@@ -2576,8 +2638,20 @@ body.africa-mode .main-content { margin-left: 0 !important; }
 <div class="section" id="sec-fiches">
   <div class="section-header">
     <h2 class="section-title">Fiches <em>Techniques</em></h2>
-    <p class="section-sub">Paramètres clés de référence pour NosVers · Dordogne</p>
+    <p class="section-sub">Paramètres clés de référence + fiches sauvegardées depuis les agents IA</p>
   </div>
+
+  <!-- Saved fiches from agents -->
+  <div id="savedFichesContainer" style="margin-bottom:2rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text)">📋 Fiches sauvegardées</h3>
+      <span id="savedFichesCount" style="font-size:0.75rem;color:var(--muted)">0 fiches</span>
+    </div>
+    <div id="savedFichesList"></div>
+    <p id="noFichesMsg" style="color:var(--muted);font-size:0.9rem;text-align:center;padding:2rem 0;display:none">Aucune fiche sauvegardée. Consultez un agent et cliquez sur 📋 Fiches pour sauvegarder.</p>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--muted);margin-bottom:1rem;padding-top:1rem;border-top:1px solid var(--border)">Référence technique</h3>
 
   <div class="fiches-grid">
     <!-- Vers -->
@@ -4930,6 +5004,102 @@ async function africaLoadMeteo() {
     el.innerHTML = h;
   } catch(e) { el.innerHTML = '<p style="color:red">Erreur meteo</p>'; }
 }
+
+
+// ==================== FICHES SAVED FROM AGENTS ====================
+let savedFiches = JSON.parse(localStorage.getItem('nv_saved_fiches') || '[]');
+
+function saveToFiches() {
+  if (!lastResp || lastResp.length < 20) return;
+  const agentLabels = {
+    vers: 'Lombricompost', compost: 'Compost', animaux: 'Animaux', huerto: 'Potager',
+    director: 'Direction', intelligence: 'Intelligence', youtube: 'YouTube',
+    facebook: 'Facebook', content_director: 'Stratégie', community: 'Communauté', analytics: 'Analytics'
+  };
+  const fiche = {
+    id: Date.now(),
+    agent: activeAgent || 'unknown',
+    agentLabel: agentLabels[activeAgent] || activeAgent,
+    date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}),
+    query: document.getElementById('queryInput')?.value?.trim()?.substring(0, 100) || '',
+    content: lastResp
+  };
+  savedFiches.unshift(fiche);
+  localStorage.setItem('nv_saved_fiches', JSON.stringify(savedFiches));
+  
+  // Also save to vault for persistence across devices
+  api('vault_write', {
+    category: 'operaciones',
+    filename: 'fiches-sauvegardees',
+    content: '\n\n---\n## ' + fiche.date + ' — ' + fiche.agentLabel + '\n' + (fiche.query ? '> ' + fiche.query + '\n\n' : '') + fiche.content,
+    mode: 'append'
+  }).catch(e => console.warn('Vault fiche save:', e));
+  
+  // Visual feedback
+  const badge = document.getElementById('conseilSavedBadge');
+  if (badge) {
+    badge.textContent = '✓ Sauvegardé dans Fiches Techniques';
+    badge.style.display = 'block';
+    setTimeout(() => badge.style.display = 'none', 3000);
+  }
+  renderSavedFiches();
+}
+
+function renderSavedFiches() {
+  const container = document.getElementById('savedFichesList');
+  const countEl = document.getElementById('savedFichesCount');
+  const noMsg = document.getElementById('noFichesMsg');
+  if (!container) return;
+  
+  if (!savedFiches.length) {
+    container.innerHTML = '';
+    if (noMsg) noMsg.style.display = 'block';
+    if (countEl) countEl.textContent = '0 fiches';
+    return;
+  }
+  if (noMsg) noMsg.style.display = 'none';
+  if (countEl) countEl.textContent = savedFiches.length + ' fiche' + (savedFiches.length > 1 ? 's' : '');
+  
+  container.innerHTML = savedFiches.map(f => 
+    '<div class="saved-fiche" id="fiche-' + f.id + '">' +
+    '  <div class="saved-fiche-header" onclick="toggleFiche(' + f.id + ')">' +
+    '    <div class="saved-fiche-meta">' +
+    '      <span class="saved-fiche-badge">' + (f.agentLabel || f.agent) + '</span>' +
+    '      <span>' + (f.query || 'Consultation agent') + '</span>' +
+    '    </div>' +
+    '    <div style="display:flex;align-items:center;gap:8px">' +
+    '      <span class="saved-fiche-date">' + f.date + '</span>' +
+    '      <div class="saved-fiche-actions">' +
+    '        <button onclick="event.stopPropagation();copyFiche(' + f.id + ')" title="Copier">⎘</button>' +
+    '        <button onclick="event.stopPropagation();deleteFiche(' + f.id + ')" title="Supprimer">✕</button>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '  <div class="saved-fiche-body">' + (f.content || '').replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function toggleFiche(id) {
+  const el = document.getElementById('fiche-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+function copyFiche(id) {
+  const fiche = savedFiches.find(f => f.id === id);
+  if (fiche) navigator.clipboard.writeText(fiche.content).catch(() => {});
+}
+
+function deleteFiche(id) {
+  savedFiches = savedFiches.filter(f => f.id !== id);
+  localStorage.setItem('nv_saved_fiches', JSON.stringify(savedFiches));
+  renderSavedFiches();
+}
+
+// Render on page load
+document.addEventListener('DOMContentLoaded', () => {
+  renderSavedFiches();
+});
 
 </script>
 
