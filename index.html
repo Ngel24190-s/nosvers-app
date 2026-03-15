@@ -1524,6 +1524,12 @@ body::before {
   font-weight: 700;
   flex-shrink: 0;
 }
+.agent-spec-badge--intel    { background: rgba(88,49,150,0.12);  color: #583196; }
+.agent-spec-badge--video    { background: rgba(180,30,30,0.12);  color: #b41e1e; }
+.agent-spec-badge--social   { background: rgba(24,119,242,0.12); color: #1877f2; }
+.agent-spec-badge--strategy { background: rgba(200,80,0,0.12);   color: #c85000; }
+.agent-spec-badge--community{ background: rgba(0,150,136,0.12);  color: #009688; }
+.agent-spec-badge--analytics{ background: rgba(30,136,229,0.12); color: #1e88e5; }
 
 @media (max-width: 640px) {
   .agents-grid { grid-template-columns: 1fr; }
@@ -2020,6 +2026,54 @@ body.africa-mode .nav-tabs, body.africa-mode .header, body.africa-mode .motto-ba
         <div class="agent-spec-desc">Cultivos · JADAM · Rotaciones</div>
       </div>
       <div class="agent-spec-badge">Conseil</div>
+    </div>
+    <div class="agent-specialist" id="card-intelligence" onclick="selectAgent('intelligence')">
+      <div class="agent-spec-icon">🧠</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-00 Intelligence</div>
+        <div class="agent-spec-desc">Veille stratégique & marché</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--intel">Analyse</div>
+    </div>
+    <div class="agent-specialist" id="card-youtube" onclick="selectAgent('youtube')">
+      <div class="agent-spec-icon">🎬</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-07 YouTube</div>
+        <div class="agent-spec-desc">Contenu vidéo & tutoriels</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--video">Vidéo</div>
+    </div>
+    <div class="agent-specialist" id="card-facebook" onclick="selectAgent('facebook')">
+      <div class="agent-spec-icon">📘</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-08 Facebook</div>
+        <div class="agent-spec-desc">Communauté & partage</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--social">Social</div>
+    </div>
+    <div class="agent-specialist" id="card-content" onclick="selectAgent('content')">
+      <div class="agent-spec-icon">🎯</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-09 Content Director</div>
+        <div class="agent-spec-desc">Stratégie éditoriale</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--strategy">Stratégie</div>
+    </div>
+    <div class="agent-specialist" id="card-community" onclick="selectAgent('community')">
+      <div class="agent-spec-icon">💬</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-10 Community</div>
+        <div class="agent-spec-desc">Engagement & réponses</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--community">Engage</div>
+    </div>
+    <div class="agent-specialist" id="card-analytics" onclick="selectAgent('analytics')">
+      <div class="agent-spec-icon">📊</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-11 Analytics</div>
+        <div class="agent-spec-desc">Métriques & rapports</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--analytics">Données</div>
     </div>
   </div>
 
@@ -2892,6 +2946,16 @@ function callAgent(domain) {
     lastResp = text;
     currentMode = prevMode;
     if (respBody) respBody.textContent = text;
+    // Auto-save to vault if photo was attached (useful for Instagram posts)
+    if (currentPhotoBase64 && text && text.length > 50) {
+      const fecha = new Date().toISOString().split('T')[0];
+      api('vault_write', {
+        category: 'agentes',
+        filename: 'agt02-posts-pendientes',
+        content: '\n\n## ' + fecha + ' — Post generado desde foto (' + domain + ')\n\n' + text,
+        mode: 'append'
+      }).catch(e => console.warn('Vault save error:', e));
+    }
     if (card) card.classList.remove('loading');
     if (btnQ) btnQ.disabled = false;
     if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

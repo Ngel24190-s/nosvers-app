@@ -256,4 +256,21 @@ Responde SOLO en JSON:
         self.log.info("AGT-01 Visual completado")
 
 if __name__ == '__main__':
-    VisualAgent().run()
+    if len(sys.argv) >= 3 and sys.argv[1] == 'process':
+        # CLI: python3 agt01_visual.py process '{"input_path":"/tmp/test.jpg"}'
+        try:
+            params = json.loads(sys.argv[2])
+            input_path = params.get('input_path', '')
+            output_path = params.get('output_path', None)
+            if not input_path:
+                print(json.dumps({'ok': False, 'error': 'input_path requerido'}))
+                sys.exit(1)
+            edited = editar_para_instagram(input_path, output_path)
+            with open(edited, 'rb') as fh:
+                b64 = base64.b64encode(fh.read()).decode()
+            print(json.dumps({'ok': True, 'output_path': edited, 'base64': b64}))
+        except Exception as exc:
+            print(json.dumps({'ok': False, 'error': str(exc)}))
+            sys.exit(1)
+    else:
+        VisualAgent().run()

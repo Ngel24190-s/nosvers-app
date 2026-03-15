@@ -355,6 +355,97 @@ switch ($action) {
         echo json_encode(['ok' => true, 'filename' => $filename, 'url' => $baseUrl . '/granja/uploads/' . $user . '/' . $filename, 'size' => strlen($imageData)]);
         break;
 
+    // ============================================================
+    //  PROCESS PHOTO INSTAGRAM — Edita foto con AGT-01 y devuelve base64
+    // ============================================================
+    case 'process_photo_instagram':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $image_b64   = $data['image_base64'] ?? '';
+        $caption_hint = $data['caption_hint'] ?? '';
+        $image_type  = $data['image_type'] ?? 'image/jpeg';
+
+        if (empty($image_b64)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta image_base64']);
+            break;
+        }
+
+        // Decode y guardar en /tmp/
+        $ext       = (strpos($image_type, 'png') !== false) ? 'png' : 'jpg';
+        $tmp_in    = '/tmp/nosvers_ig_in_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $tmp_out   = '/tmp/nosvers_ig_out_' . bin2hex(random_bytes(4)) . '.jpg';
+        $img_bytes = base64_decode($image_b64);
+
+        if ($img_bytes === false || file_put_contents($tmp_in, $img_bytes) === false) {
+            http_response_code(500);
+            echo json_encode(['error' => 'No se pudo guardar la imagen temporal']);
+            break;
+        }
+
+        // Llamar a AGT-01 para editar
+        $payload_json = json_encode(['input_path' => $tmp_in, 'output_path' => $tmp_out]);
+        $cmd = '/home/nosvers/venv/bin/python3 /home/nosvers/agents/agt01_visual.py process ' . escapeshellarg($payload_json) . ' 2>&1';
+        $output = shell_exec($cmd);
+        @unlink($tmp_in);
+
+        $result = json_decode(trim($output), true);
+        if (empty($result['ok'])) {
+            http_response_code(500);
+            echo json_encode(['error' => 'AGT-01 error: ' . ($result['error'] ?? $output)]);
+            break;
+        }
+
+        // Devolver imagen editada como base64 + sugerencia de caption
+        $edited_b64 = $result['base64'] ?? base64_encode(file_get_contents($tmp_out));
+        @unlink($tmp_out);
+
+        echo json_encode([
+            'ok'              => true,
+            'edited_base64'   => $edited_b64,
+            'caption_hint'    => $caption_hint,
+            'output_path'     => $result['output_path'] ?? $tmp_out,
+        ]);
+        break;
+
+    // ============================================================
+    //  PUBLISH INSTAGRAM — Publica foto llamando a AGT-02
+    // ============================================================
+    case 'publish_instagram':
+        $data       = json_decode(file_get_contents('php://input'), true);
+        $image_path = $data['image_path'] ?? '';
+        $caption    = $data['caption'] ?? '';
+
+        if (empty($image_path) || empty($caption)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan image_path y caption']);
+            break;
+        }
+
+        // Seguridad: solo rutas bajo /tmp/ o /home/nosvers/uploads/
+        if (!str_starts_with($image_path, '/tmp/') && !str_starts_with($image_path, '/home/nosvers/uploads/')) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Ruta no permitida']);
+            break;
+        }
+
+        $payload_json = json_encode(['image_path' => $image_path, 'caption' => $caption]);
+        $cmd = '/home/nosvers/venv/bin/python3 /home/nosvers/agents/agt02_instagram.py --publish-single ' . escapeshellarg($payload_json) . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        $result = json_decode(trim($output), true);
+        if (empty($result['ok'])) {
+            http_response_code(500);
+            echo json_encode(['error' => 'AGT-02 error: ' . ($result['error'] ?? $output)]);
+            break;
+        }
+
+        echo json_encode([
+            'ok'            => true,
+            'instagram_url' => $result['instagram_url'] ?? '',
+            'post_id'       => $result['post_id'] ?? '',
+        ]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Accion desconocida: ' . $action]);
