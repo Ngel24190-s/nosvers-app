@@ -597,3 +597,88 @@ Flujo completo sin Canva:
 3. Claude Vision genera el caption en francés
 4. Preview en la app + botones Publicar / Guardar
 5. ✅ → instagrapi publica directamente
+
+
+---
+*2026-03-15 08:08*
+
+
+---
+## TAREA REPOS — Instalar en Claude Code (terminal del VPS)
+
+Ejecutar en la sesión tmux de Claude Code:
+
+### 1. Superpowers (metodología TDD + planning)
+```
+/plugin marketplace add obra/superpowers-marketplace
+/plugin install superpowers@superpowers-marketplace
+```
+
+### 2. WordPress skills (para arreglar nosvers.com)
+```
+/plugin marketplace add elvismdev/claude-wordpress-skills
+/plugin install claude-wordpress-skills@claude-wordpress-skills
+```
+
+### 3. Frontend design (para que la web se parezca al Studio V2)
+```
+/plugin install frontend-design@superpowers-marketplace
+```
+
+### 4. Web testing con Playwright
+```
+/plugin install webapp-testing@superpowers-marketplace
+```
+
+### 5. Subagentes especializados
+```
+curl -sO https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/main/install-agents.sh
+chmod +x install-agents.sh
+./install-agents.sh
+# Seleccionar: workflow-orchestrator, python-expert, web-developer
+```
+
+### 6. Marketing skills de Ayrshare
+```
+/plugin install marketingskills@ayrshare
+```
+
+### 7. Ayrshare MCP para RRSS (cuando Angel decida opción B gratis o pago)
+```bash
+# Opción B gratis — Facebook:
+git clone https://github.com/HagaiHen/facebook-mcp-server /home/nosvers/facebook-mcp
+cd /home/nosvers/facebook-mcp && npm install
+
+# Registrar en mcp_server.py de NosVers como herramienta adicional
+```
+
+---
+
+## TAREA TELEGRAM — Fix chat_id Angel
+
+El bot está corriendo con `ANGEL_CHAT_ID=5752097691` pero ese ID puede ser incorrecto.
+
+**Pasos:**
+1. El bot ya fue modificado temporalmente para aceptar cualquier usuario y loguear IDs
+2. Cuando Angel escriba al bot, ver el log: `journalctl -u nosvers-bot -f | grep AUTH`
+3. Capturar el user_id real
+4. Actualizar en /home/nosvers/.env: `ANGEL_CHAT_ID=ID_REAL`
+5. Restaurar is_authorized() para que solo acepte el ID correcto
+6. Reiniciar bot: `systemctl restart nosvers-bot`
+
+---
+
+## TAREA PENDIENTE — Push todo lo de ayer
+
+Hacer push de TODOS los cambios pendientes:
+```bash
+cd /home/nosvers  # o donde esté el repo
+git add -A
+git commit -m "feat: HQ UI completa + 6 agentes marketing + pipeline instagram + repos skills"
+git push origin main
+```
+
+Incluye: index.html con HQ Angel + vista África + 6 agentes python + pipeline instagram.
+
+---
+*Angel fuera — 2026-03-15*
