@@ -1078,12 +1078,118 @@ body::before {
   .mobile-topbar { display: flex; }
   .bottom-nav { display: flex; }
   .main-content { margin-left: 0 !important; padding-bottom: var(--bottom-bar-h); }
-  .main { padding: 1.2rem 1rem 5rem; }
-  .cards-grid, .fiches-grid { grid-template-columns: 1fr; }
-  .inventory-grid { grid-template-columns: repeat(2, 1fr); }
-  .section-title { font-size: 1.55rem; }
-  .agents-grid { grid-template-columns: 1fr; }
-  .etat-grid { grid-template-columns: 1fr; }
+  .main { padding: 0.8rem 0.75rem 5rem; max-width: 100vw; overflow-x: hidden; }
+  .cards-grid, .fiches-grid { grid-template-columns: 1fr !important; }
+  .inventory-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .section-title { font-size: 1.35rem; }
+  .section-sub { font-size: 0.8rem; }
+  .agents-grid { grid-template-columns: 1fr !important; }
+  .etat-grid { grid-template-columns: 1fr !important; }
+  
+  /* Fix overflow on all grids */
+  .harvest-grid, .feed-grid { grid-template-columns: 1fr !important; }
+  .eggs-stats { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+  .huerto-grid { grid-template-columns: 1fr !important; }
+  .quick-stats { flex-wrap: wrap; gap: 8px; }
+  .qstat { min-width: 60px; }
+  
+  /* Cards - no horizontal overflow */
+  .card-agent, .etat-card, .harvest-card, .feed-card { overflow: hidden; }
+  .section { overflow-x: hidden; }
+  
+  /* Header section */
+  .section-header { padding: 0; }
+  .header-right { gap: 6px; }
+  
+  /* Response panel full width */
+  .resp-panel { border-radius: 12px; margin: 0.5rem 0; }
+  
+  /* Photo zone */
+  .photo-zone { flex-direction: column; }
+  .btn-photo { font-size: 0.8rem; }
+  
+  /* Query input */
+  .query-zone { flex-direction: column; gap: 8px; }
+  .query-input { font-size: 14px; min-width: 0 !important; width: 100% !important; }
+  .btn-query { width: 100%; }
+  
+  /* Login */
+  .login-box { width: 90vw; max-width: 340px; padding: 2rem 1.5rem; }
+  .login-title { font-size: 1.5rem; }
+  
+  /* Director cards */
+  .director-grid { grid-template-columns: 1fr !important; }
+  
+  /* Tables that overflow */
+  [style*="grid-template-columns: 90px"] { 
+    grid-template-columns: 1fr 1fr 1fr 1fr !important; 
+    font-size: 10px !important;
+  }
+  
+  /* Fiche body grids */
+  .fiche-body { grid-template-columns: 1fr !important; }
+  [style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; }
+  
+  /* Checklist, Journal */
+  .check-item { font-size: 0.85rem; }
+  .log-entry { padding: 0.6rem; }
+  
+  /* Modals */
+  .modal-box { width: 95vw; max-width: 95vw; margin: 5vh auto; }
+  
+  /* Home dashboard cards */
+  .home-card { margin-bottom: 0.75rem; }
+  .home-alerts { margin-bottom: 0.75rem; }
+  .alert-item { font-size: 0.85rem; padding: 0.6rem; }
+  
+  /* Agent specialist cards */
+  .agent-specialist { padding: 0.75rem; }
+  .agent-spec-icon { font-size: 1.4rem; min-width: 38px; width: 38px; height: 38px; }
+  
+  /* Meteo widget */
+  .meteo-widget { flex-direction: column; }
+  .meteo-main { min-width: 0; }
+  
+  /* btn-row */
+  .btn-row { flex-wrap: wrap; gap: 6px; }
+  .btn-sm { font-size: 0.75rem; padding: 6px 10px; }
+  
+  /* Timeline steps */
+  .timeline-steps { flex-direction: column; }
+  .tstep { min-width: 0; }
+  
+  /* Countdown */
+  .countdown-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  
+  /* Tag pills */
+  .tag-pill { font-size: 0.7rem; padding: 3px 8px; }
+  
+  /* Body - prevent horizontal scroll */
+  body { overflow-x: hidden; }
+  html { overflow-x: hidden; }
+}
+
+@media (max-width: 480px) {
+  .main { padding: 0.5rem 0.5rem 5rem; }
+  .inventory-grid { grid-template-columns: 1fr 1fr !important; }
+  .harvest-grid, .feed-grid { grid-template-columns: 1fr !important; }
+  .eggs-stats { grid-template-columns: 1fr 1fr 1fr !important; font-size: 0.8rem; }
+  .section-title { font-size: 1.2rem; }
+  .home-card-head { font-size: 0.85rem; padding: 10px 14px; }
+  .more-sheet-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+  .more-sheet-item { padding: 0.6rem 0.3rem; font-size: 0.65rem; }
+  .bottom-nav-item { font-size: 0.55rem; padding: 4px 8px; }
+  .bottom-nav-item .bn-icon { font-size: 1.15rem; }
+  .mobile-topbar { height: 48px; padding: 0 0.75rem; }
+  .mobile-logo { font-size: 1rem; }
+  
+  /* Force single column for everything */
+  .agents-grid, .etat-grid, .director-grid, .cards-grid, .fiches-grid { grid-template-columns: 1fr !important; }
+  
+  /* Africa view */
+  .africa-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; padding: 0 0.5rem; }
+  .africa-btn { padding: 1rem 0.5rem; }
+  .africa-btn .africa-icon { font-size: 1.8rem; }
 }
 
 @media (max-width: 480px) {
