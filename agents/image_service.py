@@ -46,31 +46,41 @@ ALL_DRIVE_FOLDERS = {**DRIVE_FOLDERS, **DRIVE_LEGACY_FOLDERS}
 CACHE_FILE = Path('/home/nosvers/agents/.image_cache.json')
 
 
-def list_drive_folder(folder_id: str) -> list:
-    """List images in a public Google Drive folder (no auth needed if shared)."""
+def list_drive_folder(folder_id: str, include_subfolders: bool = False) -> list:
+    """List images in a Google Drive folder using API key."""
     if not folder_id:
         return []
+    api_key = os.getenv('GOOGLE_API_KEY', '')
+    if not api_key:
+        return []
     try:
-        # Use Google Drive API v3 with API key or public access
-        api_key = os.getenv('GOOGLE_API_KEY', '')
-        if api_key:
-            url = f"https://www.googleapis.com/drive/v3/files?q='{folder_id}'+in+parents+and+mimeType+contains+'image'&key={api_key}&fields=files(id,name,mimeType,thumbnailLink,webContentLink,createdTime)&pageSize=100"
-        else:
-            # Fallback: scrape the public folder page
-            url = f"https://drive.google.com/drive/folders/{folder_id}"
-        
+        url = f"https://www.googleapis.com/drive/v3/files?q='{folder_id}'+in+parents+and+mimeType+contains+'image'&key={api_key}&fields=files(id,name,mimeType,thumbnailLink,createdTime)&pageSize=100"
         r = requests.get(url, timeout=15)
-        if r.status_code == 200 and 'files' in r.text:
-            data = r.json()
-            return [{
-                'id': f['id'],
-                'name': f['name'],
-                'type': f.get('mimeType', 'image/jpeg'),
-                'url': f"https://drive.google.com/uc?id={f['id']}&export=download",
-                'thumbnail': f.get('thumbnailLink', ''),
-                'date': f.get('createdTime', ''),
-                'source': 'drive'
-            } for f in data.get('files', [])]
+        if r.status_code != 200:
+            return []
+        data = r.json()
+        images = [{
+            'id': f['id'],
+            'name': f['name'],
+            'type': f.get('mimeType', 'image/jpeg'),
+            'url': f"https://drive.google.com/uc?id={f['id']}&export=download",
+            'thumbnail': f.get('thumbnailLink', ''),
+            'date': f.get('createdTime', ''),
+            'source': 'drive',
+            'folder_id': folder_id
+        } for f in data.get('files', [])]
+        
+        # Recursively list subfolders if requested
+        if include_subfolders:
+            sub_url = f"https://www.googleapis.com/drive/v3/files?q='{folder_id}'+in+parents+and+mimeType='application/vnd.google-apps.folder'&key={api_key}&fields=files(id,name)&pageSize=50"
+            sr = requests.get(sub_url, timeout=15)
+            if sr.status_code == 200:
+                for sf in sr.json().get('files', []):
+                    sub_images = list_drive_folder(sf['id'], include_subfolders=False)
+                    for img in sub_images:
+                        img['subfolder'] = sf['name']
+                    images.extend(sub_images)
+        return images
     except Exception as e:
         print(f"Drive error for {folder_id}: {e}")
     return []
