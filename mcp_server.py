@@ -25,7 +25,7 @@ load_dotenv('/home/nosvers/.env')
 # ── CONFIG ────────────────────────────────────────────────
 MCP_TOKEN      = os.getenv('MCP_TOKEN', 'nosvers-mcp-2026')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '')
-ANGEL_CHAT_ID  = os.getenv('ANGEL_CHAT_ID', '5752097691')
+ANGEL_CHAT_ID  = os.getenv('ANGEL_CHAT_ID', '-1003801137875')
 APP_URL        = os.getenv('APP_URL', 'https://nosvers.com/granja/api.php')
 APP_TOKEN      = os.getenv('APP_TOKEN', '')
 WP_URL         = os.getenv('WP_URL', 'https://nosvers.com/wp-json/wp/v2/')
@@ -66,10 +66,18 @@ Cuando termines algo importante, notifica via Telegram."""
 def notify(msg):
     if not TELEGRAM_TOKEN: return False
     try:
-        req.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+        # Try Markdown first
+        r = req.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
                  json={"chat_id": ANGEL_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
                  timeout=10)
-        return True
+        if r.status_code == 200:
+            return True
+        # Markdown failed — retry without parse_mode
+        log.warning(f"Telegram Markdown failed ({r.status_code}), retrying plain text")
+        r2 = req.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                 json={"chat_id": ANGEL_CHAT_ID, "text": msg},
+                 timeout=10)
+        return r2.status_code == 200
     except Exception as e:
         log.error(f"Telegram: {e}")
         return False

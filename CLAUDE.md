@@ -387,3 +387,17 @@ APP_TOKEN=base64_de_user_pass_app_granja
 ```
 
 Claude Code carga este archivo automáticamente al arrancar.
+
+---
+
+## DESIGN SYSTEM OBLIGATORIO
+
+Antes de tocar cualquier HTML, CSS o WordPress, lee:
+`/home/nosvers/public_html/knowledge_base/contexto/nosvers-design-system.md`
+
+Tipografía: Playfair Display (títulos) + DM Sans (cuerpo) + DM Serif Display (subtítulos editoriales)
+Fondo: #FEFAF4 | Verde: #5A7A2E / #3D6B20 | Texto: #1c1510
+NUNCA usar: Arial, Inter, Roboto, blanco puro #ffffff, ni verde genérico
+
+El Studio V2 de referencia está en: /home/nosvers/nosvers-studio-v2.html (84KB)
+Templates generados en: /home/nosvers/templates/

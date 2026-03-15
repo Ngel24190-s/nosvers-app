@@ -1,4 +1,37 @@
 # _inbox
+*Creado: 2026-03-15 19:00*
+
+# _inbox
+*Creado: 2026-03-15 18:00*
+
+# _inbox
+*Creado: 2026-03-15 17:00*
+
+# _inbox
+*Creado: 2026-03-15 16:00*
+
+# _inbox
+*Creado: 2026-03-15 15:00*
+
+# _inbox
+*Creado: 2026-03-15 14:00*
+
+# _inbox
+*Creado: 2026-03-15 13:00*
+
+# _inbox
+*Creado: 2026-03-15 12:00*
+
+# _inbox
+*Creado: 2026-03-15 11:00*
+
+# _inbox
+*Creado: 2026-03-15 10:00*
+
+# _inbox
+*Creado: 2026-03-15 09:00*
+
+# _inbox
 *Creado: 2026-03-15 08:00*
 
 # _inbox
@@ -88,3 +121,25 @@ Contenido generado con voz de África. Guardado en vault. AGT-06 notificado para
 Contenido listo en vault/club/. Requiere diseno por Nerea antes de publicar en Lemon Squeezy.
 
 *Estado: PROCESADO 2026-03-14 10:00*
+
+---
+*2026-03-15 10:01*
+
+## [2026-03-15 10:00] DE: agt02_instagram → PARA: orchestrator
+**Asunto:** ERROR generando posts
+**Prioridad:** alta
+
+AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.
+
+*Estado: PROCESADO 2026-03-15 11:00*
+
+---
+*2026-03-15 10:01*
+
+## [2026-03-15 10:00] DE: agt02_instagram → PARA: orchestrator
+**Asunto:** ERROR generando posts
+**Prioridad:** alta
+
+AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.
+
+*Estado: PROCESADO 2026-03-15 11:00*

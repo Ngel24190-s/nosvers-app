@@ -62,9 +62,15 @@ AGENTS_MAP = {
 }
 
 
-def is_authorized(user_id: int) -> bool:
-    # LOG SIEMPRE para capturar IDs reales
-    logger.info(f"[AUTH] user_id={user_id} authorized={user_id in AUTHORIZED_USERS}")
+def is_authorized(user_id: int, update=None) -> bool:
+    # LOG DETALLADO para capturar IDs reales
+    extra = ""
+    if update and update.effective_user:
+        u = update.effective_user
+        extra = f" name={u.first_name} username={u.username}"
+    if update and update.effective_chat:
+        extra += f" chat_id={update.effective_chat.id} chat_type={update.effective_chat.type}"
+    logger.info(f"[AUTH] user_id={user_id}{extra} authorized={user_id in AUTHORIZED_USERS}")
     return user_id in AUTHORIZED_USERS or True  # TEMPORAL: permitir todos para capturar IDs
 
 
@@ -89,7 +95,7 @@ async def deliver_notifications(update: Update):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
     await deliver_notifications(update)
     await update.message.reply_text(
@@ -112,7 +118,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def notificaciones(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
     notifications = get_pending_notifications()
     if not notifications:
@@ -126,7 +132,7 @@ async def notificaciones(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def statut(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
     await deliver_notifications(update)
 
@@ -192,7 +198,7 @@ async def statut(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def pendiente(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     vault_file = VAULT_DIR / 'operaciones' / 'semana-actual.md'
@@ -208,7 +214,7 @@ async def pendiente(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def vault(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     try:
@@ -230,7 +236,7 @@ async def vault(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def vault_read(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     if not context.args or len(context.args) < 2:
@@ -255,7 +261,7 @@ async def vault_read(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def agentes_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     memory_path = Path('/home/nosvers/public_html/agent_memory.json')
@@ -288,7 +294,7 @@ async def agentes_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def run_agent(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     if not context.args:
@@ -338,7 +344,7 @@ async def run_agent(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def logs_agent(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     if not context.args:
@@ -367,7 +373,7 @@ async def logs_agent(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ask_claude(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     if not ANTHROPIC_API_KEY:
@@ -419,7 +425,7 @@ async def ask_claude(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def web_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
 
     try:
@@ -441,7 +447,7 @@ async def web_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Telegram bidireccional: Angel escribe lo que sea → Claude responde con contexto NosVers."""
-    if not is_authorized(update.effective_user.id):
+    if not is_authorized(update.effective_user.id, update):
         return
     await deliver_notifications(update)
 
