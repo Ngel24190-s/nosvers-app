@@ -3108,9 +3108,9 @@ body.africa-mode .mobile-topbar-title::after {
 
   <nav class="sidebar-nav">
     <div class="nav-group-label">Ferme</div>
-    <button class="nav-tab" data-section="home" onclick="goTo('home')"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></button>
+    <button class="nav-tab" data-section="home" onclick="goTo('home')"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
     <button class="nav-tab" data-section="etat" onclick="goTo('etat')"><span class="nav-icon">🌾</span><span class="nav-label">État Ferme</span></button>
-    <button class="nav-tab" data-section="director" onclick="goTo('director')"><span class="nav-icon">🎯</span><span class="nav-label">Dirección</span></button>
+    <button class="nav-tab" data-section="director" onclick="goTo('director')"><span class="nav-icon">🎯</span><span class="nav-label">Direction</span></button>
 
     <div class="nav-group-label">Spécialistes</div>
     <button class="nav-tab" data-section="agents" onclick="goTo('agents')"><span class="nav-icon">🔬</span><span class="nav-label">Agentes IA</span></button>
@@ -3122,7 +3122,7 @@ body.africa-mode .mobile-topbar-title::after {
 
     <div class="nav-group-label">Animaux</div>
     <button class="nav-tab" data-section="lapins" onclick="goTo('lapins')"><span class="nav-icon">🐰</span><span class="nav-label">Animaux</span></button>
-    <button class="nav-tab" data-section="feed" onclick="goTo('feed')"><span class="nav-icon">🌾</span><span class="nav-label">Alimentación</span></button>
+    <button class="nav-tab" data-section="feed" onclick="goTo('feed')"><span class="nav-icon">🌾</span><span class="nav-label">Alimentation</span></button>
     <button class="nav-tab" data-section="huevos" onclick="goTo('huevos')"><span class="nav-icon">🥚</span><span class="nav-label">Huevos</span></button>
 
     <div class="nav-group-label">Production</div>
@@ -3280,7 +3280,7 @@ body.africa-mode .mobile-topbar-title::after {
   <div class="director-card" id="directorCard">
     <div class="director-header">
       <div class="director-title">🎯 Director de Operaciones NosVers</div>
-      <div class="director-meta" id="directorMeta">Listo para generar el briefing del día</div>
+      <div class="director-meta" id="directorMeta">Prêt pour le briefing du jour</div>
     </div>
     <div class="director-body" id="directorBody">
       <div style="opacity:0.5;font-style:italic;font-size:0.85rem">
@@ -3468,7 +3468,7 @@ body.africa-mode .mobile-topbar-title::after {
     <div class="response-panel" id="huertoPhotoPanel" style="margin-top:0.8rem">
       <div class="resp-body" id="huertoPhotoBody"></div>
       <div class="resp-footer" style="display:none" id="huertoPhotoFooter">
-        <button class="btn-action btn-secondary" onclick="saveHuertoAnalysis()">💾 Guardar en plano</button>
+        <button class="btn-action btn-secondary" onclick="saveHuertoAnalysis()">💾 Sauvegarder</button>
         <button class="btn-action btn-secondary" onclick="copyHuertoAnalysis()">⎘ Copiar</button>
       </div>
     </div>
@@ -3476,8 +3476,8 @@ body.africa-mode .mobile-topbar-title::after {
 
   <!-- Plano manual -->
   <div class="huerto-controls">
-    <button class="btn-action btn-primary" onclick="openModalHuerto()">+ Nueva parcela</button>
-    <button class="btn-action btn-secondary" onclick="resetHuerto()">🔄 Nueva temporada</button>
+    <button class="btn-action btn-primary" onclick="openModalHuerto()">+ Nouvelle parcelle</button>
+    <button class="btn-action btn-secondary" onclick="resetHuerto()">🔄 Nouvelle saison</button>
     <span style="font-size:0.75rem;color:var(--texte-doux);margin-left:auto" id="huertoCount"></span>
   </div>
 
@@ -3680,8 +3680,8 @@ body.africa-mode .mobile-topbar-title::after {
 <!-- ====== INICIO / ALERTAS ====== -->
 <div class="section" id="sec-home">
   <div class="section-header">
-    <h2 class="section-title">Inicio <em>&amp; Alertas</em></h2>
-    <p class="section-sub">Panel de control diario · Lo más urgente de un vistazo</p>
+    <h2 class="section-title">Accueil <em>&amp; Alertes</em></h2>
+    <p class="section-sub">Tableau de bord quotidien · L'essentiel en un coup d'œil</p>
   </div>
   <div class="home-alerts">
     <h3>⚠️ Requièrent attention</h3>
@@ -3703,8 +3703,8 @@ body.africa-mode .mobile-topbar-title::after {
       </div>
       <div style="text-align:center;font-size:12px;color:#888;margin-top:8px;">Stock: <strong id="hw-stock">0</strong> huevos</div>
       <div class="btn-row" style="justify-content:center;margin-top:10px;">
-        <button class="btn-sm btn-orange" onclick="goTo('huevos')">Registrar hoy</button>
-        <button class="btn-sm btn-grey" onclick="goTo('lapins')">Ver lapines</button>
+        <button class="btn-sm btn-orange" onclick="goTo('huevos')">Enregistrer aujourd'hui</button>
+        <button class="btn-sm btn-grey" onclick="goTo('lapins')">Voir lapines</button>
       </div>
     </div>
   </div>
@@ -3717,7 +3717,7 @@ body.africa-mode .mobile-topbar-title::after {
         <span class="tag-pill tag-orange">Gris · día 12</span>
         <span class="tag-pill tag-green">Negra · día 5</span>
       </div>
-      <button class="btn-sm btn-primary" style="margin-top:10px;" onclick="goTo('lapins')">Ver detalle →</button>
+      <button class="btn-sm btn-primary" style="margin-top:10px;" onclick="goTo('lapins')">Voir détail →</button>
     </div>
   </div>
 </div>
@@ -3733,7 +3733,7 @@ body.africa-mode .mobile-topbar-title::after {
     <div class="lap-stat"><div class="lval">17</div><div class="llbl">Crías vivas</div></div>
     <div class="lap-stat" style="background:#fde8e8;"><div class="lval" style="color:#c0392b;">1</div><div class="llbl">Sevrage urgent</div></div>
   </div>
-  <button class="btn-sm btn-primary" onclick="openNvModal('modal-parto')" style="margin-bottom:14px;">+ Registrar parto</button>
+  <button class="btn-sm btn-primary" onclick="openNvModal('modal-parto')" style="margin-bottom:14px;">+ Enregistrer mise bas</button>
   <div class="lapin-card" style="border-left:4px solid #c0392b;">
     <div class="lapin-name">🐰 Blanche <span class="tag-pill tag-red">Sevrage urgent</span></div>
     <div style="font-size:12px;color:#888;margin-top:4px;">Parto: 30 enero 2026 · 6 petits vivas · Padre: Macho gris</div>
@@ -3741,12 +3741,12 @@ body.africa-mode .mobile-topbar-title::after {
       <div class="tstep done"><div class="ticon">🐣</div><div>Parto</div><div class="tdate">30 ene</div></div>
       <div class="tstep done"><div class="ticon">👁️</div><div>Ojos</div><div class="tdate">día 10</div></div>
       <div class="tstep done"><div class="ticon">🥬</div><div>Sólido</div><div class="tdate">día 18</div></div>
-      <div class="tstep overdue"><div class="ticon">✂️</div><div><strong>Destete</strong></div><div class="tdate">¡HOY!</div></div>
+      <div class="tstep overdue"><div class="ticon">✂️</div><div><strong>Destete</strong></div><div class="tdate">⚡ URGENT</div></div>
       <div class="tstep"><div class="ticon">💕</div><div>Cubrición</div><div class="tdate">~15 mar</div></div>
     </div>
     <div class="btn-row">
       <button class="btn-sm btn-red" onclick="alert('Destete registrado. Cubrición siguiente: ~15 marzo.')">✅ Marcar destete</button>
-      <button class="btn-sm btn-grey">Notas</button>
+      <button class="btn-sm btn-grey">Notes</button>
     </div>
   </div>
   <div class="lapin-card" style="border-left:4px solid #f39c12;">
@@ -3760,8 +3760,8 @@ body.africa-mode .mobile-topbar-title::after {
       <div class="tstep"><div class="ticon">💕</div><div>Cubrición</div><div class="tdate">~5 abr</div></div>
     </div>
     <div class="btn-row">
-      <button class="btn-sm btn-orange">Registrar peso</button>
-      <button class="btn-sm btn-grey">Notas</button>
+      <button class="btn-sm btn-orange">Enregistrer poids</button>
+      <button class="btn-sm btn-grey">Notes</button>
     </div>
   </div>
   <div class="lapin-card" style="border-left:4px solid #81c784;">
@@ -3776,7 +3776,7 @@ body.africa-mode .mobile-topbar-title::after {
     </div>
     <div class="btn-row">
       <button class="btn-sm btn-green">Todo bien ✓</button>
-      <button class="btn-sm btn-grey">Notas</button>
+      <button class="btn-sm btn-grey">Notes</button>
     </div>
   </div>
   <div class="home-card" style="margin-top:14px;">
@@ -3800,7 +3800,7 @@ body.africa-mode .mobile-topbar-title::after {
     <h2 class="section-title">Alimentación <em>&amp; Stock</em></h2>
     <p class="section-sub">Niveles de aliment · Alertas de reposición · Lista de compra automática</p>
   </div>
-  <button class="btn-sm btn-orange" onclick="openNvModal('modal-compra')" style="margin-bottom:14px;">+ Registrar compra</button>
+  <button class="btn-sm btn-orange" onclick="openNvModal('modal-compra')" style="margin-bottom:14px;">+ Enregistrer achat</button>
   <div class="feed-grid">
     <div class="feed-item" style="border-left:4px solid #c0392b;">
       <div class="feed-animal">🐓 Gallinas</div>
@@ -3829,7 +3829,7 @@ body.africa-mode .mobile-topbar-title::after {
   </div>
   <div class="shopping-box">
     <h4>🛒 Lista de compra sugerida</h4>
-    <div class="shop-item"><span>🐓 Aliment ponedoras</span><span class="shop-badge">URGENTE · 10 kg</span></div>
+    <div class="shop-item"><span>🐓 Aliment ponedoras</span><span class="shop-badge">⚠️ URGENT · 10 kg</span></div>
     <div class="shop-item"><span>🐰 Granulado lapines</span><span class="shop-badge">cette semaine · 5 kg</span></div>
     <div class="shop-item"><span>🐰 Heno suplementario</span><span class="shop-badge">cette semaine · 2 fardos</span></div>
     <div style="margin-top:10px;font-size:12px;color:#888;">Point Vert Neuvic · L-V 8h-12h / 14h-18h</div>
@@ -3846,7 +3846,7 @@ body.africa-mode .mobile-topbar-title::after {
         <div>🐰 3 lapines+petits: <strong>~600g/día</strong></div>
         <div>🐑 2 brebis: <strong>~800g/día</strong></div>
       </div>
-      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;"><strong>Total: ~2,5 kg/día · ~17 kg/semana</strong></div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;"><strong>Total : ~2,5 kg/jour · ~17 kg/semaine</strong></div>
     </div>
   </div>
 </div>
@@ -3858,7 +3858,7 @@ body.africa-mode .mobile-topbar-title::after {
     <p class="section-sub">Registro diario · Consumo vs venta · Historial e ingresos</p>
   </div>
   <div class="eggs-stats">
-    <div class="egg-stat c-col"><div class="eval" id="egg-col">47</div><div class="elbl">Esta semana</div></div>
+    <div class="egg-stat c-col"><div class="eval" id="egg-col">47</div><div class="elbl">Cette semaine</div></div>
     <div class="egg-stat c-eat"><div class="eval" id="egg-eat">12</div><div class="elbl">Consumidos</div></div>
     <div class="egg-stat c-sell"><div class="eval" id="egg-sell">24</div><div class="elbl">Vendidos</div></div>
   </div>
@@ -3871,8 +3871,8 @@ body.africa-mode .mobile-topbar-title::after {
       </div>
       <div class="suggest-box">💡 Con 11 huevos y ~7/día de producción, puedes vender una docena el jueves. Precio sugerido: <strong>3,50€/docena</strong></div>
       <div class="btn-row">
-        <button class="btn-sm btn-orange" onclick="openNvModal('modal-huevos')">+ Registrar hoy</button>
-        <button class="btn-sm btn-green" onclick="openNvModal('modal-venta-huevos')">💰 Registrar venta</button>
+        <button class="btn-sm btn-orange" onclick="openNvModal('modal-huevos')">+ Enregistrer aujourd'hui</button>
+        <button class="btn-sm btn-green" onclick="openNvModal('modal-venta-huevos')">💰 Enregistrer vente</button>
       </div>
     </div>
   </div>
@@ -3900,47 +3900,47 @@ body.africa-mode .mobile-topbar-title::after {
     <p class="section-sub">Madurez por bac · Estimación de kilos · Historial de producción</p>
   </div>
   <div class="yield-box">
-    <div style="font-size:12px;color:#888;margin-bottom:4px;">Disponible para cosechar</div>
+    <div style="font-size:12px;color:#888;margin-bottom:4px;">Prêt à récolter</div>
     <div class="yield-total">~18 kg lombricompost</div>
-    <div style="font-size:12px;color:#888;margin-top:4px;">2 bacs listos · Valor: <strong>~54€</strong> (3€/kg) o <strong>~90€</strong> en retail</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">2 bacs prêts · Valeur : <strong>~54€</strong> (3€/kg) o <strong>~90€</strong> en retail</div>
   </div>
-  <button class="btn-sm btn-green" onclick="openNvModal('modal-cosecha')" style="margin-bottom:14px;">+ Registrar cosecha</button>
+  <button class="btn-sm btn-green" onclick="openNvModal('modal-cosecha')" style="margin-bottom:14px;">+ Enregistrer récolte</button>
   <div class="harvest-grid">
     <div class="bac-card">
       <div class="bac-title">🪱 Bac #1</div>
       <div class="readiness-ring ring-ready">87%</div>
-      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ LISTO</div>
-      <div class="bac-detail">Última alimentación: <strong>hace 21 jours</strong></div>
+      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ PRÊT</div>
+      <div class="bac-detail">Dernière alimentation : <strong>hace 21 jours</strong></div>
       <div class="bac-detail">Estimado: <strong>~10 kg</strong></div>
-      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Cosechar</button>
+      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Récolter</button>
     </div>
     <div class="bac-card">
       <div class="bac-title">🪱 Bac #2</div>
       <div class="readiness-ring ring-ready">92%</div>
-      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ LISTO</div>
-      <div class="bac-detail">Última alimentación: <strong>hace 25 jours</strong></div>
+      <div style="font-size:13px;font-weight:700;color:#27ae60;">✅ PRÊT</div>
+      <div class="bac-detail">Dernière alimentation : <strong>hace 25 jours</strong></div>
       <div class="bac-detail">Estimado: <strong>~8 kg</strong></div>
-      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Cosechar</button>
+      <button class="btn-sm btn-green" style="margin-top:8px;width:100%;" onclick="openNvModal('modal-cosecha')">Récolter</button>
     </div>
     <div class="bac-card">
       <div class="bac-title">🪱 Bac #3</div>
       <div class="readiness-ring ring-almost">54%</div>
       <div style="font-size:13px;font-weight:700;color:#f39c12;">En progreso</div>
-      <div class="bac-detail">Última alimentación: <strong>hace 8 jours</strong></div>
-      <div class="bac-detail">Próxima cosecha: <strong>~15 mar</strong></div>
+      <div class="bac-detail">Dernière alimentation : <strong>hace 8 jours</strong></div>
+      <div class="bac-detail">Prochaine récolte : <strong>~15 mar</strong></div>
       <button class="btn-sm btn-grey" style="margin-top:8px;width:100%;">Verificar</button>
     </div>
     <div class="bac-card">
       <div class="bac-title">🪱 IBC</div>
       <div class="readiness-ring ring-not">20%</div>
-      <div style="font-size:13px;font-weight:700;color:#ccc;">No listo</div>
-      <div class="bac-detail">Última alimentación: <strong>hace 3 jours</strong></div>
-      <div class="bac-detail">Próxima cosecha: <strong>~25 abr</strong></div>
-      <button class="btn-sm btn-grey" style="margin-top:8px;width:100%;">Alimentar</button>
+      <div style="font-size:13px;font-weight:700;color:#ccc;">Pas prêt</div>
+      <div class="bac-detail">Dernière alimentation : <strong>hace 3 jours</strong></div>
+      <div class="bac-detail">Prochaine récolte : <strong>~25 abr</strong></div>
+      <button class="btn-sm btn-grey" style="margin-top:8px;width:100%;">Nourrir</button>
     </div>
   </div>
   <div class="home-card">
-    <div class="home-card-head">📦 Historial cosechas 2026</div>
+    <div class="home-card-head">📦 Historique récoltes 2026</div>
     <div class="home-card-body" style="font-size:13px;">
       <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;font-weight:700;font-size:11px;color:#888;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #eee;">
         <div>Fecha</div><div>Bac</div><div>Kg</div><div>Destino</div>
@@ -3954,7 +3954,7 @@ body.africa-mode .mobile-topbar-title::after {
       <div style="display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;padding:7px 0;">
         <div>3 ene</div><div>#1</div><div><strong>11 kg</strong></div><div>Venta mercado</div>
       </div>
-      <div style="padding-top:10px;border-top:1px solid #eee;margin-top:4px;">Total 2026: <strong>27 kg</strong> · Objetivo: <strong>50 kg/mes</strong></div>
+      <div style="padding-top:10px;border-top:1px solid #eee;margin-top:4px;">Total 2026 : <strong>27 kg</strong> · Objetivo: <strong>50 kg/mes</strong></div>
     </div>
   </div>
 </div>
@@ -3989,10 +3989,10 @@ body.africa-mode .mobile-topbar-title::after {
     <div class="home-card-head">🌱 Próximos eventos granja</div>
     <div class="home-card-body">
       <div class="milestone-list">
-        <div class="milestone-item" style="border-left:4px solid #c0392b;"><div style="font-size:20px;">✂️</div><div><div class="m-title">Destete Lapine Blanche</div><div class="m-date">HOY · 2 marzo</div></div><div class="m-days days-late">URGENTE</div></div>
-        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🪱</div><div><div class="m-title">Cosecha Bac #1 et #2</div><div class="m-date">Cette semaine · ~5 mars</div></div><div class="m-days days-warn">3 jours</div></div>
-        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🛒</div><div><div class="m-title">Compra aliment poules</div><div class="m-date">Urgente · antes 5 marzo</div></div><div class="m-days days-warn">3 jours</div></div>
-        <div class="milestone-item" style="border-left:4px solid #81c784;"><div style="font-size:20px;">🥬</div><div><div class="m-title">Crías Gris — inicio aliment solide</div><div class="m-date">9 marzo</div></div><div class="m-days days-ok">7 jours</div></div>
+        <div class="milestone-item" style="border-left:4px solid #c0392b;"><div style="font-size:20px;">✂️</div><div><div class="m-title">Destete Lapine Blanche</div><div class="m-date">Aujourd'hui</div></div><div class="m-days days-late">URGENT</div></div>
+        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🪱</div><div><div class="m-title">Récolte Bac #1 et #2</div><div class="m-date">Cette semaine · ~5 mars</div></div><div class="m-days days-warn">3 jours</div></div>
+        <div class="milestone-item" style="border-left:4px solid #f39c12;"><div style="font-size:20px;">🛒</div><div><div class="m-title">Compra aliment poules</div><div class="m-date">Urgent · avant 5 mars</div></div><div class="m-days days-warn">3 jours</div></div>
+        <div class="milestone-item" style="border-left:4px solid #81c784;"><div style="font-size:20px;">🥬</div><div><div class="m-title">Petits Grise — début aliment solide</div><div class="m-date">9 marzo</div></div><div class="m-days days-ok">7 jours</div></div>
         <div class="milestone-item" style="border-left:4px solid #81c784;"><div style="font-size:20px;">✂️</div><div><div class="m-title">Destete Lapine Grise</div><div class="m-date">~21 marzo</div></div><div class="m-days days-ok">19 jours</div></div>
       </div>
     </div>
@@ -4002,7 +4002,7 @@ body.africa-mode .mobile-topbar-title::after {
 <!-- ====== MODALES ====== -->
 <div class="modal-overlay" id="modal-parto">
   <div class="modal-box">
-    <div class="modal-hdr">🐣 Registrar parto <button class="close-x" onclick="closeNvModal('modal-parto')">×</button></div>
+    <div class="modal-hdr">🐣 Enregistrer mise bas <button class="close-x" onclick="closeNvModal('modal-parto')">×</button></div>
     <div class="modal-body">
       <div class="form-grp"><label>Lapine</label><select><option>Blanche</option><option>Grise</option><option>Noire</option><option>Nouvelle lapine...</option></select></div>
       <div class="form-row">
@@ -4013,79 +4013,79 @@ body.africa-mode .mobile-topbar-title::after {
         <div class="form-grp"><label>Crías muertas</label><input type="number" placeholder="0" min="0"></div>
         <div class="form-grp"><label>Padre</label><input type="text" placeholder="Macho gris..."></div>
       </div>
-      <div class="form-grp"><label>Notas</label><textarea placeholder="Observaciones del parto, estado de la madre..."></textarea></div>
+      <div class="form-grp"><label>Notes</label><textarea placeholder="Observaciones del parto, estado de la madre..."></textarea></div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-parto')">Cancelar</button>
-      <button class="btn-sm btn-primary" onclick="alert('Parto registrado. Alertas creadas para jours 10, 18, 28.');closeNvModal('modal-parto')">Guardar y crear alertas</button>
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-parto')">Annuler</button>
+      <button class="btn-sm btn-primary" onclick="alert('Parto registrado. Alertas creadas para jours 10, 18, 28.');closeNvModal('modal-parto')">Sauvegarder et créer alertes</button>
     </div>
   </div>
 </div>
 <div class="modal-overlay" id="modal-huevos">
   <div class="modal-box">
-    <div class="modal-hdr">🥚 Registrar huevos <button class="close-x" onclick="closeNvModal('modal-huevos')">×</button></div>
+    <div class="modal-hdr">🥚 Enregistrer œufs <button class="close-x" onclick="closeNvModal('modal-huevos')">×</button></div>
     <div class="modal-body">
       <div class="form-row">
         <div class="form-grp"><label>Recogidos</label><input type="number" placeholder="0" min="0" id="inp-egg-col"></div>
         <div class="form-grp"><label>Consumo casa</label><input type="number" placeholder="0" min="0" id="inp-egg-eat"></div>
         <div class="form-grp"><label>Regalados</label><input type="number" placeholder="0" min="0"></div>
       </div>
-      <div class="form-grp"><label>Nota rápida</label><input type="text" placeholder="Todo bien, gallina clueca..."></div>
+      <div class="form-grp"><label>Note rapide</label><input type="text" placeholder="Todo bien, gallina clueca..."></div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-huevos')">Cancelar</button>
-      <button class="btn-sm btn-orange" onclick="saveEggEntry()">Guardar</button>
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-huevos')">Annuler</button>
+      <button class="btn-sm btn-orange" onclick="saveEggEntry()">Sauvegarder</button>
     </div>
   </div>
 </div>
 <div class="modal-overlay" id="modal-venta-huevos">
   <div class="modal-box">
-    <div class="modal-hdr">💰 Registrar venta huevos <button class="close-x" onclick="closeNvModal('modal-venta-huevos')">×</button></div>
+    <div class="modal-hdr">💰 Enregistrer vente huevos <button class="close-x" onclick="closeNvModal('modal-venta-huevos')">×</button></div>
     <div class="modal-body">
       <div class="form-row">
         <div class="form-grp"><label>Huevos vendidos</label><input type="number" placeholder="12" min="0" id="inp-egg-sell"></div>
-        <div class="form-grp"><label>Precio total (€)</label><input type="number" placeholder="3.50" step="0.10" id="inp-egg-price"></div>
+        <div class="form-grp"><label>Prix total (€)</label><input type="number" placeholder="3.50" step="0.10" id="inp-egg-price"></div>
       </div>
       <div class="form-grp"><label>Comprador (opcional)</label><input type="text" placeholder="Mercado, vecino..."></div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-venta-huevos')">Cancelar</button>
-      <button class="btn-sm btn-green" onclick="alert('Venta registrada.');closeNvModal('modal-venta-huevos')">Registrar</button>
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-venta-huevos')">Annuler</button>
+      <button class="btn-sm btn-green" onclick="alert('Venta registrada.');closeNvModal('modal-venta-huevos')">Enregistrer</button>
     </div>
   </div>
 </div>
 <div class="modal-overlay" id="modal-cosecha">
   <div class="modal-box">
-    <div class="modal-hdr">🪱 Registrar cosecha <button class="close-x" onclick="closeNvModal('modal-cosecha')">×</button></div>
+    <div class="modal-hdr">🪱 Enregistrer récolte <button class="close-x" onclick="closeNvModal('modal-cosecha')">×</button></div>
     <div class="modal-body">
       <div class="form-row">
         <div class="form-grp"><label>Bac récolté</label><select><option>Bac #1</option><option>Bac #2</option><option>Bac #3</option><option>IBC</option></select></div>
-        <div class="form-grp"><label>Kg cosechados</label><input type="number" placeholder="10" min="0" step="0.5"></div>
+        <div class="form-grp"><label>Kg récoltés</label><input type="number" placeholder="10" min="0" step="0.5"></div>
       </div>
       <div class="form-grp"><label>Destino</label><select><option>Stock venta</option><option>Huerto propio</option><option>Venta inmediata</option><option>Otro</option></select></div>
-      <div class="form-grp"><label>Estado (color, textura...)</label><input type="text" placeholder="Negro granulado, sin olor..."></div>
-      <div class="form-grp"><label>Notas</label><textarea placeholder="Lombrices visibles, humedad, incidencias..."></textarea></div>
+      <div class="form-grp"><label>État (couleur, texture…)</label><input type="text" placeholder="Negro granulado, sin olor..."></div>
+      <div class="form-grp"><label>Notes</label><textarea placeholder="Lombrices visibles, humedad, incidencias..."></textarea></div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-cosecha')">Cancelar</button>
-      <button class="btn-sm btn-green" onclick="alert('Cosecha registrada. Stock actualizado.');closeNvModal('modal-cosecha')">Registrar</button>
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-cosecha')">Annuler</button>
+      <button class="btn-sm btn-green" onclick="alert('Cosecha registrada. Stock actualizado.');closeNvModal('modal-cosecha')">Enregistrer</button>
     </div>
   </div>
 </div>
 <div class="modal-overlay" id="modal-compra">
   <div class="modal-box">
-    <div class="modal-hdr">🛒 Registrar compra alimentación <button class="close-x" onclick="closeNvModal('modal-compra')">×</button></div>
+    <div class="modal-hdr">🛒 Enregistrer achat aliment <button class="close-x" onclick="closeNvModal('modal-compra')">×</button></div>
     <div class="modal-body">
       <div class="form-grp"><label>Producto</label><select><option>Aliment poules</option><option>Granulado lapines</option><option>Heno</option><option>Mezcla canards</option><option>Complemento brebis</option><option>Otro</option></select></div>
       <div class="form-row">
         <div class="form-grp"><label>Cantidad (kg)</label><input type="number" placeholder="10" min="0"></div>
-        <div class="form-grp"><label>Precio total (€)</label><input type="number" placeholder="18.50" step="0.10"></div>
+        <div class="form-grp"><label>Prix total (€)</label><input type="number" placeholder="18.50" step="0.10"></div>
       </div>
       <div class="form-grp"><label>Tienda</label><input type="text" placeholder="Point Vert, Gamm Vert..."></div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-compra')">Cancelar</button>
-      <button class="btn-sm btn-orange" onclick="alert('Compra registrada. Stock actualizado.');closeNvModal('modal-compra')">Guardar</button>
+      <button class="btn-sm btn-grey" onclick="closeNvModal('modal-compra')">Annuler</button>
+      <button class="btn-sm btn-orange" onclick="alert('Compra registrada. Stock actualizado.');closeNvModal('modal-compra')">Sauvegarder</button>
     </div>
   </div>
 </div>
@@ -4095,9 +4095,9 @@ body.africa-mode .mobile-topbar-title::after {
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav">
-  <button class="bottom-nav-item" onclick="goTo('home')"><span class="bn-icon">🏠</span>Inicio</button>
+  <button class="bottom-nav-item" onclick="goTo('home')"><span class="bn-icon">🏠</span>Accueil</button>
   <button class="bottom-nav-item" onclick="goTo('etat')"><span class="bn-icon">🌾</span>Ferme</button>
-  <button class="bottom-nav-item" onclick="goTo('agents')"><span class="bn-icon">🔬</span>Agentes</button>
+  <button class="bottom-nav-item" onclick="goTo('agents')"><span class="bn-icon">🔬</span>Agents</button>
   <button class="bottom-nav-item" onclick="goTo('lapins')"><span class="bn-icon">🐰</span>Animaux</button>
   <button class="bottom-nav-item" onclick="openMoreSheet()"><span class="bn-icon">⋯</span>Plus</button>
 </nav>
@@ -4108,9 +4108,9 @@ body.africa-mode .mobile-topbar-title::after {
   <div class="more-sheet-panel">
     <div class="more-sheet-handle"></div>
     <div class="more-sheet-grid">
-      <button class="more-sheet-item" onclick="goTo('director');closeMoreSheet()"><span class="ms-icon">🎯</span>Dirección</button>
+      <button class="more-sheet-item" onclick="goTo('director');closeMoreSheet()"><span class="ms-icon">🎯</span>Direction</button>
       <button class="more-sheet-item" onclick="goTo('huerto');closeMoreSheet()"><span class="ms-icon">🗺️</span>Huerto</button>
-      <button class="more-sheet-item" onclick="goTo('feed');closeMoreSheet()"><span class="ms-icon">🌾</span>Alimentación</button>
+      <button class="more-sheet-item" onclick="goTo('feed');closeMoreSheet()"><span class="ms-icon">🌾</span>Alimentation</button>
       <button class="more-sheet-item" onclick="goTo('huevos');closeMoreSheet()"><span class="ms-icon">🥚</span>Huevos</button>
       <button class="more-sheet-item" onclick="goTo('cosecha');closeMoreSheet()"><span class="ms-icon">🪱</span>Cosecha</button>
       <button class="more-sheet-item" onclick="goTo('fechas');closeMoreSheet()"><span class="ms-icon">📅</span>Fechas</button>
@@ -5075,9 +5075,9 @@ async function saveEtat() {
   if (btn) { btn.textContent = '⏳ Guardando...'; }
   try {
     await api('etat_set', data);
-    if (btn) { btn.textContent = '✓ Guardado y sincronizado!'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Guardar estado de la granja'; btn.classList.remove('saved'); }, 2500); }
+    if (btn) { btn.textContent = '✓ Guardado y sincronizado!'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder estado de la granja'; btn.classList.remove('saved'); }, 2500); }
   } catch(e) {
-    if (btn) { btn.textContent = '⚠ Guardado local (sin sync)'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Guardar estado de la granja'; btn.classList.remove('saved'); }, 2500); }
+    if (btn) { btn.textContent = '⚠ Guardado local (sin sync)'; btn.classList.add('saved'); setTimeout(() => { btn.textContent = '💾 Sauvegarder estado de la granja'; btn.classList.remove('saved'); }, 2500); }
   }
 }
 
@@ -6118,6 +6118,8 @@ async function sendAgentConsult() {
   addConsultMsg(activeAgent, 'user', question);
   addConsultMsg(activeAgent, 'agent', '⏳ Réflexion en cours…');
   
+  const prevMode = currentMode;
+  currentMode = 'conseil';
   try {
     const response = await callClaude(activeAgent, question);
     // Supprimer le message de chargement

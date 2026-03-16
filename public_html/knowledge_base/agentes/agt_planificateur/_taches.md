@@ -1,27 +1,24 @@
 # _taches
-*Creado: 2026-03-16 12:00*
+*Creado: 2026-03-16 20:01*
 
 [
   {
-    "titre": "📥 Traiter le message de la boîte de réception",
-    "source": "Système (_inbox)",
-    "priorite": "jaune",
-    "duree_min": 10,
+    "titre": "📋 Message vide reçu — Vérifier les agents",
+    "source": "inconnu",
+    "priorite": "vert",
+    "duree_min": 5,
     "materiel": [
-      "téléphone ou ordinateur",
-      "accès à l'app"
+      "téléphone avec Telegram"
     ],
     "etapes": [
-      "Ouvrir la note _inbox datée du 2026-03-16",
-      "Lire le contenu du message reçu",
-      "Identifier l'agent expéditeur et le sujet de la demande",
-      "Si le message contient une demande concrète, la transmettre au Planificateur pour structuration",
-      "Archiver ou supprimer la note _inbox une fois traitée"
+      "Ouvrir Telegram et vérifier les conversations des agents (Eisenia, Composteur, Berger, Dr. Ingham)",
+      "Confirmer si un agent a tenté d'envoyer un message qui n'est pas arrivé",
+      "Si tout est normal, ignorer — aucune action nécessaire"
     ],
-    "resultat_attendu": "La boîte de réception est vide, tout message a été transformé en tâche ou classé",
+    "resultat_attendu": "Confirmation qu'aucun agent n'a de demande en attente. Si un message était prévu, le relancer.",
     "delai_jours": 3,
-    "id": "T03161200",
-    "created": "16/03/2026 12:00",
+    "id": "T03162001",
+    "created": "16/03/2026 20:01",
     "done": false
   }
 ]
