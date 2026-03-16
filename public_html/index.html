@@ -2190,6 +2190,846 @@ body.africa-mode .main-content { margin-left: 0 !important; }
   .main { padding: 0.4rem 0.5rem 5rem !important; }
 }
 
+/* ═══════════════════════════════════════════════════
+   VISTA ÁFRICA V2 — Même interface, 4 grandes actions
+═══════════════════════════════════════════════════ */
+.africa-v2 {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg, #FEFAF4);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Header África */
+.africa-v2-header {
+  background: var(--primary-dark, #3D5420);
+  padding: 1.2rem 1.4rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.africa-v2-logo {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.africa-v2-logo-mark {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.africa-v2-greeting {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+}
+.africa-v2-logout {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.africa-v2-logout:hover { color: white; background: rgba(255,255,255,0.1); }
+
+/* Alerte rapide */
+.africa-v2-alert {
+  background: #FFF3E0;
+  border-left: 3px solid #F59E0B;
+  margin: 0.8rem 1rem 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8rem;
+  color: #92400E;
+  display: none;
+}
+.africa-v2-alert.active { display: block; }
+
+/* Météo mini */
+.africa-v2-meteo {
+  margin: 0.8rem 1rem 0;
+  background: white;
+  border: 1px solid var(--border, #e0d8cc);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.africa-v2-meteo-icon { font-size: 1.6rem; }
+.africa-v2-meteo-info { flex: 1; }
+.africa-v2-meteo-temp { font-weight: 700; font-size: 1.1rem; color: var(--primary-dark); }
+.africa-v2-meteo-desc { color: var(--muted); font-size: 0.75rem; }
+
+/* 4 boutons d'action */
+.africa-v2-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 1rem;
+  flex: 1;
+}
+.africa-v2-btn {
+  background: white;
+  border: 1.5px solid var(--border, #e0d8cc);
+  border-radius: 18px;
+  padding: 1.4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 120px;
+  justify-content: center;
+}
+.africa-v2-btn:active {
+  transform: scale(0.96);
+}
+.africa-v2-btn.btn-primary {
+  background: var(--primary, #5A7A2E);
+  border-color: var(--primary);
+  color: white;
+}
+.africa-v2-btn.btn-journal {
+  background: linear-gradient(135deg, #FEFAF4 0%, #F0EAD9 100%);
+  border-color: #C4893D;
+}
+.africa-v2-btn.btn-chat {
+  background: linear-gradient(135deg, #EEF4E4 0%, #D8EAC0 100%);
+  border-color: #5A7A2E;
+}
+.africa-v2-btn.btn-photo {
+  background: linear-gradient(135deg, #F0F4FF 0%, #E0E8FF 100%);
+  border-color: #6B7FBB;
+}
+.africa-v2-btn.btn-sol {
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFE8D0 100%);
+  border-color: #C4893D;
+}
+.africa-v2-btn-icon { font-size: 2.2rem; line-height: 1; }
+.africa-v2-btn-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text, #1c1510);
+  line-height: 1.2;
+}
+.africa-v2-btn.btn-chat .africa-v2-btn-label,
+.africa-v2-btn.btn-journal .africa-v2-btn-label { color: var(--primary-dark, #3D5420); }
+.africa-v2-btn.btn-photo .africa-v2-btn-label { color: #4A5A9B; }
+.africa-v2-btn-sub {
+  font-size: 0.7rem;
+  color: var(--muted, #7A7060);
+  line-height: 1.3;
+}
+.africa-v2-btn.btn-chat .africa-v2-btn-sub { color: #5A7A2E; }
+
+/* Dernière note */
+.africa-v2-last-note {
+  margin: 0 1rem 1rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+}
+.africa-v2-last-note-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.africa-v2-last-note-text {
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Panels secondaires África V2 */
+.africa-v2-panel {
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.africa-v2-panel.active { display: flex; }
+
+.africa-v2-panel-header {
+  background: var(--primary-dark);
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.africa-v2-back {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.africa-v2-panel-title {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Chat África V2 */
+.africa-v2-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 80px;
+}
+.africa-v2-msg {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.africa-v2-msg.user {
+  background: var(--primary, #5A7A2E);
+  color: white;
+  align-self: flex-end;
+  border-radius: 16px 16px 4px 16px;
+}
+.africa-v2-msg.agent {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-radius: 16px 16px 16px 4px;
+}
+.africa-v2-msg.agent .msg-agent-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.africa-v2-input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  background: white;
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  z-index: 200;
+}
+.africa-v2-input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  resize: none;
+  min-height: 40px;
+  max-height: 100px;
+  background: var(--bg);
+  outline: none;
+}
+.africa-v2-input:focus { border-color: var(--primary); }
+.africa-v2-send {
+  background: var(--primary);
+  border: none;
+  color: white;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Journal África V2 */
+.africa-v2-journal-body {
+  flex: 1;
+  padding: 1rem;
+  padding-bottom: 100px;
+  overflow-y: auto;
+}
+.africa-v2-journal-today {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.africa-v2-journal-date {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.africa-v2-journal-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  min-height: 120px;
+  font-style: italic;
+}
+.africa-v2-journal-save {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+.africa-v2-journal-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.africa-v2-entry {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+}
+.africa-v2-entry-date { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
+.africa-v2-entry-text { font-size: 0.82rem; line-height: 1.6; color: var(--text); font-style: italic; }
+
+/* Photo África V2 */
+.africa-v2-photo-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.africa-v2-photo-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.africa-v2-photo-btn {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 2rem;
+}
+.africa-v2-photo-btn span { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.africa-v2-photo-btn.primary { background: var(--primary); border-color: var(--primary); }
+.africa-v2-photo-btn.primary span { color: white; }
+.africa-v2-photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.africa-v2-photo-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.africa-v2-photo-input { display: none; }
+
+/* Sol Africa V2 — observations rapides */
+.africa-v2-sol-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  padding-bottom: 100px;
+}
+.africa-v2-obs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.africa-v2-obs-btn {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.africa-v2-obs-btn.selected {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+}
+.africa-v2-obs-btn-icon { font-size: 1.8rem; }
+.africa-v2-obs-btn-label { font-size: 0.75rem; font-weight: 600; color: var(--text); margin-top: 4px; }
+.africa-v2-obs-note {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.africa-v2-obs-note textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  min-height: 80px;
+  font-style: italic;
+  color: var(--text);
+}
+.africa-v2-obs-save {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem;
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   AGENTES ÉLITE — Interface enrichie
+═══════════════════════════════════════════════════ */
+.agents-elite-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.agent-elite-card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.agent-elite-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(90,122,46,0.08);
+}
+
+.agent-elite-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.1rem 0.75rem;
+  cursor: pointer;
+}
+.agent-elite-avatar {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.agent-elite-meta { flex: 1; min-width: 0; }
+.agent-elite-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-elite-role {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.agent-elite-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+.agent-elite-status.online { background: #EEF4E4; color: #3D5420; }
+.agent-elite-status.active { background: #FFF3E0; color: #9A5000; }
+.agent-elite-status.idle { background: #F5F5F5; color: #666; }
+.agent-elite-status::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Compétences */
+.agent-elite-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0 1.1rem 0.75rem;
+}
+.agent-elite-skill {
+  background: var(--primary-pale, #EEF4E4);
+  color: var(--primary-dark, #3D5420);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* Dernière activité */
+.agent-elite-last {
+  padding: 0 1.1rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agent-elite-last-time {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Actions */
+.agent-elite-actions {
+  display: flex;
+  gap: 6px;
+  padding: 0 1.1rem 1rem;
+}
+.agent-elite-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  text-align: center;
+}
+.agent-elite-btn:hover { background: var(--primary-pale); border-color: var(--primary); color: var(--primary-dark); }
+.agent-elite-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.agent-elite-btn.primary:hover { background: var(--primary-dark); }
+
+/* Chat panel élite */
+.agent-elite-chat-panel {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  flex-direction: column;
+}
+.agent-elite-chat-panel.active { display: flex; }
+
+.agent-elite-chat-header {
+  background: var(--primary-dark);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+}
+.agent-elite-chat-back {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.agent-elite-chat-info { flex: 1; }
+.agent-elite-chat-name {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.agent-elite-chat-subtitle { font-size: 0.7rem; color: rgba(255,255,255,0.6); }
+.agent-elite-chat-avatar {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  background: rgba(255,255,255,0.15);
+}
+
+/* Chat collaboration indicator */
+.collab-indicator {
+  background: #FFF3E0;
+  border-bottom: 1px solid #FFD580;
+  padding: 0.4rem 1rem;
+  font-size: 0.72rem;
+  color: #9A5000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.agent-elite-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 80px;
+}
+
+.agent-elite-msg {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.agent-elite-msg.user {
+  background: var(--primary);
+  color: white;
+  align-self: flex-end;
+  border-radius: 16px 16px 4px 16px;
+}
+.agent-elite-msg.agent {
+  background: white;
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-radius: 16px 16px 16px 4px;
+}
+.agent-elite-msg.collab {
+  background: #FFFBF0;
+  border: 1px solid #FFD580;
+  align-self: flex-start;
+  border-radius: 16px 16px 16px 4px;
+}
+.agent-elite-msg-from {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.agent-elite-msg.agent .agent-elite-msg-from { color: var(--primary); }
+.agent-elite-msg.collab .agent-elite-msg-from { color: #9A5000; }
+
+.agent-elite-input-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: white;
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  z-index: 600;
+}
+.agent-elite-input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  resize: none;
+  min-height: 40px;
+  max-height: 100px;
+  background: var(--bg);
+  outline: none;
+}
+.agent-elite-input:focus { border-color: var(--primary); }
+.agent-elite-send-btn {
+  background: var(--primary);
+  border: none;
+  color: white;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Bouton Africa dans le chat élite */
+.ask-africa-btn {
+  background: linear-gradient(135deg, #7A3A6A, #9B4D8A);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════════
+   TEMA ÁFRICA — misma app, paleta violeta
+═══════════════════════════════════════════════════ */
+body.africa-mode {
+  --primary:       #7A3A6A;
+  --primary-dark:  #5A2A4E;
+  --primary-mid:   #9B4D8A;
+  --primary-pale:  #F5EAF3;
+  --primary-light: #C87AB8;
+  --accent:        #B86FAA;
+  --bg:            #FDF8FC;
+  --surface:       #F2E8F0;
+  --card:          #FFFFFF;
+  --border:        #E8D0E4;
+  --text:          #2A1A28;
+  --muted:         #8B6E85;
+}
+
+/* Header violet */
+body.africa-mode .main-content > .mobile-topbar,
+body.africa-mode .sidebar {
+  background: var(--primary-dark) !important;
+}
+
+/* Bottom nav */
+body.africa-mode .bottom-nav {
+  background: #FFFFFF !important;
+  border-top-color: var(--border) !important;
+}
+body.africa-mode .bottom-nav-item.active .bottom-nav-icon,
+body.africa-mode .bottom-nav-item.active .bottom-nav-label {
+  color: var(--primary) !important;
+}
+body.africa-mode .bottom-nav-item.active::before {
+  background: var(--primary) !important;
+}
+
+/* Tags et pills */
+body.africa-mode .tag-pill,
+body.africa-mode .status-pill {
+  background: var(--primary-pale) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Boutons primaires */
+body.africa-mode .btn-primary,
+body.africa-mode .btn-g,
+body.africa-mode button[style*="#5A7A2E"],
+body.africa-mode button[style*="#3D5420"] {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Highlight nom África dans le topbar */
+body.africa-mode #userBadge::after {
+  content: " · África";
+  color: var(--primary-light);
+  font-style: italic;
+}
+
+/* Section titles */
+body.africa-mode .section-title em {
+  color: var(--primary) !important;
+}
+
+/* Cards hover */
+body.africa-mode .agent-specialist:hover,
+body.africa-mode .home-card:hover {
+  border-color: var(--primary) !important;
+}
+
+/* Agent badge */
+body.africa-mode .agent-spec-badge {
+  background: var(--primary-pale) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Chat messages */
+body.africa-mode .msg-user {
+  background: var(--primary) !important;
+}
+
+/* Inputs focus */
+body.africa-mode input:focus,
+body.africa-mode textarea:focus,
+body.africa-mode select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(122,58,106,0.12) !important;
+}
+
+/* Scrollbar */
+body.africa-mode ::-webkit-scrollbar-thumb {
+  background: var(--primary-light) !important;
+}
+
+/* Greeting África dans le topbar */
+body.africa-mode .mobile-topbar-title::after {
+  content: " 🌿";
+}
+
 </style>
 </head>
 <body>
@@ -4902,18 +5742,13 @@ let africaChatHistory = [];
 
 function activateAfricaMode() {
   document.body.classList.add('africa-mode');
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  // Ocultar africaView antiguo si existe
   const av = document.getElementById('africaView');
-  if (av) av.style.display = 'block';
-  const ub = document.getElementById('userBadge');
-  if (ub) ub.style.display = 'none';
-  africaLoadMeteo();
+  if (av) av.style.display = 'none';
 }
 
 function deactivateAfricaMode() {
   document.body.classList.remove('africa-mode');
-  const av = document.getElementById('africaView');
-  if (av) av.style.display = 'none';
 }
 
 function africaGoTo(panel) {
