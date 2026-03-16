@@ -1,131 +1,105 @@
 # Brief Semanal — 2026-03-15
 
 # BRIEF SEMANAL — SEMAINE 10 · 2026
-## AGT-09 Content Director · NosVers · Dordogne
+**AGT-09 Content Director | NosVers | Ferme lombricole, Dordogne**
 
 ---
 
-```
-DOCUMENTO: brief-s10-2026.md
-FECHA GENERACIÓN: Semaine 10 · 2026
-ESTADO: LISTO PARA DISTRIBUCIÓN A AGENTES
-TEMA PRINCIPAL: "El suelo compactado y la magia de recuperarlo"
-TEMPORADA: Inicio de primavera — marzo, tierra que despierta
-```
+## METADATOS DEL BRIEF
+
+| Campo | Valor |
+|---|---|
+| Semana | S10 · 2026 (02–08 marzo 2026) |
+| Generado por | AGT-09 Content Director |
+| Tema central | **Leer el suelo con los sentidos** |
+| Fuente principal | África — conocimiento directo, experiencia bancal compactado → recuperado |
+| Estacionalidad | Inicio de primavera: momento exacto en que los jardineros preparan bancales y "ven" su suelo por primera vez en el año |
+| Frase ancla | *"Deja que opere la magia"* — voz de África |
 
 ---
 
-## 🎯 TEMA DE LA SEMANA
+## TEMA DE LA SEMANA
 
-**"De suelo muerto a suelo vivo: cómo un bancal compactado se transforma"**
+### **"Tu suelo te habla. ¿Sabes escucharlo?"**
 
-### Por qué este tema, por qué ahora
+**Por qué este tema, por qué ahora:**
+Marzo = despertar del huerto. Los jardineros están en sus bancales, manos en la tierra, y se encuentran con dos realidades opuestas: suelo compactado y gris, o suelo granulado y café oscuro, vivo. África lo ha vivido en el mismo huerto. Tiene el antes y el después. Eso es oro narrativo.
 
-Estamos en la semaine 10 de 2026, inicio de marzo. En Dordogne y en toda la zona templada, el jardinero sale al huerto después del invierno y encuentra la tierra dura, gris, compactada. Es el momento exacto en que este mensaje resuena: *no es demasiado tarde, no hay que labrar, solo hay que cubrir y dejar que opere la magia.*
+El tema no es "cómo hacer compost" ni "compra lombrices". Es más profundo y más accesible: **aprender a leer el suelo con los sentidos** — olor, color, textura, absorción del agua, presencia de vida. Un conocimiento que no requiere laboratorio, solo atención.
 
-El conocimiento de África aporta algo que muy pocos contenidos tienen: **la voz de alguien que ha vivido el antes y el después en el mismo bancal.** Eso es oro. No es teoría. Es observación sensorial directa — olor, textura, color, absorción del agua.
-
----
-
-## 🧵 EJE NARRATIVO CENTRAL
-
-> *Mismo bancal. Dos estados. Una sola diferencia: dejar vivir al suelo.*
-
-El hilo conductor de todos los formatos esta semana es la **transformación visible** de un suelo compactado en un suelo granulado, café oscuro, lleno de lombrices. África lo describe con cuatro sentidos: toca el suelo, lo huele, ve el color, observa cómo absorbe el agua. Eso es nuestra ventaja comunicativa esta semana.
-
-**Palabras clave de la semana** (usar en todos los formatos):
-- `suelo compactado` / `sol compacté`
-- `vie du sol` / `vida del suelo`
-- `granulado` / `structure du sol`
-- `magie du paillage` / `magia del acolchado`
-- `carton + paille + foin`
-- `lombrics` / `lombrices`
+**Ángulo diferenciador NosVers:**
+No vendemos producto esta semana. Construimos autoridad educativa y confianza emocional. África es la voz. Las lombrices son la consecuencia natural de un suelo vivo, no el punto de partida.
 
 ---
 
-## 📸 INSTAGRAM — 5 POSTS
-
-**Agente responsable: AGT-IG**
-**Tono: cercano, sensorial, desde el huerto real**
+## INSTRUCCIONES POR AGENTE Y CANAL
 
 ---
 
-### POST 1 — Lunes · Gancho visual
-**Formato:** Carrusel 2 fotos (antes/después) o Reels 15 sec
-**Hora sugerida:** 07h30
+### 📸 INSTAGRAM — AGT-02 Social Media Manager
 
-**Concepto:**
-Foto 1: tierra gris, dura, compactada. Foto 2: tierra café oscuro, granulada, con lombrices visibles.
-Sin texto en las fotos. Todo en el caption.
+**Objetivo de la semana:** Construir una mini-serie de 5 posts que funcionen solos Y como secuencia. Hilo narrativo: del suelo muerto al suelo vivo.
+
+---
+
+**POST 1 — LUNES 02/03**
+*Formato: Carrusel 4 diapositivas*
+*Hora: 08h30*
+
+**Gancho (slide 1):**
+> "Si tu suelo parece cemento gris, no es culpa tuya. Pero sí es tu responsabilidad."
+
+**Contenido slides 2-3-4:**
+- Slide 2: Las 4 señales de un suelo enfermo (compactado, gris, sin olor, agua que no penetra)
+- Slide 3: Las 4 señales de un suelo vivo (granulado, café oscuro, olor a tierra fresca, lombrices visibles)
+- Slide 4: "El mismo bancal. Dos años de diferencia. Mismas manos."
 
 **Caption:**
-```
-Mismo bancal. Seis meses de diferencia.
+> África lo vio en su propio huerto. Un bancal que no cedía al mano. Otro donde plantar no costaba nada.
+> La diferencia no es suerte. Es observación.
+> 👉 Desliza para saber qué buscar esta primavera.
+> ¿Cómo está tu suelo hoy? Cuéntanos abajo 👇
+> #suelo #huertovivo #lombrices #permacultura #jardinería #primavera
 
-Izquierda: tierra que rechaza el agua, sin olor, sin vida.
-Derecha: tierra que huele a bosque, que absorbe, que respira.
-
-¿Qué pasó entre las dos fotos?
-
-Cartón. Paja. Tiempo. 🌱
-
-(lo que África nos enseñó esta semana ↓ guardad este post)
-
-#suelvivo #huertosinfronteras #lombrices #nosvers #paillagedordogne
-```
-
-**Instrucción de imagen:** Si no hay foto real de bancal NosVers, usar foto archivo con textura de tierra muy visible. NUNCA imagen stock genérica de jardín bonito. Debe verse suciedad, realidad.
+**Visual:** Dos fotografías lado a lado — suelo compactado gris vs suelo granulado café. Si no hay fotos reales, ilustración minimalista estilo diario de campo.
 
 ---
 
-### POST 2 — Martes · Educativo / Carrusel
-**Formato:** Carrusel 5 slides
-**Hora sugerida:** 12h00
+**POST 2 — MARTES 03/03**
+*Formato: Reel 30-45 segundos*
+*Hora: 12h00*
 
-**Concepto:** Tutorial visual "Las 4 señales de un suelo muerto"
+**Concepto:**
+África coge un puñado de tierra de cada bancal (el recuperado y uno sin trabajar). Sin hablar. Solo el sonido. Deja caer agua sobre cada uno. El espectador ve y oye la diferencia.
 
-**Slides:**
-```
-SLIDE 1 (portada):
-"¿Cómo saber si tu suelo está muerto?
-4 señales que debes buscar ahora"
+**Texto en vídeo (aparece en pantalla):**
+> "Este absorbe. Este rechaza."
+> "¿Adivinas cuál tiene vida?"
 
-SLIDE 2:
-🔸 SEÑAL 1: Color gris o marrón claro
-→ Un suelo vivo es oscuro. El humus es negro-café.
-Si ves gris: hay poco carbono, poca vida.
+**Caption:**
+> El agua no miente.
+> Un suelo vivo la absorbe en segundos. Un suelo compactado la deja correr.
+> Este test puedes hacerlo ahora mismo, en 30 segundos.
+> 🎬 Guarda este reel para cuando estés en el huerto.
+> #testdelsuelo #suelosaludable #huerto2026 #NosVers
 
-SLIDE 3:
-🔸 SEÑAL 2: El agua hace charcos
-→ La tierra compactada no deja pasar el agua.
-→ Un suelo vivo la absorbe en segundos.
-
-SLIDE 4:
-🔸 SEÑAL 3: No huele a nada (o huele mal)
-→ El suelo sano huele a bosque después de lluvia.
-→ Es el olor de los hongos, las bacterias, los actinomicetos.
-
-SLIDE 5:
-🔸 SEÑAL 4: Nada se mueve
-→ Coge un puñado. ¿Hay lombrices? ¿Insectos?
-→ Si solo ves tierra: está dormido, no muerto. Aún hay tiempo.
-
-SLIDE 6 (CTA):
-"La buena noticia:
-cubrir es suficiente para empezar.
-Cartón + paja + agua + tiempo.
-¿Tu suelo tiene alguna de estas señales?
-Cuéntanoslo 👇"
-```
+**Nota técnica para rodaje:** Luz natural, plano cenital, manos de África en primer plano. Audio ambiente (pájaros, agua). Sin música artificial.
 
 ---
 
-### POST 3 — Miércoles · Reel / Voz de África
-**Formato:** Reel 30-45 segundos
-**Hora sugerida:** 18h30
+**POST 3 — MIÉRCOLES 04/03**
+*Formato: Imagen fija + texto largo*
+*Hora: 17h00*
 
-**Concepto:** África en voz propia. Cita directa con texto animado o voz en off.
+**Visual:** Macro fotografía de tierra granulada con lombrices visibles. Estética "cuaderno naturalista".
 
-**Script del reel:**
-```
-[
+**Caption (texto largo, voz de África en primera persona):**
+> Hubo un tiempo en que mi suelo no olía a nada.
+>
+> Compacto. Gris claro. Cuando llovía, el agua se quedaba en la superficie sin saber dónde ir. Plantar era una lucha.
+>
+> Hoy ese mismo bancal huele a bosque después de lluvia. El color cambió — café oscuro, casi negro. La tierra cede sola cuando meto los dedos. Y está lleno de lombrices que no invité: vinieron solas.
+>
+> No hice nada espectacular. Cubrí. Regué. Esperé.
+>
+> "

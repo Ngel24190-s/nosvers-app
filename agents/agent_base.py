@@ -170,7 +170,7 @@ class NosVersAgent:
                          'Content-Type': 'application/json'},
                 json={'model': 'claude-sonnet-4-6', 'max_tokens': max_tokens,
                       'system': system, 'messages': [{'role': 'user', 'content': prompt}]},
-                timeout=60)
+                timeout=120)
             return r.json()['content'][0]['text']
         except Exception as e:
             self.log.error(f"Claude API error: {e}")

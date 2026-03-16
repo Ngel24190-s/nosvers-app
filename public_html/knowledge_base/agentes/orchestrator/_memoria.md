@@ -198,3 +198,106 @@ Check completado. Triggers: 1. Agentes: ['agt01_visual', 'agt02_instagram', 'agt
 *2026-03-15 19:00*
 
 Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-15 20:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-15 21:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-15 22:00*
+
+Inbox procesado: # REPORTE ORCHESTRATOR — "El Sargento"
+**2026-03-15 21:00 | NosVers Ferme Lombricole**
+
+---
+
+## DIAGNÓSTICO
+
+❌ **27 entradas en _inbox — CONTENIDO NULO**
+Rango: 2026-03-14 19:00 → 2026-03-15 21:00
+Cau
+
+---
+*2026-03-15 22:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-15 23:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 00:00*
+
+Check completado. Triggers: 1. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 01:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 02:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 03:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 04:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 05:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 06:00*
+
+Check completado. Triggers: 1. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 07:00*
+
+Check completado. Triggers: 1. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 08:00*
+
+Inbox procesado: ```json
+{
+  "orchestrator": "El Sargento",
+  "timestamp_analysis": "2026-03-16T07:00:00",
+  "status": "ALERTA",
+
+  "diagnostico": {
+    "mensajes_recibidos": 27,
+    "mensajes_con_contenido": 0,
+    "
+
+---
+*2026-03-16 08:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 09:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']
+
+---
+*2026-03-16 10:00*
+
+Check completado. Triggers: 0. Agentes: ['agt01_visual', 'agt02_instagram', 'agt04_seo', 'agt05_africa', 'agt06_infoproduct']

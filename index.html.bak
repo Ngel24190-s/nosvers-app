@@ -1524,6 +1524,12 @@ body::before {
   font-weight: 700;
   flex-shrink: 0;
 }
+.agent-spec-badge--intel    { background: rgba(88,49,150,0.12);  color: #583196; }
+.agent-spec-badge--video    { background: rgba(180,30,30,0.12);  color: #b41e1e; }
+.agent-spec-badge--social   { background: rgba(24,119,242,0.12); color: #1877f2; }
+.agent-spec-badge--strategy { background: rgba(200,80,0,0.12);   color: #c85000; }
+.agent-spec-badge--community{ background: rgba(0,150,136,0.12);  color: #009688; }
+.agent-spec-badge--analytics{ background: rgba(30,136,229,0.12); color: #1e88e5; }
 
 @media (max-width: 640px) {
   .agents-grid { grid-template-columns: 1fr; }
@@ -1696,6 +1702,40 @@ body::before {
   .harvest-grid, .feed-grid { grid-template-columns: 1fr; }
 }
 
+
+/* ==================== VISTA AFRICA ==================== */
+.africa-view { display: none; }
+body.africa-mode { --sol: #7A3A6A; --sol-mid: #9B4D8A; --sol-light: #B86FAA; --terre: #4A2040; --humus: #C87AB8; --creme: #FDF5FB; --sable: #F0E0ED; --blanc: #FFF8FD; }
+body.africa-mode .nav-tabs, body.africa-mode .header, body.africa-mode .motto-band { display: none; }
+.africa-header { background: linear-gradient(135deg, #7A3A6A 0%, #9B4D8A 100%); color: white; padding: 1.5rem; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 1.5rem; }
+.africa-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.3rem; }
+.africa-header p { opacity: 0.85; font-size: 0.95rem; }
+.africa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0 1rem; max-width: 500px; margin: 0 auto; }
+.africa-btn { background: white; border: 2px solid #E8D0E4; border-radius: 16px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease; font-family: 'Space Grotesk', sans-serif; }
+.africa-btn:hover { border-color: #7A3A6A; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(122,58,106,0.15); }
+.africa-btn .africa-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.africa-btn .africa-label { font-size: 1rem; font-weight: 600; color: #4A2040; }
+.africa-btn .africa-desc { font-size: 0.8rem; color: #8B6E85; margin-top: 0.3rem; }
+.africa-chat-panel { display: none; max-width: 500px; margin: 1rem auto; padding: 0 1rem; }
+.africa-chat-panel.visible { display: block; }
+.africa-chat-messages { background: white; border-radius: 16px; padding: 1rem; min-height: 200px; max-height: 400px; overflow-y: auto; margin-bottom: 1rem; border: 1px solid #E8D0E4; }
+.africa-chat-input-wrap { display: flex; gap: 0.5rem; }
+.africa-chat-input { flex: 1; padding: 0.8rem 1rem; border: 2px solid #E8D0E4; border-radius: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; outline: none; }
+.africa-chat-input:focus { border-color: #7A3A6A; }
+.africa-chat-send { background: #7A3A6A; color: white; border: none; border-radius: 12px; padding: 0.8rem 1.2rem; cursor: pointer; font-size: 1.1rem; }
+.africa-msg { padding: 0.6rem 0; border-bottom: 1px solid #F0E0ED; }
+.africa-msg:last-child { border: none; }
+.africa-msg.user { text-align: right; }
+.africa-msg.user .msg-bubble { background: #F0E0ED; display: inline-block; padding: 0.5rem 1rem; border-radius: 12px; }
+.africa-msg.assistant .msg-bubble { background: #FDF5FB; display: inline-block; padding: 0.5rem 1rem; border-radius: 12px; }
+.africa-back { display: block; margin: 1rem auto; background: none; border: none; color: #7A3A6A; font-size: 1rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif; }
+.africa-photo-section { display: none; max-width: 500px; margin: 1rem auto; padding: 0 1rem; }
+.africa-photo-section.visible { display: block; }
+.africa-photo-btn { width: 100%; background: linear-gradient(135deg, #7A3A6A, #9B4D8A); color: white; border: none; border-radius: 16px; padding: 1.5rem; font-size: 1.1rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif; margin-bottom: 1rem; }
+.africa-photo-gallery { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+.africa-photo-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+.africa-logout { display: block; margin: 2rem auto 1rem; background: none; border: 2px solid #E8D0E4; color: #7A3A6A; padding: 0.6rem 2rem; border-radius: 12px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; }
+
 </style>
 </head>
 <body>
@@ -1718,6 +1758,45 @@ body::before {
 
 <div class="login-user-badge" id="userBadge" style="display:none" onclick="logout()">
   👤 <span id="userBadgeName"></span> · Salir
+</div>
+
+
+<!-- ===================== VISTA AFRICA ===================== -->
+<div class="africa-view" id="africaView">
+  <div class="africa-header"><h1>NosVers</h1><p>Bienvenue Africa</p></div>
+  <div id="africaMain">
+    <div class="africa-grid">
+      <div class="africa-btn" onclick="africaGoTo('journal')"><div class="africa-icon">📔</div><div class="africa-label">Journal</div><div class="africa-desc">Notes du jour</div></div>
+      <div class="africa-btn" onclick="africaGoTo('chat')"><div class="africa-icon">💬</div><div class="africa-label">Assistant</div><div class="africa-desc">Poser une question</div></div>
+      <div class="africa-btn" onclick="africaGoTo('photos')"><div class="africa-icon">📷</div><div class="africa-label">Photos</div><div class="africa-desc">Capturer</div></div>
+      <div class="africa-btn" onclick="africaGoTo('meteo')"><div class="africa-icon">🌤️</div><div class="africa-label">Météo</div><div class="africa-desc">Prévisions</div></div>
+    </div>
+  </div>
+  <div class="africa-chat-panel" id="africaChatPanel">
+    <button class="africa-back" onclick="africaBack()">← Retour</button>
+    <div class="africa-chat-messages" id="africaChatMessages"></div>
+    <div class="africa-chat-input-wrap">
+      <input class="africa-chat-input" id="africaChatInput" placeholder="Pose ta question..." onkeydown="if(event.key==='Enter') africaSendChat()">
+      <button class="africa-chat-send" onclick="africaSendChat()">➤</button>
+    </div>
+  </div>
+  <div class="africa-photo-section" id="africaPhotoSection">
+    <button class="africa-back" onclick="africaBack()">← Retour</button>
+    <input type="file" accept="image/*" capture="environment" id="africaPhotoInput" style="display:none" onchange="africaHandlePhoto(this)">
+    <button class="africa-photo-btn" onclick="document.getElementById('africaPhotoInput').click()">📷 Prendre une photo</button>
+    <div class="africa-photo-gallery" id="africaPhotoGallery"></div>
+  </div>
+  <div class="africa-chat-panel" id="africaJournalPanel">
+    <button class="africa-back" onclick="africaBack()">← Retour</button>
+    <textarea id="africaJournalText" placeholder="Notes du jour..." style="width:100%;min-height:150px;border:2px solid #E8D0E4;border-radius:12px;padding:1rem;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;resize:vertical;outline:none;"></textarea>
+    <button class="africa-photo-btn" style="margin-top:0.5rem" onclick="africaSaveJournal()">💾 Sauvegarder</button>
+    <div id="africaJournalHistory" style="margin-top:1rem;"></div>
+  </div>
+  <div class="africa-chat-panel" id="africaMeteoPanel">
+    <button class="africa-back" onclick="africaBack()">← Retour</button>
+    <div id="africaMeteoContent" style="background:white;border-radius:16px;padding:1.5rem;border:1px solid #E8D0E4;"><p style="text-align:center;color:#8B6E85">Chargement...</p></div>
+  </div>
+  <button class="africa-logout" onclick="logout()">Déconnexion</button>
 </div>
 
 <div class="motto-band">« Une passion pour le sol, un engagement pour la vie »</div>
@@ -1947,6 +2026,54 @@ body::before {
         <div class="agent-spec-desc">Cultivos · JADAM · Rotaciones</div>
       </div>
       <div class="agent-spec-badge">Conseil</div>
+    </div>
+    <div class="agent-specialist" id="card-intelligence" onclick="selectAgent('intelligence')">
+      <div class="agent-spec-icon">🧠</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-00 Intelligence</div>
+        <div class="agent-spec-desc">Veille stratégique & marché</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--intel">Analyse</div>
+    </div>
+    <div class="agent-specialist" id="card-youtube" onclick="selectAgent('youtube')">
+      <div class="agent-spec-icon">🎬</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-07 YouTube</div>
+        <div class="agent-spec-desc">Contenu vidéo & tutoriels</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--video">Vidéo</div>
+    </div>
+    <div class="agent-specialist" id="card-facebook" onclick="selectAgent('facebook')">
+      <div class="agent-spec-icon">📘</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-08 Facebook</div>
+        <div class="agent-spec-desc">Communauté & partage</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--social">Social</div>
+    </div>
+    <div class="agent-specialist" id="card-content" onclick="selectAgent('content')">
+      <div class="agent-spec-icon">🎯</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-09 Content Director</div>
+        <div class="agent-spec-desc">Stratégie éditoriale</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--strategy">Stratégie</div>
+    </div>
+    <div class="agent-specialist" id="card-community" onclick="selectAgent('community')">
+      <div class="agent-spec-icon">💬</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-10 Community</div>
+        <div class="agent-spec-desc">Engagement & réponses</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--community">Engage</div>
+    </div>
+    <div class="agent-specialist" id="card-analytics" onclick="selectAgent('analytics')">
+      <div class="agent-spec-icon">📊</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">AGT-11 Analytics</div>
+        <div class="agent-spec-desc">Métriques & rapports</div>
+      </div>
+      <div class="agent-spec-badge agent-spec-badge--analytics">Données</div>
     </div>
   </div>
 
@@ -2691,7 +2818,8 @@ async function doLogin() {
       const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
       const ub = document.getElementById('userBadge'); if(ub) ub.style.display = 'block';
       const un = document.getElementById('userBadgeName'); if(un) un.textContent = data.user;
-      initApp();
+      const isAfrica = data.user === 'africa';
+      if (isAfrica) { activateAfricaMode(); } else { deactivateAfricaMode(); initApp(); }
       setTimeout(() => {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -2709,6 +2837,7 @@ async function doLogin() {
 }
 
 function logout() {
+  deactivateAfricaMode();
   sessionStorage.removeItem('nv_token');
   sessionStorage.removeItem('nv_user');
   const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'flex';
@@ -2759,7 +2888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
     const ub3 = document.getElementById('userBadge'); if(ub3) ub3.style.display = 'block';
     const ubn = document.getElementById('userBadgeName'); if(ubn) ubn.textContent = user;
-    initApp();
+    if (user === 'africa') { activateAfricaMode(); } else { deactivateAfricaMode(); initApp(); }
     // Start on director tab
     setTimeout(() => {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -2817,6 +2946,16 @@ function callAgent(domain) {
     lastResp = text;
     currentMode = prevMode;
     if (respBody) respBody.textContent = text;
+    // Auto-save to vault if photo was attached (useful for Instagram posts)
+    if (currentPhotoBase64 && text && text.length > 50) {
+      const fecha = new Date().toISOString().split('T')[0];
+      api('vault_write', {
+        category: 'agentes',
+        filename: 'agt02-posts-pendientes',
+        content: '\n\n## ' + fecha + ' — Post generado desde foto (' + domain + ')\n\n' + text,
+        mode: 'append'
+      }).catch(e => console.warn('Vault save error:', e));
+    }
     if (card) card.classList.remove('loading');
     if (btnQ) btnQ.disabled = false;
     if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2930,7 +3069,84 @@ Calendar biodinámico: indicar tipo de día (raíz/flor/fruto/hoja) según Marí
 Sintropía: integrar plantas de distintos estratos, plantas pioneras preparando para plantas productoras.
 Square foot garden: densidad optimizada en bancales de 1,2m, acceso sin pisar.
 Productos NosVers: kit "Commence ton jardin" (semences maison + lombricompost + conseils África).
-Responde siempre en ESPAÑOL. Directo, práctico, con base científica y espíritu de granja real.`
+Responde siempre en ESPAÑOL. Directo, práctico, con base científica y espíritu de granja real.`,
+
+    intelligence: `Tu es l'agent AGT-00 Intelligence de NosVers, ferme agroécologique en Dordogne.
+Ta mission : veille stratégique, analyse de marché et intelligence concurrentielle pour faire croître NosVers.
+DOMAINES DE VEILLE :
+- Marché du lombricompost et amendements biologiques en France et Europe : prix, acteurs, tendances.
+- Concurrents directs (fermes pédagogiques, vente de lombricompost, ateliers "sol vivant").
+- Opportunités de financement : aides PAC, subventions région Nouvelle-Aquitaine, appels à projets agroécologie.
+- Tendances consommateurs : jardinage urbain, permaculture, alimentation vivante, circuits courts.
+- Veille réglementaire : normes bio AB, certification HVE, GDPR pour e-commerce, étiquetage produits.
+PHILOSOPHIE NOSVERS :
+NosVers incarne une agriculture régénératrice, autonome et éducative. Chaque analyse doit évaluer la cohérence avec les valeurs : autonomie des intrants, zéro déchet, pédagogie, lien direct producteur-consommateur.
+Fournis des analyses structurées avec données chiffrées quand disponibles, sources citées, et recommandations actionnables pour Angel (CEO). Réponds en français. Sois synthétique et orienté décision.`,
+
+    youtube: `Tu es l'agent AGT-07 YouTube de NosVers, ferme agroécologique en Dordogne.
+Ta mission : créer et optimiser le contenu vidéo pour la chaîne YouTube NosVers.
+STRATÉGIE CONTENU VIDÉO :
+- Formats : tutoriels pratiques (lombricompostage, JADAM, semis), vlogs de la ferme, séries thématiques, shorts viraux.
+- SEO YouTube : titres avec mots-clés (lombricompost, vermicompost, agriculture régénératrice), descriptions optimisées, tags pertinents, miniatures à fort taux de clic.
+- Calendrier éditorial : aligner sur les saisons agricoles (semis en mars, récolte en septembre), événements (Ateliers Sol Vivant).
+- Narration NosVers : montrer la réalité brute de la ferme, l'apprentissage par l'erreur, la philosophie de suelo vivo. Angel en tant que protagoniste authentique.
+- Monétisation : appels à l'action vers boutique (lombricompost, kits), ateliers, Patreon potentiel.
+PHILOSOPHIE NOSVERS :
+Authenticité avant tout. Pas de greenwashing. Montrer le vrai travail, les vrais animaux, les vraies galères. Le spectateur doit apprendre quelque chose d'actionnable dans chaque vidéo.
+Propose des scripts, idées de titres, plans de tournage et stratégies de croissance. Réponds en français.`,
+
+    facebook: `Tu es l'agent AGT-08 Facebook de NosVers, ferme agroécologique en Dordogne.
+Ta mission : développer la communauté Facebook de NosVers et gérer la présence sur ce réseau.
+STRATÉGIE FACEBOOK :
+- Page NosVers : publications quotidiennes ou bi-hebdomadaires, mélange de contenu éducatif, coulisses de la ferme, produits disponibles.
+- Groupes : animer "Lombricompost & Sol Vivant" ou rejoindre des groupes de jardinage/permaculture pour partager l'expertise NosVers.
+- Facebook Marketplace : vente locale de lombricompost, lombrices, plants.
+- Publicité Facebook Ads : cibler jardiniers amateurs, agriculteurs bio, familles avec jardin dans un rayon de 100km autour de la Dordogne.
+- Events : promouvoir les ateliers et journées portes ouvertes via Facebook Events.
+- Formats : Reels (même contenu qu'Instagram/YouTube Shorts), posts texte engageants, albums photos des saisons.
+PHILOSOPHIE NOSVERS :
+Communauté avant vente. Donner de la valeur gratuitement (conseils, partages). La vente vient naturellement quand la confiance est établie. Authenticité et proximité humaine.
+Propose des posts prêts à publier, stratégies de croissance et idées de campagnes. Réponds en français.`,
+
+    content: `Tu es l'agent AGT-09 Content Director de NosVers, ferme agroécologique en Dordogne.
+Ta mission : définir et coordonner la stratégie éditoriale globale de NosVers sur tous les canaux.
+RÔLE ÉDITORIAL :
+- Calendrier de contenu transversal : coordonner blog WordPress, YouTube, Facebook, Instagram, newsletter.
+- Piliers de contenu NosVers : (1) Éducation technique (JADAM, lombricompostage, semis), (2) Vie de la ferme (récits, animaux, saisons), (3) Produits & services (vente, ateliers), (4) Communauté (témoignages, Q&R).
+- Cohérence de marque : ton authentique, vocabulaire agroécologique, identité visuelle verte/terre.
+- Recyclage de contenu : une vidéo YouTube → article de blog → posts réseaux sociaux → newsletter.
+- Planning éditorial mensuel : thèmes, dates clés agricoles, campagnes produits.
+- SEO global : mots-clés prioritaires (lombricompost, vermiculture, agriculture régénératrice France, atelier sol vivant Dordogne).
+PHILOSOPHIE NOSVERS :
+Chaque contenu doit servir à la fois à éduquer, à créer du lien avec la communauté et à soutenir l'économie de la ferme. Qualité sur quantité. Cohérence sur inspiration du moment.
+Fournis des plannings, stratégies et recommandations éditorielles actionnables. Réponds en français.`,
+
+    community: `Tu es l'agent AGT-10 Community de NosVers, ferme agroécologique en Dordogne.
+Ta mission : gérer l'engagement communautaire, répondre aux messages et fidéliser l'audience de NosVers.
+GESTION COMMUNAUTAIRE :
+- Réponses aux commentaires : YouTube, Facebook, Instagram — rapides, chaleureux, avec valeur ajoutée technique.
+- Gestion des DMs : demandes de renseignements (produits, ateliers, livraison), transformer en ventes ou inscriptions.
+- Modération : bienveillance sans complaisance, cadrer les débats hors-sujet, remercier les contributeurs.
+- Fidélisation : identifier les membres actifs, les valoriser (partages, mentions), créer un sentiment d'appartenance.
+- FAQ dynamique : compiler les questions fréquentes pour alimenter le blog et les vidéos.
+- Gestion des avis négatifs : répondre avec empathie, proposer une solution concrète, transformer en opportunité.
+PHILOSOPHIE NOSVERS :
+Chaque personne qui écrit à NosVers mérite une réponse humaine et utile. La communauté est le cœur du projet. Un client satisfait est le meilleur ambassadeur. Écouter avant de répondre.
+Propose des réponses types, scripts de gestion de crise et stratégies d'engagement. Réponds en français.`,
+
+    analytics: `Tu es l'agent AGT-11 Analytics de NosVers, ferme agroécologique en Dordogne.
+Ta mission : analyser les métriques digitales et de la ferme pour orienter les décisions stratégiques d'Angel.
+MÉTRIQUES SUIVIES :
+- Web & SEO : trafic WordPress (Google Analytics), positions mots-clés (Search Console), taux de conversion boutique.
+- YouTube : vues, watch time, abonnés, revenus AdSense potentiels, meilleur contenu par engagement.
+- Réseaux sociaux : portée, engagement rate, croissance abonnés, meilleurs horaires de publication.
+- Ventes : CA mensuel lombricompost/lombrices/kits/ateliers, panier moyen, clients récurrents.
+- Ferme : production lombricompost (kg/mois), consommation intrants, ratio coût/production.
+RAPPORTS :
+Format synthétique : KPIs semaine/mois, tendances, alertes (baisse trafic, perte abonnés), recommandations actionnables. Toujours relier les données digitales aux réalités physiques de la ferme.
+PHILOSOPHIE NOSVERS :
+Les données sont au service du projet, pas l'inverse. Mesurer ce qui compte vraiment : impact éducatif, autonomie économique, santé du sol. Ne pas optimiser pour optimiser — optimiser pour la mission.
+Fournis des analyses claires avec graphiques textuels si pertinent, et recommandations prioritaires. Réponds en français.`
   };
 
   // ── USER MESSAGE según modo ───────────────────────────────────
@@ -2957,7 +3173,11 @@ Modo CONSEJO/DIAGNOSTICO: responde como un experto asesor de campo con la filoso
   }
 
   // Search knowledge base for relevant context
-  const kbCategory = { vers: 'lombricultura', compost: 'jadam', animaux: null, huerto: 'latanina' }[domain];
+  const kbCategory = {
+    vers: 'lombricultura', compost: 'jadam', animaux: null, huerto: 'latanina',
+    intelligence: null, youtube: null, facebook: null,
+    content: null, community: null, analytics: null
+  }[domain];
   const kbResults = await searchKB(extras || userMsg.substring(0, 200), kbCategory);
   const kbContext = formatKBContext(kbResults);
   
@@ -3459,6 +3679,9 @@ function handlePhotoHuerto(input) {
     if (wrap) wrap.classList.add('visible');
     if (btn) btn.classList.add('has-photo');
     if (lbl) lbl.textContent = '📷 ' + file.name.substring(0, 25);
+    // Auto-save huerto photo
+    const user = sessionStorage.getItem('nv_user') || 'unknown';
+    api('upload_photo', { image: huertoPhotoBase64, type: huertoPhotoType, user: user, note: 'Huerto: ' + file.name }).catch(err => console.warn(err));
   };
   reader.readAsDataURL(file);
 }
@@ -3890,9 +4113,23 @@ function selectAgent(domain) {
   const btnQ = document.getElementById('btnQuery');
   if (btnQ) btnQ.disabled = false;
 
-  const labels = { vers: 'Especialista Lombricompost', compost: 'Especialista Compost', animaux: 'Especialista Animaux', huerto: 'Especialista Potager' };
-  const colors = { vers: '#6b3a2a', compost: '#c45c00', animaux: '#7b3f00', huerto: '#2e6b30' };
-  const icons = { vers: '🪱', compost: '🍂', animaux: '🐓', huerto: '🌿' };
+  const labels = {
+    vers: 'Especialista Lombricompost', compost: 'Especialista Compost',
+    animaux: 'Especialista Animaux', huerto: 'Especialista Potager',
+    intelligence: 'AGT-00 Intelligence', youtube: 'AGT-07 YouTube',
+    facebook: 'AGT-08 Facebook', content: 'AGT-09 Content Director',
+    community: 'AGT-10 Community', analytics: 'AGT-11 Analytics'
+  };
+  const colors = {
+    vers: '#6b3a2a', compost: '#c45c00', animaux: '#7b3f00', huerto: '#2e6b30',
+    intelligence: '#583196', youtube: '#b41e1e', facebook: '#1877f2',
+    content: '#c85000', community: '#009688', analytics: '#1e88e5'
+  };
+  const icons = {
+    vers: '🪱', compost: '🍂', animaux: '🐓', huerto: '🌿',
+    intelligence: '🧠', youtube: '🎬', facebook: '📘',
+    content: '🎯', community: '💬', analytics: '📊'
+  };
   const col = colors[domain] || '#666';
   const domEl = document.getElementById('respDomain');
   if (domEl) domEl.innerHTML = `<span class="resp-domain-dot" style="background:${col}"></span> ${icons[domain]} ${labels[domain]}`;
@@ -3956,6 +4193,11 @@ function handlePhoto(input) {
     if (wrap) wrap.classList.add('visible');
     if (btn) btn.classList.add('has-photo');
     if (lbl) lbl.textContent = '📷 ' + file.name.substring(0, 25);
+    // Auto-save photo to server
+    const user = sessionStorage.getItem('nv_user') || 'unknown';
+    api('upload_photo', { image: currentPhotoBase64, type: currentPhotoType, user: user, note: file.name }).then(() => {
+      if (lbl) lbl.textContent = '📷 ✓ ' + file.name.substring(0, 22);
+    }).catch(err => console.warn('Photo save error:', err));
   };
   reader.readAsDataURL(file);
 }
@@ -4091,6 +4333,142 @@ function saveEggEntry() {
   if (document.getElementById('hw-eat')) document.getElementById('hw-eat').textContent = totalEat;
   if (document.getElementById('hw-stock')) document.getElementById('hw-stock').textContent = newStock;
   closeNvModal('modal-huevos');
+}
+
+
+// ==================== VISTA AFRICA ====================
+let africaChatHistory = [];
+
+function activateAfricaMode() {
+  document.body.classList.add('africa-mode');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const av = document.getElementById('africaView');
+  if (av) av.style.display = 'block';
+  const ub = document.getElementById('userBadge');
+  if (ub) ub.style.display = 'none';
+  africaLoadMeteo();
+}
+
+function deactivateAfricaMode() {
+  document.body.classList.remove('africa-mode');
+  const av = document.getElementById('africaView');
+  if (av) av.style.display = 'none';
+}
+
+function africaGoTo(panel) {
+  document.getElementById('africaMain').style.display = 'none';
+  ['africaChatPanel','africaPhotoSection','africaJournalPanel','africaMeteoPanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const map = {chat:'africaChatPanel', photos:'africaPhotoSection', journal:'africaJournalPanel', meteo:'africaMeteoPanel'};
+  const el = document.getElementById(map[panel]);
+  if (el) el.classList.add('visible');
+  if (panel === 'journal') africaLoadJournal();
+  if (panel === 'meteo') africaLoadMeteo();
+}
+
+function africaBack() {
+  document.getElementById('africaMain').style.display = 'block';
+  ['africaChatPanel','africaPhotoSection','africaJournalPanel','africaMeteoPanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+}
+
+async function africaSendChat() {
+  const input = document.getElementById('africaChatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  const msgs = document.getElementById('africaChatMessages');
+  msgs.innerHTML += '<div class="africa-msg user"><div class="msg-bubble">' + msg.replace(/</g,'&lt;') + '</div></div>';
+  msgs.innerHTML += '<div class="africa-msg assistant" id="africaTyping"><div class="msg-bubble">Je reflechis...</div></div>';
+  msgs.scrollTop = msgs.scrollHeight;
+  africaChatHistory.push({role: 'user', content: msg});
+  try {
+    const r = await api('claude', {
+      system: "Tu es l'assistant IA de la ferme NosVers en Dordogne. Tu reponds TOUJOURS en francais, de maniere simple et pratique. Tu aides Africa avec la gestion quotidienne: potager, animaux, compost, lombricompost. Sois concis et utile.",
+      messages: africaChatHistory,
+      prompt: msg
+    });
+    const text = r?.content?.[0]?.text || 'Desole, erreur de connexion.';
+    africaChatHistory.push({role: 'assistant', content: text});
+    const typing = document.getElementById('africaTyping');
+    if (typing) typing.outerHTML = '<div class="africa-msg assistant"><div class="msg-bubble">' + text.replace(/\n/g,'<br>') + '</div></div>';
+  } catch(e) {
+    const typing = document.getElementById('africaTyping');
+    if (typing) typing.outerHTML = '<div class="africa-msg assistant"><div class="msg-bubble">Erreur: ' + e.message + '</div></div>';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function africaHandlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    const base64 = dataUrl.split(',')[1];
+    const gallery = document.getElementById('africaPhotoGallery');
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    gallery.prepend(img);
+    try {
+      await api('upload_photo', { image: base64, type: file.type || 'image/jpeg', user: 'africa', note: 'Photo ferme ' + new Date().toLocaleDateString('fr-FR') });
+    } catch(err) { console.warn('Photo save error:', err); }
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+async function africaSaveJournal() {
+  const text = document.getElementById('africaJournalText').value.trim();
+  if (!text) return;
+  try {
+    await api('journal_add', { domain: 'africa', action: text, completed: 1 });
+    document.getElementById('africaJournalText').value = '';
+    africaLoadJournal();
+  } catch(e) { alert('Erreur: ' + e.message); }
+}
+
+async function africaLoadJournal() {
+  try {
+    const entries = await api('journal_get');
+    const ae = (entries || []).filter(e => e.domain === 'africa').slice(0, 20);
+    const el = document.getElementById('africaJournalHistory');
+    if (!el) return;
+    if (!ae.length) { el.innerHTML = '<p style="color:#8B6E85;text-align:center">Pas encore de notes</p>'; return; }
+    el.innerHTML = ae.map(e =>
+      '<div style="background:white;border-radius:12px;padding:0.8rem 1rem;margin-bottom:0.5rem;border:1px solid #E8D0E4">' +
+      '<div style="font-size:0.8rem;color:#8B6E85">' + new Date(e.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) + '</div>' +
+      '<div style="margin-top:0.3rem">' + (e.action||'').replace(/</g,'&lt;') + '</div></div>'
+    ).join('');
+  } catch(e) { console.warn(e); }
+}
+
+async function africaLoadMeteo() {
+  const el = document.getElementById('africaMeteoContent');
+  if (!el) return;
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=44.86&longitude=0.72&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=Europe/Paris&forecast_days=5');
+    const data = await r.json();
+    if (!data.daily) { el.innerHTML = '<p>Donnees meteo indisponibles</p>'; return; }
+    const codes = {0:'\u2600\uFE0F',1:'\u26C5',2:'\u26C5',3:'\u2601\uFE0F',51:'\uD83C\uDF26',61:'\uD83C\uDF27',80:'\uD83C\uDF26',95:'\u26C8'};
+    const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    let h = '<h3 style="margin-bottom:1rem;color:#4A2040">Meteo Dordogne</h3>';
+    for (let i = 0; i < data.daily.time.length; i++) {
+      const d = new Date(data.daily.time[i]);
+      const tmax = Math.round(data.daily.temperature_2m_max[i]);
+      const tmin = Math.round(data.daily.temperature_2m_min[i]);
+      const rain = data.daily.precipitation_sum[i];
+      h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F0E0ED">';
+      h += '<span style="font-weight:600;width:40px">' + days[d.getDay()] + '</span>';
+      h += '<span style="color:#4A2040"><b>' + tmax + '</b> / ' + tmin + '</span>';
+      h += '<span style="color:#8B6E85;font-size:0.85rem">' + rain + 'mm</span></div>';
+    }
+    el.innerHTML = h;
+  } catch(e) { el.innerHTML = '<p style="color:red">Erreur meteo</p>'; }
 }
 
 </script>

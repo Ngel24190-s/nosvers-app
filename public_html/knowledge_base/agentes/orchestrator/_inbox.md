@@ -1,4 +1,49 @@
 # _inbox
+*Creado: 2026-03-16 10:00*
+
+# _inbox
+*Creado: 2026-03-16 09:00*
+
+# _inbox
+*Creado: 2026-03-16 08:00*
+
+# _inbox
+*Creado: 2026-03-16 07:00*
+
+# _inbox
+*Creado: 2026-03-16 06:00*
+
+# _inbox
+*Creado: 2026-03-16 05:00*
+
+# _inbox
+*Creado: 2026-03-16 04:00*
+
+# _inbox
+*Creado: 2026-03-16 03:00*
+
+# _inbox
+*Creado: 2026-03-16 02:00*
+
+# _inbox
+*Creado: 2026-03-16 01:00*
+
+# _inbox
+*Creado: 2026-03-16 00:00*
+
+# _inbox
+*Creado: 2026-03-15 23:00*
+
+# _inbox
+*Creado: 2026-03-15 22:00*
+
+# _inbox
+*Creado: 2026-03-15 21:00*
+
+# _inbox
+*Creado: 2026-03-15 20:00*
+
+# _inbox
 *Creado: 2026-03-15 19:00*
 
 # _inbox
@@ -143,3 +188,57 @@ AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.
 AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.
 
 *Estado: PROCESADO 2026-03-15 11:00*
+
+---
+*2026-03-15 21:37*
+
+## [2026-03-15 21:36] DE: agt02_instagram → PARA: orchestrator
+**Asunto:** ERROR generando posts
+**Prioridad:** alta
+
+AGT-02 falló al generar posts. Verificar ANTHROPIC_API_KEY.
+
+*Estado: PROCESADO 2026-03-15 22:00*
+
+---
+*2026-03-15 21:40*
+
+## [2026-03-15 21:39] DE: agt02_instagram → PARA: orchestrator
+**Asunto:** Posts listos para aprobación
+**Prioridad:** normal
+
+5 posts semana 11 generados y guardados en vault.
+agentes/agt02_instagram/_resultado.md
+
+Para aprobar un post: cambia STATUS: PENDING_APPROVAL → STATUS: APPROVED
+Para publicar los aprobados: python3 agt02_instagram.py --publish
+
+*Estado: PROCESADO 2026-03-15 22:00*
+
+---
+*2026-03-16 07:01*
+
+## [2026-03-16 07:00] DE: agt04_seo → PARA: orchestrator
+**Asunto:** Artículo SEO listo — semana 12
+**Prioridad:** normal
+
+Borrador creado en WordPress.
+Tema: LombriThé — protocole complet et science derrière
+Post ID: 517
+Pendiente aprobación de Angel.
+
+*Estado: PROCESADO 2026-03-16 08:00*
+
+---
+*2026-03-16 07:01*
+
+## [2026-03-16 07:00] DE: agt04_seo → PARA: orchestrator
+**Asunto:** Artículo SEO listo — semana 12
+**Prioridad:** normal
+
+Borrador creado en WordPress.
+Tema: LombriThé — protocole complet et science derrière
+Post ID: 518
+Pendiente aprobación de Angel.
+
+*Estado: PROCESADO 2026-03-16 08:00*

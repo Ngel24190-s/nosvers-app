@@ -1,45 +1,43 @@
 # Post Facebook — 2026-03-15
 
-# Facebook — Post Espárrago Adapté
-*AGT-08 · Basé sur post Instagram 2026-03-14*
+# Post Facebook — Asperge · NosVers
+*Adapté pour Facebook · Audience 40-65 ans · Jardiniers France*
 
 ---
 
-## VERSION FACEBOOK
+## 📝 TEXTE DU POST
 
 ---
 
-🌱 **Les premières pointes d'asperge sont sorties ce matin au jardin**
+🌱 **Le sol se réveille avant nous — et ce matin, il nous a fait un beau cadeau.**
 
-Ce matin, en faisant sa ronde habituelle, África a découvert les premières pointes d'asperge qui perçaient la terre. Un de ces petits moments qui font tout le plaisir du jardinage.
+Ce matin, en passant dans le jardin, África a vu sortir les premières pointes d'asperge. Discrètes, presque timides, mais bien là.
 
-Ça nous a donné envie de vous partager quelque chose d'important : **quand le sol est vivant, il vous parle. Il suffit d'apprendre à l'écouter.**
-
----
-
-**🌿 L'asperge, une plante qui récompense la patience**
-
-Si vous n'avez jamais cultivé d'asperges, voici ce qu'il faut savoir :
-
-- La première année, on plante les griffes (les racines) et on laisse pousser sans récolter
-- La deuxième année, on continue à laisser la plante se renforcer
-- **C'est seulement à partir de la troisième année qu'on peut commencer à récolter**
-
-En échange de cette patience, l'asperge vous offre **15 à 20 ans de production** au même endroit. C'est un vrai investissement à long terme dans votre jardin.
+C'est un de ces moments qui rappellent pourquoi on jardine.
 
 ---
 
-**🪱 Le rôle du sol dans tout ça**
+**🌿 Quelques mots sur l'asperge, pour ceux qui voudraient se lancer :**
 
-Le nôtre a été amendé depuis deux ans avec notre lombricompost. Et ce qu'on voit aujourd'hui — ces pointes qui sortent tôt, vigoureuses, bien formées — c'est le résultat direct d'un sol qui a appris à respirer.
+L'asperge est une plante particulière — elle demande de la patience, mais elle vous le rend au centuple.
 
-Un sol vivant, c'est un sol peuplé de micro-organismes, de champignons, de vers de terre. Tous ces êtres travaillent ensemble pour :
+- **Année 1 et 2 :** on ne récolte pas. On laisse la plante s'installer, développer ses racines, construire sa force.
+- **Année 3 :** les premières récoltes arrivent. Modestes, mais réelles.
+- **Années 4 à 20 :** une production régulière, chaque printemps, sans replanter. Une fois bien établie, une aspergerie peut durer **15 à 20 ans**.
 
-✅ Décomposer la matière organique et libérer les nutriments
-✅ Améliorer la structure du sol (moins compact, mieux drainé)
-✅ Renforcer naturellement les plantes contre les maladies
+C'est une culture de long terme — exactement le type de projet qui convient à un jardin qu'on construit dans la durée.
 
-**Le lombricompost, c'est exactement ce qui nourrit cet écosystème.** Ce n'est pas un engrais chimique qui force la croissance — c'est un amendement naturel qui construit la fertilité sur le long
+---
+
+**🪱 Ce qu'on voit aujourd'hui, c'est le résultat de deux ans de travail sur le sol.**
+
+Nous amendons notre terre depuis 2024 avec notre lombricompost maison. Pas des engrais chimiques, pas de recettes miracles — juste un sol qu'on nourrit régulièrement avec de la matière organique vivante.
+
+Le lombricompost, c'est le travail des vers de terre : ils transforment les déchets organiques en un amendement extraordinairement riche, plein de micro-organismes bénéfiques, d'enzymes et d'éléments nutritifs immédiatement assimilables par les plantes.
+
+Un sol vivant, ça se construit. Ça ne s'achète pas en un sac. Mais les résultats, eux, finissent par se voir — exactement comme ces pointes d'asperge ce matin.
+
+**C'est ça, le sol
 
 ## Grupos para compartir
 - Jardinage biologique France
