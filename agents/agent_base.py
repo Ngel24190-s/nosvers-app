@@ -197,6 +197,38 @@ class NosVersAgent:
         """
         return []
 
+    # ── ALIAS METHODS (compatibilidad nuevos agentes) ──────
+    def message_agent(self, to_agent: str, body: str, priority: str = 'normal'):
+        """Alias simplificado de send_message para los nuevos agentes."""
+        subject = body[:60].split('\n')[0].strip()
+        self.send_message(to_agent, subject, body, priority)
+
+    def notify_telegram(self, msg: str):
+        """Alias de notify() para los nuevos agentes."""
+        self.notify(msg)
+
+    def call_claude(self, prompt: str, max_tokens: int = 500) -> str:
+        """Llamar a Claude API directamente."""
+        import requests as req
+        headers = {
+            'x-api-key': CLAUDE_KEY,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json'
+        }
+        payload = {
+            'model': 'claude-opus-4-6',
+            'max_tokens': max_tokens,
+            'messages': [{'role': 'user', 'content': prompt}]
+        }
+        try:
+            r = req.post('https://api.anthropic.com/v1/messages',
+                        json=payload, headers=headers, timeout=60)
+            data = r.json()
+            return data.get('content', [{}])[0].get('text', 'Error API')
+        except Exception as e:
+            self.log.error(f"Claude API error: {e}")
+            return f"Error: {e}"
+
     def run(self):
         """
         Método principal. Sobrescribir en cada agente.

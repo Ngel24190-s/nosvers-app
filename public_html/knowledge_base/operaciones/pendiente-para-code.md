@@ -682,3 +682,111 @@ Incluye: index.html con HQ Angel + vista África + 6 agentes python + pipeline i
 
 ---
 *Angel fuera — 2026-03-15*
+
+
+---
+*2026-03-16 10:21*
+
+
+## URGENTE — Fix versión móvil de la app granja
+
+Angel dice que la versión móvil no se ve bien.
+
+### Diagnóstico
+- La app tiene sidebar nav de 240px que en móvil se oculta ✅
+- Pero varios elementos tienen anchos que pueden desbordarse
+- CSS duplicado con reglas `!important` en conflicto
+- El panel lateral de agentes (modal) puede no adaptarse bien
+
+### Fix a hacer en index.html (Hostinger)
+
+Añadir al final del bloque `<style>` principal estas reglas mobile-first:
+
+```css
+/* ═══ MOBILE FIX DEFINITIVO ═══ */
+@media (max-width: 768px) {
+
+  /* Layout base */
+  html, body { overflow-x: hidden !important; width: 100% !important; }
+  
+  /* Sidebar oculto en móvil — ya existe pero reforzar */
+  .sidebar, sidebar { display: none !important; }
+  .main-content { margin-left: 0 !important; width: 100% !important; }
+  
+  /* Bottom nav visible */
+  .bottom-nav { display: flex !important; }
+  
+  /* Agentes grid — 1 columna */
+  .agents-grid, .cards-grid, .fiches-grid,
+  .etat-grid, .director-grid { 
+    grid-template-columns: 1fr !important; 
+  }
+  
+  /* Panel modal agentes — ancho completo */
+  .agent-modal, .agent-panel, .modal-box,
+  [class*="modal"], [class*="panel"] {
+    width: 100% !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    position: fixed !important;
+  }
+  
+  /* Chat bubbles — no desbordarse */
+  .message, .msg, .chat-msg,
+  [class*="message"], [class*="bubble"] {
+    max-width: 88vw !important;
+    word-break: break-word !important;
+  }
+  
+  /* Inputs — tamaño táctil */
+  input, textarea, button, select {
+    font-size: 16px !important; /* Evita zoom en iOS */
+  }
+  
+  /* Africa grid — 2 columnas en móvil */
+  .africa-grid { 
+    grid-template-columns: 1fr 1fr !important;
+    padding: 0 0.75rem !important;
+  }
+  
+  /* Texto no desbordarse */
+  * { max-width: 100% !important; }
+  
+  /* Fix específico: elementos que pueden sobresalir */
+  .section, .tab-content, .view {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+  
+  /* Home cards */
+  .home-grid, .home-cards {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Quick stats */
+  .quick-stats, .stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .africa-grid { grid-template-columns: 1fr !important; }
+  .quick-stats { grid-template-columns: 1fr 1fr !important; }
+  .main { padding: 0.4rem 0.4rem 5rem !important; }
+}
+```
+
+### También verificar
+1. Que el `input font-size: 16px` esté en todos los campos — evita el zoom automático de iOS
+2. Que el bottom-nav no tape el contenido — padding-bottom en .main debe ser >= 70px
+3. Que el modal/panel de agentes sea bottom-sheet en móvil (desde abajo, ancho completo)
+
+### Después de hacer el fix
+- Hacer push a GitHub → autodeploy a Hostinger
+- Verificar en nosvers.com/granja/ desde móvil
+
+*2026-03-16 — Angel reporta versión móvil no se ve bien*

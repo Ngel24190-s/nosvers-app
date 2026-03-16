@@ -1,43 +1,45 @@
-# Post Facebook — 2026-03-15
+# Post Facebook — 2026-03-16
 
-# Post Facebook — Asperge · NosVers
-*Adapté pour Facebook · Audience 40-65 ans · Jardiniers France*
-
----
-
-## 📝 TEXTE DU POST
+# AGT-08 · Adaptación Facebook — Post Espárrago
+*2026-03-14 · Programado 13:30*
 
 ---
 
-🌱 **Le sol se réveille avant nous — et ce matin, il nous a fait un beau cadeau.**
-
-Ce matin, en passant dans le jardin, África a vu sortir les premières pointes d'asperge. Discrètes, presque timides, mais bien là.
-
-C'est un de ces moments qui rappellent pourquoi on jardine.
+## 📘 POST FACEBOOK — Version longue
 
 ---
 
-**🌿 Quelques mots sur l'asperge, pour ceux qui voudraient se lancer :**
+**🌱 Quand le jardin nous annonce le printemps avant le calendrier...**
 
-L'asperge est une plante particulière — elle demande de la patience, mais elle vous le rend au centuple.
+Ce matin, en faisant sa tournée habituelle dans le jardin, África a remarqué quelque chose qui ne trompe pas : les premières pointes d'asperge qui percent la terre.
 
-- **Année 1 et 2 :** on ne récolte pas. On laisse la plante s'installer, développer ses racines, construire sa force.
-- **Année 3 :** les premières récoltes arrivent. Modestes, mais réelles.
-- **Années 4 à 20 :** une production régulière, chaque printemps, sans replanter. Une fois bien établie, une aspergerie peut durer **15 à 20 ans**.
-
-C'est une culture de long terme — exactement le type de projet qui convient à un jardin qu'on construit dans la durée.
+Pas encore le 20 mars. Pas encore l'équinoxe officiel. Mais le jardin, lui, avait déjà décidé.
 
 ---
 
-**🪱 Ce qu'on voit aujourd'hui, c'est le résultat de deux ans de travail sur le sol.**
+**🌿 L'asperge, une plante qui demande de la patience — et qui la récompense bien**
 
-Nous amendons notre terre depuis 2024 avec notre lombricompost maison. Pas des engrais chimiques, pas de recettes miracles — juste un sol qu'on nourrit régulièrement avec de la matière organique vivante.
+Si vous n'avez jamais cultivé d'asperges, voici ce qu'il faut savoir :
 
-Le lombricompost, c'est le travail des vers de terre : ils transforment les déchets organiques en un amendement extraordinairement riche, plein de micro-organismes bénéfiques, d'enzymes et d'éléments nutritifs immédiatement assimilables par les plantes.
+👉 La première année, on plante les griffes (les racines) et on laisse la plante s'établir.
+👉 La deuxième année, on résiste à l'envie de récolter — et on laisse encore.
+👉 La troisième année seulement, on commence à récolter, prudemment.
 
-Un sol vivant, ça se construit. Ça ne s'achète pas en un sac. Mais les résultats, eux, finissent par se voir — exactement comme ces pointes d'asperge ce matin.
+Mais une fois installée ? Une aspergerie bien entretenue peut vous accompagner **15 à 20 ans**. Certains jardiniers transmettent leurs aspergeries de génération en génération.
 
-**C'est ça, le sol
+C'est une plante qui ne convient pas aux impatients — mais qui récompense généreusement ceux qui respectent son rythme.
+
+---
+
+**🪱 Ce qu'on voit aujourd'hui, c'est le travail d'il y a deux ans**
+
+Notre aspergerie a été amendée depuis deux saisons avec notre lombricompost maison. Et ce que ces petites pointes nous montrent ce matin, c'est le résultat concret d'un sol qui a appris à respirer.
+
+Un sol vivant, c'est un sol peuplé de micro-organismes, de champignons, de vers de terre — tout un écosystème invisible qui travaille en permanence pour rendre les nutriments disponibles aux plantes.
+
+Le lombricompost ne "nourrit" pas la plante directement comme le ferait un engrais chimique. Il **nourrit le sol**, qui nourrit la plante. La différence est essentielle.
+
+C'est plus l
 
 ## Grupos para compartir
 - Jardinage biologique France
