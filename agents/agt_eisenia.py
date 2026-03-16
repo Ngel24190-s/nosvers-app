@@ -56,7 +56,9 @@ class EiseniaAgent(NosVersAgent):
         if not etat_raw:
             return {}
         try:
-            return json.loads(etat_raw)
+            import re as _re
+            jm = _re.search(r'\{[\s\S]+\}', etat_raw)
+            return json.loads(jm.group()) if jm else {}
         except:
             return {}
 

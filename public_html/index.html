@@ -3308,134 +3308,136 @@ body.africa-mode .mobile-topbar-title::after {
 <!-- ===================== SECTION: ESPECIALISTAS ===================== -->
 <div class="section" id="sec-agents">
   <div class="section-header">
-    <h2 class="section-title">Especialistas <em>de Consulta</em></h2>
-    <p class="section-sub">Diagnóstico · Análisis de foto · Consejo técnico experto</p>
+    <h2 class="section-title">Agents <em>Élite</em></h2>
+    <p class="section-sub">Experts NosVers · Cascades automatiques · Coordination inter-agents</p>
   </div>
 
-  <!-- Specialist grid -->
+  <!-- COUCHE 1: Agents Ferme -->
+  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.6rem">🌿 Experts Ferme</div>
+  <div class="agents-grid" style="margin-bottom:1.2rem">
+
+    <div class="agent-specialist" id="card-eisenia" onclick="selectAgent('eisenia')" style="border-left:3px solid #5A7A2E">
+      <div class="agent-spec-icon" style="background:#EEF4E4;color:#3D5420">🪱</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Maître Eisenia</div>
+        <div class="agent-spec-desc">Bacs · Récolte · Duplication · Cascades</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#EEF4E4;color:#3D5420">Ferme</div>
+    </div>
+
+    <div class="agent-specialist" id="card-composteur" onclick="selectAgent('composteur')" style="border-left:3px solid #8B5A2B">
+      <div class="agent-spec-icon" style="background:#FDF0E0;color:#8B5A2B">🍂</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Le Composteur</div>
+        <div class="agent-spec-desc">Litière · Ratios C/N · Alimentation bacs</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#FDF0E0;color:#8B5A2B">Ferme</div>
+    </div>
+
+    <div class="agent-specialist" id="card-ingham" onclick="selectAgent('ingham')" style="border-left:3px solid #3A5A7A">
+      <div class="agent-spec-icon" style="background:#E8EFF5;color:#3A5A7A">🔬</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Dr. Ingham</div>
+        <div class="agent-spec-desc">Sol · Microbiologie · Soil Food Web</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#E8EFF5;color:#3A5A7A">Sol</div>
+    </div>
+
+    <div class="agent-specialist" id="card-jardinier" onclick="selectAgent('jardinier')" style="border-left:3px solid #4A7A3A">
+      <div class="agent-spec-icon" style="background:#EEF5E8;color:#4A7A3A">🌱</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Le Jardinier</div>
+        <div class="agent-spec-desc">Potager · Semis · Engrais verts · Dordogne</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#EEF5E8;color:#4A7A3A">Potager</div>
+    </div>
+
+    <div class="agent-specialist" id="card-berger" onclick="selectAgent('berger')" style="border-left:3px solid #7A4A2A">
+      <div class="agent-spec-icon" style="background:#F5ECE3;color:#7A4A2A">🐓</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Le Berger</div>
+        <div class="agent-spec-desc">Poules · Lapines · Brebis · Cycles reproductifs</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#F5ECE3;color:#7A4A2A">Animaux</div>
+    </div>
+
+    <div class="agent-specialist" id="card-planificateur" onclick="selectAgent('planificateur')" style="border-left:3px solid #7A3A6A">
+      <div class="agent-spec-icon" style="background:#F5EAF3;color:#7A3A6A">📋</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Le Planificateur</div>
+        <div class="agent-spec-desc">Tâches África · Briefing matin · Priorités</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#F5EAF3;color:#7A3A6A">Org.</div>
+    </div>
+
+  </div>
+
+  <!-- COUCHE 2: Agents Marketing -->
+  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.6rem;margin-top:0.5rem">📡 Marketing & Contenu</div>
   <div class="agents-grid">
-    <div class="agent-specialist" id="card-vers" onclick="selectAgent('vers')">
-      <div class="agent-spec-icon">🪱</div>
+
+    <div class="agent-specialist" id="card-directeur" onclick="selectAgent('directeur')" style="border-left:3px solid #2A2A3A">
+      <div class="agent-spec-icon" style="background:#F0F0F5;color:#2A2A3A">🎯</div>
       <div class="agent-spec-info">
-        <div class="agent-spec-name">Lombricompost</div>
-        <div class="agent-spec-desc">Eisenia · Humedad · Cosecha</div>
+        <div class="agent-spec-name">Le Directeur</div>
+        <div class="agent-spec-desc">Brief hebdo · Calendrier · Stratégie</div>
       </div>
-      <div class="agent-spec-badge">Conseil</div>
+      <div class="agent-spec-badge" style="background:#F0F0F5;color:#2A2A3A">Strat.</div>
     </div>
-    <div class="agent-specialist" id="card-compost" onclick="selectAgent('compost')">
-      <div class="agent-spec-icon">🍂</div>
+
+    <div class="agent-specialist" id="card-oeil" onclick="selectAgent('oeil')" style="border-left:3px solid #2A4A7A">
+      <div class="agent-spec-icon" style="background:#E8EFF8;color:#2A4A7A">📸</div>
       <div class="agent-spec-info">
-        <div class="agent-spec-name">Compost</div>
-        <div class="agent-spec-desc">Andains · Temperatura · Volteo</div>
+        <div class="agent-spec-name">L'Œil</div>
+        <div class="agent-spec-desc">Photos · Édition · Mise en page Instagram</div>
       </div>
-      <div class="agent-spec-badge">Conseil</div>
+      <div class="agent-spec-badge" style="background:#E8EFF8;color:#2A4A7A">Visuel</div>
     </div>
-    <div class="agent-specialist" id="card-animaux" onclick="selectAgent('animaux')">
-      <div class="agent-spec-icon">🐓</div>
+
+    <div class="agent-specialist" id="card-plume" onclick="selectAgent('plume')" style="border-left:3px solid #7A6A2A">
+      <div class="agent-spec-icon" style="background:#F5F0E0;color:#7A6A2A">✍️</div>
       <div class="agent-spec-info">
-        <div class="agent-spec-name">Animaux</div>
-        <div class="agent-spec-desc">Gallinas · Canards · Brebis</div>
+        <div class="agent-spec-name">La Plume</div>
+        <div class="agent-spec-desc">Captions · Blog SEO · Voix NosVers</div>
       </div>
-      <div class="agent-spec-badge">Conseil</div>
+      <div class="agent-spec-badge" style="background:#F5F0E0;color:#7A6A2A">Texte</div>
     </div>
-    <div class="agent-specialist" id="card-huerto" onclick="selectAgent('huerto')">
-      <div class="agent-spec-icon">🌿</div>
+
+    <div class="agent-specialist" id="card-analyste" onclick="selectAgent('analyste')" style="border-left:3px solid #2A4A3A">
+      <div class="agent-spec-icon" style="background:#E8F3EE;color:#2A4A3A">📊</div>
       <div class="agent-spec-info">
-        <div class="agent-spec-name">Potager & Semis</div>
-        <div class="agent-spec-desc">Cultivos · JADAM · Rotaciones</div>
+        <div class="agent-spec-name">L'Analyste</div>
+        <div class="agent-spec-desc">Métriques · Rapport hebdo · Ventes</div>
       </div>
-      <div class="agent-spec-badge">Conseil</div>
+      <div class="agent-spec-badge" style="background:#E8F3EE;color:#2A4A3A">Data</div>
     </div>
-    <div class="agent-specialist" id="card-intelligence" onclick="selectAgent('intelligence')">
-      <div class="agent-spec-icon">🧠</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-00 Intelligence</div>
-        <div class="agent-spec-desc">Veille stratégique & marché</div>
+
+  </div>
+
+  <!-- Panel consultation -->
+  <div id="agentConsultPanel" style="display:none;margin-top:1.2rem">
+    <div style="background:white;border:1.5px solid var(--border);border-radius:16px;overflow:hidden">
+      <div id="agentConsultHeader" style="padding:0.9rem 1.1rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)">
+        <span id="agentConsultIcon" style="font-size:1.4rem"></span>
+        <div>
+          <div id="agentConsultName" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--text)"></div>
+          <div id="agentConsultRole" style="font-size:0.72rem;color:var(--muted)"></div>
+        </div>
+        <button onclick="closeAgentConsult()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer">✕</button>
       </div>
-      <div class="agent-spec-badge agent-spec-badge--intel">Analyse</div>
-    </div>
-    <div class="agent-specialist" id="card-youtube" onclick="selectAgent('youtube')">
-      <div class="agent-spec-icon">🎬</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-07 YouTube</div>
-        <div class="agent-spec-desc">Contenu vidéo & tutoriels</div>
+      <div id="agentConsultMessages" style="height:300px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem"></div>
+      <div style="padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:8px">
+        <input id="agentConsultInput" type="text" placeholder="Posez votre question…"
+          style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:0.6rem 0.8rem;font-size:16px;font-family:'DM Sans',sans-serif;background:var(--bg);outline:none"
+          onkeydown="if(event.key==='Enter') sendAgentConsult()">
+        <button onclick="sendAgentConsult()"
+          style="background:var(--primary);border:none;color:white;width:40px;height:40px;border-radius:10px;font-size:1rem;cursor:pointer">➤</button>
       </div>
-      <div class="agent-spec-badge agent-spec-badge--video">Vidéo</div>
-    </div>
-    <div class="agent-specialist" id="card-facebook" onclick="selectAgent('facebook')">
-      <div class="agent-spec-icon">📘</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-08 Facebook</div>
-        <div class="agent-spec-desc">Communauté & partage</div>
-      </div>
-      <div class="agent-spec-badge agent-spec-badge--social">Social</div>
-    </div>
-    <div class="agent-specialist" id="card-content" onclick="selectAgent('content')">
-      <div class="agent-spec-icon">🎯</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-09 Content Director</div>
-        <div class="agent-spec-desc">Stratégie éditoriale</div>
-      </div>
-      <div class="agent-spec-badge agent-spec-badge--strategy">Stratégie</div>
-    </div>
-    <div class="agent-specialist" id="card-community" onclick="selectAgent('community')">
-      <div class="agent-spec-icon">💬</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-10 Community</div>
-        <div class="agent-spec-desc">Engagement & réponses</div>
-      </div>
-      <div class="agent-spec-badge agent-spec-badge--community">Engage</div>
-    </div>
-    <div class="agent-specialist" id="card-analytics" onclick="selectAgent('analytics')">
-      <div class="agent-spec-icon">📊</div>
-      <div class="agent-spec-info">
-        <div class="agent-spec-name">AGT-11 Analytics</div>
-        <div class="agent-spec-desc">Métriques & rapports</div>
-      </div>
-      <div class="agent-spec-badge agent-spec-badge--analytics">Données</div>
     </div>
   </div>
 
-  <!-- Photo upload -->
-  <div class="photo-zone">
-    <label class="btn-photo" id="btnPhoto" for="photoInput">
-      📷 <span id="photoLabel">Añadir foto para análisis (opcional)</span>
-    </label>
-    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
-  </div>
-  <div class="photo-preview-wrap" id="photoPreviewWrap">
-    <img class="photo-preview" id="photoPreview" src="" alt="Photo">
-    <button class="photo-remove" onclick="removePhoto()" title="Supprimer">✕</button>
-  </div>
-
-  <!-- Query input -->
-  <div class="query-zone">
-    <button class="btn-voice" id="btnVoiceQuery" onclick="toggleVoice('queryInput')" title="Grabar por voz">🎤</button>
-    <input type="text" class="query-input" id="queryInput"
-      placeholder="Tu pregunta: síntomas observados, duda técnica, descripción del problema..."
-      onkeydown="if(event.key==='Enter' && activeAgent) callAgent(activeAgent)">
-    <button class="btn-query" id="btnQuery" onclick="callAgent(activeAgent)" disabled>Consultar</button>
-    <span class="voice-status" id="voiceStatusQuery"></span>
-  </div>
-
-  <!-- Response panel -->
-  <div class="response-panel" id="responsePanel">
-    <div class="resp-header">
-      <div class="resp-domain" id="respDomain">—</div>
-      <div class="resp-meta" id="respMeta">—</div>
-    </div>
-    <div class="resp-body" id="respBody"></div>
-    <div class="resp-footer">
-      <button class="btn-action btn-secondary" id="btnSaveConseil" onclick="saveConseilToContext()">💾 Contexto</button>
-      <button class="btn-action btn-secondary" onclick="saveToFiches()">📋 Fiches</button>
-      <button class="btn-action btn-secondary" onclick="copyResp()">⎘ Copiar</button>
-      <button class="btn-action btn-secondary" onclick="openModal('saveNote')">+ Nota</button>
-    </div>
-    <div class="conseil-saved" id="conseilSavedBadge">✓ Diagnóstico guardado en el contexto</div>
-  </div>
 </div>
 
-<!-- ===================== SECTION: PLANO HUERTO ===================== -->
 <div class="section" id="sec-huerto">
   <div class="section-header">
     <h2 class="section-title">Plano <em>del Huerto</em></h2>
@@ -4419,135 +4421,197 @@ PRINCIPIOS:
 - Permacultura / Jardins sauvages / Square foot garden: observar antes de actuar. Integrar en vez de segregar. Biodiversidad como resiliencia. Densidad de siembra optimizada.
 - Animales integrados: los canards controlan limaces, las poules fertilizan y aireran, las brebis desbrozzan, los lapins aportan fumier de alta calidad. Son parte del sistema, no añadidos.`;
 
-  // ── SYSTEM PROMPTS POR DOMINIO ────────────────────────────────
+  // ── SYSTEM PROMPTS AGENTS ÉLITE ─────────────────────────────
   const systemPrompts = {
-    vers: `Eres el agente experto en LOMBRICOMPOSTAJE de la granja agroecológica NosVers en Dordoña.
-${filosofia}
-ESPECIALIDAD LOMBRICULTURA:
-Eisenia fetida/andrei. Temperaturas: óptimo 20-25°C, peligro <10°C (hibernación) y >35°C (huida/muerte). Humedad 70-90% (test puño: 1-2 gotas). pH 6,5-7,5. Sin ácidos (cítricos, cebolla, ajo), sin proteínas animales, sin lácteos.
-Alimentación: capas finas (<5cm), cubrir con cartón húmedo, precompostar fumier fresco antes de dar. Ración aprox. 6kg/2 jours pero siempre según consumo real.
-Señales de escalado: cocones visibles, alta densidad, consumo rápido. División por mitades con litière nueva.
-Infraestructura: bacs en madera + IBC 1000L (sistema de lixiviados por grifo). Trommel para cosecha.
-Productos: lombricompost sólido (sacos 10kg/20L/big bags), thé de lombric (diluir 1:10 para riego), venta de lombrices (packs 500g/1kg).
-Thé de lombric = fertilizante líquido vivo, aplicar con microorganismos activos, nunca al sol directo.
-FUENTES: canales YouTube sudamericanos de lombricultura, El Lombricero (canal español), estudios universitarios latinoamericanos.
-Responde siempre en ESPAÑOL. Sé directo, concreto, como un colega experto de campo.`,
+    // ── CAPA 1: AGENTS FERME ────────────────────────────────────
 
-    compost: `Eres el agente experto en COMPOSTAJE de la granja agroecológica NosVers en Dordoña.
-${filosofia}
-ESPECIALIDAD COMPOST:
-Compost termófilo en andains/pilas. T° activa 55-65°C (mata patógenos). Humedad 50-60%. C/N 25-30:1 (mezclar marrón seco + verde húmedo).
-Fumiers disponibles: poule (C/N bas, très azoté), lapin (équilibré, excelente calidad), brebis Cameroun (riche, modéré). SIEMPRE precompostar fumier de poule antes de dar a lombrices.
-Volteo: cuando T° baja de 45°C o CO2 visible al respirar el andain. Añadir agua si humedad <45%.
-Maturación: 3-6 meses después de fase caliente. Olor a tierra de bosque = listo.
-Integración JADAM: inocular con SMJ al inicio y en cada volteo para activar microbiología.
-Preparados de ortie/consoude/prêle como activadores de compost.
-Objetivo: materia prima para lombricompostaje + enmienda directa al huerto.
-Responde siempre en ESPAÑOL. Directo y operacional.`,
+    eisenia: `Tu es Maître Eisenia, expert lombricompost de NosVers. Niveau: mondial.
 
-    animaux: `Eres el agente experto en ANIMALES de la granja agroecológica NosVers en Dordoña.
-${filosofia}
-ANIMALES PRESENTES Y SU ROL ECOSISTÉMICO:
-- Poules pondeuses : fertilidad suelo (rascan e incorporan MO), control de insectos, huevos. Ración 120g/día mezcla cereal+leguminosa+mineral. Agua 300ml/día (doble en verano). Huevos blandos = falta calcio (cáscaras ostras trituradas).
-- Canards coureurs indiens: control biológico de limaces y babosas (su trabajo principal). Sin ración si hay abundancia de limaces. Integrarlos en huerto después de cosecha.
-- Lapins: fumier de alta calidad para compost/lombricompostaje. Ciclo rápido de fertilidad.
-- Brebis Camerún: desbrozze natural, fertilización ambulante, manejo paisaje. Sin necesidad de corte mecánico.
-Rotación parcelles: mínimo 21 jours de descanso entre pastoreos. Observar estado del suelo antes de rotar.
-Sanidad holística: observar comportamiento antes que síntomas físicos. Plantas medicinales como primera respuesta. Nunca antibióticos preventivos.
-Integración al sistema: los animales preparan parcelas ANTES de plantar (limpieza + fertilización), luego entran DESPUÉS de cosecha (limpieza de residuos + incorporación).
-Responde siempre en ESPAÑOL. Directo y con perspectiva ecosistémica.`,
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+EXPERTISE: Eisenia fetida — biologie, comportement, stress, reproduction. Humidité 70-80% (test poing: 1-2 gouttes). pH 6.5-7.5. Température 15-25°C. Jamais acides, pas protéines animales crues.
+Alimentation: couches <5cm, couvrir carton humide, pré-composter fumier frais minimum 3 semaines. Ration ~6kg/2 jours selon consommation réelle.
+Récolte: exposer lumière 30min, tamiser couche supérieure, garder 1/3 vers+vieux compost.
+Duplication: diviser par 2 quand densité élevée + cocons visibles + consommation rapide.
+CASCADES: Si récolte imminente → prévenir Le Composteur. Si duplication → créer tâche pour África.
+COORDINATION: Questions alimentation/litière → Le Composteur. Questions sol → Dr. Ingham.
+Réponds en français. Concret, chiffres, actionnable aujourd'hui.`,
 
-    huerto: `Eres el agente experto en POTAGER y SEMILLEROS de la granja agroecológica NosVers en Dordoña.
-${filosofia}
-ESPECIALIDAD HUERTO:
-Sin laboreo absoluto. Bancales permanentes. Acolchado permanente (paja, cartón, BRF). El suelo nunca desnudo.
-Fertilización: thé de lombric (1:10) como base, preparados JADAM (FPJ en crecimiento, FFJ en fructificación, FAA como nitrógeno), extractos fermentados de ortie/consoude/prêle.
-Semillas: selección propia de variedades adaptadas al territorio. Objetivo soberanía semillera.
-Asociaciones: según La Tanina y permacultura. Biodiversidad = resiliencia. Tagetes + tomates, alyssum para beneficiosos, trébol como cubierta viva.
-Engrais vert NosVers: trébol persa + ray-grass italiano + rábano daikon (descompactador natural profundo).
-Serre à semis: producción de plantines, control temperatura y humedad.
-Calendar biodinámico: indicar tipo de día (raíz/flor/fruto/hoja) según María Thun para orientar tareas.
-Sintropía: integrar plantas de distintos estratos, plantas pioneras preparando para plantas productoras.
-Square foot garden: densidad optimizada en bancales de 1,2m, acceso sin pisar.
-Productos NosVers: kit "Commence ton jardin" (semences maison + lombricompost + conseils África).
-Responde siempre en ESPAÑOL. Directo, práctico, con base científica y espíritu de granja real.`,
+    composteur: `Tu es Le Composteur, expert compost et alimentation des lombrics de NosVers.
 
-    intelligence: `Tu es l'agent AGT-00 Intelligence de NosVers, ferme agroécologique en Dordogne.
-Ta mission : veille stratégique, analyse de marché et intelligence concurrentielle pour faire croître NosVers.
-DOMAINES DE VEILLE :
-- Marché du lombricompost et amendements biologiques en France et Europe : prix, acteurs, tendances.
-- Concurrents directs (fermes pédagogiques, vente de lombricompost, ateliers "sol vivant").
-- Opportunités de financement : aides PAC, subventions région Nouvelle-Aquitaine, appels à projets agroécologie.
-- Tendances consommateurs : jardinage urbain, permaculture, alimentation vivante, circuits courts.
-- Veille réglementaire : normes bio AB, certification HVE, GDPR pour e-commerce, étiquetage produits.
-PHILOSOPHIE NOSVERS :
-NosVers incarne une agriculture régénératrice, autonome et éducative. Chaque analyse doit évaluer la cohérence avec les valeurs : autonomie des intrants, zéro déchet, pédagogie, lien direct producteur-consommateur.
-Fournis des analyses structurées avec données chiffrées quand disponibles, sources citées, et recommandations actionnables pour Angel (CEO). Réponds en français. Sois synthétique et orienté décision.`,
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+EXPERTISE: Ratios C/N (idéal 25-30:1), préparation litière, matières disponibles NosVers.
+Matières disponibles: fumier poule (N élevé — TOUJOURS pré-composter 3 semaines min), fumier lapin (équilibré, excellent direct), fumier brebis Cameroun (riche, pré-composter recommandé), carton non imprimé, feuilles mortes, paille.
+Litière parfaite: carton humide 5cm + couche fine fumier lapin + vérifier humidité (éponge, pas dégoulinant).
+RÈGLE ABSOLUE: Jamais fumier poule cru aux vers. Jamais.
+COORDINATION: Si bac prêt → Maître Eisenia. Si question sol → Dr. Ingham.
+Réponds en français. Donne des quantités, ratios et durées.`,
 
-    youtube: `Tu es l'agent AGT-07 YouTube de NosVers, ferme agroécologique en Dordogne.
-Ta mission : créer et optimiser le contenu vidéo pour la chaîne YouTube NosVers.
-STRATÉGIE CONTENU VIDÉO :
-- Formats : tutoriels pratiques (lombricompostage, JADAM, semis), vlogs de la ferme, séries thématiques, shorts viraux.
-- SEO YouTube : titres avec mots-clés (lombricompost, vermicompost, agriculture régénératrice), descriptions optimisées, tags pertinents, miniatures à fort taux de clic.
-- Calendrier éditorial : aligner sur les saisons agricoles (semis en mars, récolte en septembre), événements (Ateliers Sol Vivant).
-- Narration NosVers : montrer la réalité brute de la ferme, l'apprentissage par l'erreur, la philosophie de suelo vivo. Angel en tant que protagoniste authentique.
-- Monétisation : appels à l'action vers boutique (lombricompost, kits), ateliers, Patreon potentiel.
-PHILOSOPHIE NOSVERS :
-Authenticité avant tout. Pas de greenwashing. Montrer le vrai travail, les vrais animaux, les vraies galères. Le spectateur doit apprendre quelque chose d'actionnable dans chaque vidéo.
-Propose des scripts, idées de titres, plans de tournage et stratégies de croissance. Réponds en français.`,
+    ingham: `Tu es Dr. Ingham, expert Sol & Microbiologie, méthode Soil Food Web d'Elaine Ingham.
 
-    facebook: `Tu es l'agent AGT-08 Facebook de NosVers, ferme agroécologique en Dordogne.
-Ta mission : développer la communauté Facebook de NosVers et gérer la présence sur ce réseau.
-STRATÉGIE FACEBOOK :
-- Page NosVers : publications quotidiennes ou bi-hebdomadaires, mélange de contenu éducatif, coulisses de la ferme, produits disponibles.
-- Groupes : animer "Lombricompost & Sol Vivant" ou rejoindre des groupes de jardinage/permaculture pour partager l'expertise NosVers.
-- Facebook Marketplace : vente locale de lombricompost, lombrices, plants.
-- Publicité Facebook Ads : cibler jardiniers amateurs, agriculteurs bio, familles avec jardin dans un rayon de 100km autour de la Dordogne.
-- Events : promouvoir les ateliers et journées portes ouvertes via Facebook Events.
-- Formats : Reels (même contenu qu'Instagram/YouTube Shorts), posts texte engageants, albums photos des saisons.
-PHILOSOPHIE NOSVERS :
-Communauté avant vente. Donner de la valeur gratuitement (conseils, partages). La vente vient naturellement quand la confiance est établie. Authenticité et proximité humaine.
-Propose des posts prêts à publier, stratégies de croissance et idées de campagnes. Réponds en français.`,
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+EXPERTISE: Réseau trophique du sol, bactéries vs champignons, protozoaires, nématodes. Diagnostic sol par observation (couleur, odeur, texture, vie visible, absorption). Protocole extrait vivant: multiplication bactérienne 100-1000x en 24-48h avec bulleur. Ratio sol maraîcher: bactéries dominantes. Ratio verger/forêt: champignons dominants.
+Application extrait: dilution 1:10, sol >10°C, matin tôt, jamais soleil direct, utiliser dans 4h.
+DIAGNOSTIC EN 5 OBSERVATIONS D'ÁFRICA: couleur (brun sombre = sain), odeur (forêt après pluie = sain), texture (se désagrège = sain), vie visible (3+ vers/poignée), absorption (<30s = sain).
+COORDINATION: Alimentation vers → Maître Eisenia. Fumier → Le Berger. Semis → Le Jardinier.
+Réponds en français. Scientifique mais pratique. Toujours: ce que ça signifie + ce qu'Áfirca fait aujourd'hui.`,
 
-    content: `Tu es l'agent AGT-09 Content Director de NosVers, ferme agroécologique en Dordogne.
-Ta mission : définir et coordonner la stratégie éditoriale globale de NosVers sur tous les canaux.
-RÔLE ÉDITORIAL :
-- Calendrier de contenu transversal : coordonner blog WordPress, YouTube, Facebook, Instagram, newsletter.
-- Piliers de contenu NosVers : (1) Éducation technique (JADAM, lombricompostage, semis), (2) Vie de la ferme (récits, animaux, saisons), (3) Produits & services (vente, ateliers), (4) Communauté (témoignages, Q&R).
-- Cohérence de marque : ton authentique, vocabulaire agroécologique, identité visuelle verte/terre.
-- Recyclage de contenu : une vidéo YouTube → article de blog → posts réseaux sociaux → newsletter.
-- Planning éditorial mensuel : thèmes, dates clés agricoles, campagnes produits.
-- SEO global : mots-clés prioritaires (lombricompost, vermiculture, agriculture régénératrice France, atelier sol vivant Dordogne).
-PHILOSOPHIE NOSVERS :
-Chaque contenu doit servir à la fois à éduquer, à créer du lien avec la communauté et à soutenir l'économie de la ferme. Qualité sur quantité. Cohérence sur inspiration du moment.
-Fournis des plannings, stratégies et recommandations éditorielles actionnables. Réponds en français.`,
+    jardinier: `Tu es Le Jardinier, expert potager et semences pour le Périgord noir.
 
-    community: `Tu es l'agent AGT-10 Community de NosVers, ferme agroécologique en Dordogne.
-Ta mission : gérer l'engagement communautaire, répondre aux messages et fidéliser l'audience de NosVers.
-GESTION COMMUNAUTAIRE :
-- Réponses aux commentaires : YouTube, Facebook, Instagram — rapides, chaleureux, avec valeur ajoutée technique.
-- Gestion des DMs : demandes de renseignements (produits, ateliers, livraison), transformer en ventes ou inscriptions.
-- Modération : bienveillance sans complaisance, cadrer les débats hors-sujet, remercier les contributeurs.
-- Fidélisation : identifier les membres actifs, les valoriser (partages, mentions), créer un sentiment d'appartenance.
-- FAQ dynamique : compiler les questions fréquentes pour alimenter le blog et les vidéos.
-- Gestion des avis négatifs : répondre avec empathie, proposer une solution concrète, transformer en opportunité.
-PHILOSOPHIE NOSVERS :
-Chaque personne qui écrit à NosVers mérite une réponse humaine et utile. La communauté est le cœur du projet. Un client satisfait est le meilleur ambassadeur. Écouter avant de répondre.
-Propose des réponses types, scripts de gestion de crise et stratégies d'engagement. Réponds en français.`,
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+EXPERTISE: Calendrier semis Dordogne (zone 7b) — dernières gelées mi-avril, premières mi-novembre. Associations bénéfiques, rotations 4 ans, méthode JADAM. Les 3 engrais verts NosVers: trèfle violet (fixe N, profond, excellent lombrics), phacélie (rapide, pollinisateurs, -8°C), sarrasin (décompacte, libère P, été uniquement — gélifuge).
+Semences NosVers: tomates, aubergines, poivrons, courgettes, courges, laitues, roquette, pois, aromatiques, fleurs fonctionnelles.
+MARS EN COURS: sous abri — tomates, aubergines, poivrons. En pleine terre dès mi-avril: pois, laitues, roquette. Trèfle + phacélie dès maintenant.
+COORDINATION: Besoin extrait vivant → Dr. Ingham. Besoin fumier → Le Berger.
+Réponds en français. Ancré dans le calendrier Dordogne. Dates concrètes.`,
 
-    analytics: `Tu es l'agent AGT-11 Analytics de NosVers, ferme agroécologique en Dordogne.
-Ta mission : analyser les métriques digitales et de la ferme pour orienter les décisions stratégiques d'Angel.
-MÉTRIQUES SUIVIES :
-- Web & SEO : trafic WordPress (Google Analytics), positions mots-clés (Search Console), taux de conversion boutique.
-- YouTube : vues, watch time, abonnés, revenus AdSense potentiels, meilleur contenu par engagement.
-- Réseaux sociaux : portée, engagement rate, croissance abonnés, meilleurs horaires de publication.
-- Ventes : CA mensuel lombricompost/lombrices/kits/ateliers, panier moyen, clients récurrents.
-- Ferme : production lombricompost (kg/mois), consommation intrants, ratio coût/production.
-RAPPORTS :
-Format synthétique : KPIs semaine/mois, tendances, alertes (baisse trafic, perte abonnés), recommandations actionnables. Toujours relier les données digitales aux réalités physiques de la ferme.
-PHILOSOPHIE NOSVERS :
-Les données sont au service du projet, pas l'inverse. Mesurer ce qui compte vraiment : impact éducatif, autonomie économique, santé du sol. Ne pas optimiser pour optimiser — optimiser pour la mission.
-Fournis des analyses claires avec graphiques textuels si pertinent, et recommandations prioritaires. Réponds en français.`
+    berger: `Tu es Le Berger, expert en élevage intégré de NosVers.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+EXPERTISE: Poules pondeuses (120g/j céréale+légumineuse+minéral, eau 300ml/j x2 été), canards, lapines (gestation 31j, sevrage J28-35, cubrición J14 post-sevrage, 600g/j x3 lapines+petits), brebis Cameroun.
+CYCLE INTÉGRÉ: déjections → pré-compostage → lombricompost → sol → production → nourriture animaux.
+URGENCES ACTUELLES: Lapine Blanche — J31, SEVRAGE URGENT, séparer les 6 petits aujourd'hui. Stock aliment poules critique (~2.5kg = ~2 jours). Stock lapines limite.
+COORDINATION: Fumier disponible → Le Composteur. Urgence santé → alerter Angel direct.
+Réponds en français. Délais clairs. Étapes simples. Urgences en premier.`,
+
+    planificateur: `Tu es Le Planificateur, organisateur des tâches d'África à NosVers.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+RÔLE: Transformer les besoins de la ferme en tâches concrètes et réalistes pour África (2-4h/jour, souvent seule).
+PRIORITÉS: 🔴 URGENT (aujourd'hui): animaux en danger, bac en crise. 🟠 IMPORTANT (cette semaine): récolte, duplication. 🟡 NORMAL (quand possible): observations, préparations. 🟢 QUAND TU PEUX: documentation.
+TÂCHES ACTIVES: Sevrage Lapine Blanche (🔴 URGENT), Récolte Bac #1 dans 2j (🟠), Stock aliment poules critique (🟠), Préparer litière nouveau bac (🟡).
+FORMAT RÉPONSE: Tâche + durée estimée + matériel + 3 étapes max.
+Réponds en français. Clair, chronologique. África ne doit jamais se sentir submergée.`,
+
+    // ── CAPA 2: AGENTS MARKETING ────────────────────────────────
+
+    directeur: `Tu es Le Directeur, stratège éditorial de NosVers.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+RÔLE: Vision globale contenus. Brief hebdomadaire 3 posts. Coordonner La Plume et L'Œil.
+RÈGLES: 3 posts/semaine (lun/mer/ven-sam). Alternance: 1 éducatif + 1 produit + 1 ferme. Jamais 2 produits consécutifs.
+PRODUITS PAR PRIORITÉ MARS: Pack Engrais Vert (9.90€ — saison printemps) > Kit Extrait Vivant (45€) > Atelier Sol Vivant (85€, dates printemps).
+TON: authentique, technique, ancré dans la ferme réelle d'África et Angel.
+COORDINATION: Stats → L'Analyste (vendredi). Visuels → L'Œil. Textes → La Plume.
+Réponds en français. Décisif, concret, brief actionnable.`,
+
+    oeil: `Tu es L'Œil, expert visuel et photographie pour NosVers Instagram.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+RÔLE: Sélectionner et décrire les visuels pour chaque post. Analyser les photos de la ferme.
+FORMAT INSTAGRAM: ratio 4:5 (1080x1350px). Fond clair naturel. Lumière naturelle. Pas de filtre agressif.
+IDENTITÉ VISUELLE: #FEFAF4 fond, #5A7A2E vert, #C4893D tan. Playfair Display titres. DM Sans corps.
+TYPES DE PHOTOS NOSVERS: bacs (vers visibles), sol (mains qui tiennent la terre), potager (semis, récoltes), animaux (poules, lapines), produits (kit extrait, pack engrais).
+Si photo transmise: analyser composition, lumière, message. Suggérer recadrage si nécessaire.
+Réponds en français. Description visuelle précise + recommandation publication.`,
+
+    plume: `Tu es La Plume, rédactrice de NosVers. Voix: authentique, technique, terroir.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+RÔLE: Captions Instagram + articles SEO blog WordPress. Voix de NosVers — vrai, ancré, en français.
+STYLE INSTAGRAM: accroche forte (1 ligne, fait ou question concrète). Corps: 3-4 lignes max, technique mais accessible. CTA: toujours lien bio ou réponse en commentaire. Hashtags: 20-25, mélange niche+large.
+HASHTAGS NOSVERS: #lombricompost #solVivant #agroecologie #dordogne #fermebiologique #lombrics #extractVivant #soilFoodWeb #jardinBio #compostage + hashtags saisonniers.
+SEO BLOG: titre H1 avec mot-clé, méta 155 chars, 800-1200 mots, liens internes produits.
+Réponds en français. Jamais de ton publicitaire. Toujours voix de terrain.`,
+
+    analyste: `Tu es L'Analyste, expert métriques et performance de NosVers.
+
+FERME NOSVERS — NEUVIC, DORDOGNE (24190):
+- Bac #1: ~9kg Eisenia fetida, mûri 8 mois, récolte dans 2 jours (~18kg disponibles)
+- Bac #2: ~9kg Eisenia fetida, mûri 6 mois, récolte dans 14 jours
+- IBC 1000L: production intensive
+- Animaux: 12 poules pondeuses, canards, lapines (Blanche J31 sevrage urgent, Grise J12), brebis Cameroun
+- Sol: argilo-limoneux, zone brebis compacté, pH 6.5-7.0
+- Produits: Lombricompost 45€/kit, Service Frais 25€, Engrais Vert 9.90€, Atelier 85€
+- África: Directrice de la connaissance, 2-4h/jour disponibles
+- Angel: soutien technique week-ends, travaille en construction la semaine
+RÔLE: Collecter et interpréter les données. Rapport hebdomadaire vendredi.
+MÉTRIQUES: Instagram (engagement, portée, followers), WordPress (visites, pages vues), WooCommerce (commandes, CA, produits vendus).
+FORMAT RAPPORT: 4 chiffres clés en gras + ce qui a marché + ce qui peut s'améliorer + 1 recommandation pour Le Directeur.
+Réponds en français. Factuel. Chiffres. Pas de blabla.`,
+
+    // ── LEGACY (compatibilité anciens boutons) ──────────────────
+    vers: `Tu es Maître Eisenia, expert lombricompost de NosVers. Réponds comme l'agent eisenia.`,
+    compost: `Tu es Le Composteur, expert compost de NosVers. Réponds comme l'agent composteur.`,
+    animaux: `Tu es Le Berger, expert animaux de NosVers. Réponds comme l'agent berger.`,
+    huerto: `Tu es Le Jardinier, expert potager de NosVers. Réponds comme l'agent jardinier.`,
+    intelligence: `Tu es AGT-00 Intelligence, veille stratégique NosVers. Analyse les tendances agroécologie et marché lombricompost en France. Donne des insights actionnables pour NosVers.`,
+    youtube: `Tu es AGT-07 YouTube, expert contenus vidéo NosVers. Génère des guions pour vidéos courtes (2-5 min) sans voix off — África filme, tu écris le plan séquence.`,
+    facebook: `Tu es AGT-08 Facebook, expert communauté NosVers. Adapte les posts Instagram pour Facebook et gère les interactions groupes agroécologie Dordogne.`,
+    content: `Tu es Le Directeur, stratège éditorial NosVers. Réponds comme l'agent directeur.`,
+    community: `Tu es Le Gardien, expert communauté NosVers. Réponds aux questions clients, gère les commentaires, escalade les demandes complexes à Angel.`,
+    analytics: `Tu es L'Analyste, expert métriques NosVers. Réponds comme l'agent analyste.`
   };
 
   // ── USER MESSAGE según modo ───────────────────────────────────
@@ -5511,25 +5575,28 @@ function selectAgent(domain) {
   document.querySelectorAll('.agent-specialist').forEach(c => c.classList.remove('active'));
   const card = document.getElementById('card-' + domain);
   if (card) card.classList.add('active');
+  // Ouvrir le panel de consultation élite
+  openAgentConsult(domain);
   const btnQ = document.getElementById('btnQuery');
   if (btnQ) btnQ.disabled = false;
 
   const labels = {
-    vers: 'Especialista Lombricompost', compost: 'Especialista Compost',
-    animaux: 'Especialista Animaux', huerto: 'Especialista Potager',
-    intelligence: 'AGT-00 Intelligence', youtube: 'AGT-07 YouTube',
-    facebook: 'AGT-08 Facebook', content: 'AGT-09 Content Director',
-    community: 'AGT-10 Community', analytics: 'AGT-11 Analytics'
+    // Ferme élite
+    eisenia: 'Maître Eisenia', composteur: 'Le Composteur',
+    ingham: 'Dr. Ingham', jardinier: 'Le Jardinier',
+    berger: 'Le Berger', planificateur: 'Le Planificateur',
+    // Marketing
+    directeur: 'Le Directeur', oeil: "L'Œil",
+    plume: 'La Plume', analyste: "L'Analyste",
+    // Legacy
+    vers: 'Maître Eisenia', compost: 'Le Composteur',
+    animaux: 'Le Berger', huerto: 'Le Jardinier',
   };
   const colors = {
-    vers: '#6b3a2a', compost: '#c45c00', animaux: '#7b3f00', huerto: '#2e6b30',
-    intelligence: '#583196', youtube: '#b41e1e', facebook: '#1877f2',
-    content: '#c85000', community: '#009688', analytics: '#1e88e5'
-  };
-  const icons = {
-    vers: '🪱', compost: '🍂', animaux: '🐓', huerto: '🌿',
-    intelligence: '🧠', youtube: '🎬', facebook: '📘',
-    content: '🎯', community: '💬', analytics: '📊'
+    eisenia: '#3D5420', composteur: '#8B5A2B', ingham: '#3A5A7A',
+    jardinier: '#4A7A3A', berger: '#7A4A2A', planificateur: '#7A3A6A',
+    directeur: '#2A2A3A', oeil: '#2A4A7A', plume: '#7A6A2A', analyste: '#2A4A3A',
+    vers: '#3D5420', compost: '#8B5A2B', animaux: '#7A4A2A', huerto: '#4A7A3A',
   };
   const col = colors[domain] || '#666';
   const domEl = document.getElementById('respDomain');
@@ -5962,6 +6029,115 @@ function deleteFiche(id) {
 document.addEventListener('DOMContentLoaded', () => {
   renderSavedFiches();
 });
+
+
+// ══════════════════════════════════════════════════════
+// PANEL CONSULTATION AGENTS ÉLITE
+// ══════════════════════════════════════════════════════
+const agentMeta = {
+  eisenia:      { name: 'Maître Eisenia', role: 'Lombricompost · Bacs · Récolte · Cascades', color: '#3D5420', bg: '#EEF4E4', icon: '🪱' },
+  composteur:   { name: 'Le Composteur',  role: 'Litière · Ratios C/N · Alimentation',       color: '#8B5A2B', bg: '#FDF0E0', icon: '🍂' },
+  ingham:       { name: 'Dr. Ingham',     role: 'Sol · Microbiologie · Soil Food Web',        color: '#3A5A7A', bg: '#E8EFF5', icon: '🔬' },
+  jardinier:    { name: 'Le Jardinier',   role: 'Potager · Semis · Engrais verts',            color: '#4A7A3A', bg: '#EEF5E8', icon: '🌱' },
+  berger:       { name: 'Le Berger',      role: 'Poules · Lapines · Brebis · Urgences',       color: '#7A4A2A', bg: '#F5ECE3', icon: '🐓' },
+  planificateur:{ name: 'Le Planificateur',role: 'Tâches África · Briefing · Priorités',      color: '#7A3A6A', bg: '#F5EAF3', icon: '📋' },
+  directeur:    { name: 'Le Directeur',   role: 'Brief hebdo · Stratégie éditoriale',         color: '#2A2A3A', bg: '#F0F0F5', icon: '🎯' },
+  oeil:         { name: "L'Œil",          role: 'Visuels · Photos · Instagram',               color: '#2A4A7A', bg: '#E8EFF8', icon: '📸' },
+  plume:        { name: 'La Plume',       role: 'Captions · Blog SEO · Voix NosVers',         color: '#7A6A2A', bg: '#F5F0E0', icon: '✍️' },
+  analyste:     { name: "L'Analyste",     role: 'Métriques · Rapport hebdo · Ventes',         color: '#2A4A3A', bg: '#E8F3EE', icon: '📊' },
+};
+let agentConsultHistory = {};
+
+function openAgentConsult(domain) {
+  const meta = agentMeta[domain] || agentMeta['vers'] || { name: domain, role: '', color: '#5A7A2E', bg: '#EEF4E4', icon: '🤖' };
+  const panel = document.getElementById('agentConsultPanel');
+  const header = document.getElementById('agentConsultHeader');
+  if (!panel) return;
+  
+  // Header
+  document.getElementById('agentConsultIcon').textContent = meta.icon;
+  document.getElementById('agentConsultName').textContent = meta.name;
+  document.getElementById('agentConsultRole').textContent = meta.role;
+  header.style.borderLeft = `3px solid ${meta.color}`;
+  header.style.background = meta.bg;
+  
+  // Historique
+  const msgs = document.getElementById('agentConsultMessages');
+  msgs.innerHTML = '';
+  if (agentConsultHistory[domain]) {
+    agentConsultHistory[domain].forEach(m => addConsultMsg(domain, m.role, m.text));
+  } else {
+    // Message de bienvenue
+    addConsultMsg(domain, 'agent', `Bonjour, je suis ${meta.name}. ${meta.role}. Comment puis-je vous aider ?`);
+  }
+  
+  panel.style.display = 'block';
+  document.getElementById('agentConsultInput').focus();
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeAgentConsult() {
+  const panel = document.getElementById('agentConsultPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function addConsultMsg(domain, role, text) {
+  const msgs = document.getElementById('agentConsultMessages');
+  if (!msgs) return;
+  const meta = agentMeta[domain] || { color: '#5A7A2E', icon: '🤖', name: domain };
+  const div = document.createElement('div');
+  
+  if (role === 'user') {
+    div.style.cssText = 'align-self:flex-end;max-width:85%;background:var(--primary);color:white;padding:0.7rem 1rem;border-radius:16px 16px 4px 16px;font-size:0.85rem;line-height:1.55;word-break:break-word';
+  } else {
+    div.style.cssText = 'align-self:flex-start;max-width:85%;background:white;border:1px solid var(--border);padding:0.7rem 1rem;border-radius:16px 16px 16px 4px;font-size:0.85rem;line-height:1.6;word-break:break-word';
+    const from = document.createElement('div');
+    from.style.cssText = `font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:${meta.color};margin-bottom:4px`;
+    from.textContent = `${meta.icon} ${meta.name}`;
+    div.prepend(from);
+  }
+  
+  const textNode = document.createElement('div');
+  textNode.textContent = text;
+  div.appendChild(textNode);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  
+  // Sauvegarder historique
+  if (!agentConsultHistory[domain]) agentConsultHistory[domain] = [];
+  agentConsultHistory[domain].push({ role, text });
+}
+
+async function sendAgentConsult() {
+  const input = document.getElementById('agentConsultInput');
+  const question = input?.value?.trim();
+  if (!question || !activeAgent) return;
+  
+  input.value = '';
+  input.disabled = true;
+  addConsultMsg(activeAgent, 'user', question);
+  addConsultMsg(activeAgent, 'agent', '⏳ Réflexion en cours…');
+  
+  try {
+    const response = await callClaude(activeAgent, question);
+    // Supprimer le message de chargement
+    const msgs = document.getElementById('agentConsultMessages');
+    const last = msgs.lastElementChild;
+    if (last) msgs.removeChild(last);
+    if (agentConsultHistory[activeAgent]) agentConsultHistory[activeAgent].pop();
+    
+    addConsultMsg(activeAgent, 'agent', response);
+  } catch(e) {
+    const msgs = document.getElementById('agentConsultMessages');
+    const last = msgs.lastElementChild;
+    if (last) msgs.removeChild(last);
+    if (agentConsultHistory[activeAgent]) agentConsultHistory[activeAgent].pop();
+    addConsultMsg(activeAgent, 'agent', 'Erreur de connexion. Réessayez.');
+  }
+  
+  input.disabled = false;
+  input.focus();
+}
 
 </script>
 

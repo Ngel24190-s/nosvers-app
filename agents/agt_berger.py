@@ -53,7 +53,9 @@ class BergerAgent(NosVersAgent):
         if not raw:
             return {}
         try:
-            return json.loads(raw)
+            import re as _re
+            jm = _re.search(r'\{[\s\S]+\}', raw)
+            return json.loads(jm.group()) if jm else {}
         except:
             return {}
 
@@ -155,7 +157,7 @@ class BergerAgent(NosVersAgent):
                 msg = f"""ÉVÉNEMENT ANIMAL — {ev['type']}
 Source: Le Berger
 Urgence: {ev['urgence'].upper()}
-Détail: {ev['action']}
+Détail: {ev.get('action', ev.get('type','?'))}
 Date: {datetime.now().strftime('%d/%m/%Y')}"""
                 self.message_agent('agt_planificateur', msg)
 

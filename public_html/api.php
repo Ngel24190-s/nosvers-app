@@ -25,9 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_GET['action'] ?? '';
 
-// Actions that don't require auth token
-$public_actions = ['login', 'agente'];
-if (!in_array($action, $public_actions)) {
+if ($action !== 'login') {
     $token = $_SERVER['HTTP_X_APP_TOKEN'] ?? '';
     if (!validarToken($token)) {
         http_response_code(401);
@@ -45,21 +43,16 @@ function validarToken($token) {
     return isset($users[$user]) && $users[$user] === $pass;
 }
 
-// DB connection — optional, only needed for farm data actions
-$pdo = null;
-$db_actions = ['login', 'animaux', 'etat_parcelles', 'update_etat'];
-if (in_array($action, $db_actions)) {
-    try {
-        $pdo = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-            DB_USER, DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'DB connection failed: ' . $e->getMessage()]);
-        exit;
-    }
+try {
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER, DB_PASS,
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'DB connection failed: ' . $e->getMessage()]);
+    exit;
 }
 
 switch ($action) {
@@ -333,36 +326,123 @@ switch ($action) {
         echo json_encode(['ok' => true, 'files' => $result, 'total' => count($result)]);
         break;
 
+
+    // ============================================================
+    //  UPLOAD PHOTO
+    // ============================================================
     case 'upload_photo':
         $data = json_decode(file_get_contents('php://input'), true);
-        $image_b64 = $data['image'] ?? '';
-        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['category'] ?? 'general'));
-        $caption = $data['caption'] ?? '';
+        $image = $data['image'] ?? '';
+        $type = $data['type'] ?? 'image/jpeg';
         $user = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['user'] ?? 'unknown'));
+        $note = $data['note'] ?? '';
+        if (empty($image)) { http_response_code(400); echo json_encode(['error' => 'No image']); break; }
+        $imageData = base64_decode($image);
+        if ($imageData === false) { http_response_code(400); echo json_encode(['error' => 'Invalid base64']); break; }
+        $ext = 'jpg';
+        if (strpos($type, 'png') !== false) $ext = 'png';
+        elseif (strpos($type, 'webp') !== false) $ext = 'webp';
+        $uploadDir = __DIR__ . '/uploads/' . $user;
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        $filename = date('Y-m-d_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $filepath = $uploadDir . '/' . $filename;
+        if (file_put_contents($filepath, $imageData) === false) { http_response_code(500); echo json_encode(['error' => 'Save failed']); break; }
+        try {
+            $stmt = $pdo->prepare("INSERT INTO journal (domain, action, completed) VALUES (:d, :a, 1)");
+            $stmt->execute([':d' => $user, ':a' => 'Photo: ' . $filename . ($note ? ' - ' . $note : '')]);
+        } catch (Exception $e) {}
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+        echo json_encode(['ok' => true, 'filename' => $filename, 'url' => $baseUrl . '/granja/uploads/' . $user . '/' . $filename, 'size' => strlen($imageData)]);
+        break;
 
-        if (!$image_b64) {
+    // ============================================================
+    //  PROCESS PHOTO INSTAGRAM — Edita foto con AGT-01 y devuelve base64
+    // ============================================================
+    case 'process_photo_instagram':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $image_b64   = $data['image_base64'] ?? '';
+        $caption_hint = $data['caption_hint'] ?? '';
+        $image_type  = $data['image_type'] ?? 'image/jpeg';
+
+        if (empty($image_b64)) {
             http_response_code(400);
-            echo json_encode(['error' => 'No image data']);
+            echo json_encode(['error' => 'Falta image_base64']);
             break;
         }
 
-        $filename = date('Y-m-d_H-i-s') . '_' . $category . '_' . $user . '.jpg';
-        $upload_dir = __DIR__ . '/uploads/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+        // Decode y guardar en /tmp/
+        $ext       = (strpos($image_type, 'png') !== false) ? 'png' : 'jpg';
+        $tmp_in    = '/tmp/nosvers_ig_in_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $tmp_out   = '/tmp/nosvers_ig_out_' . bin2hex(random_bytes(4)) . '.jpg';
+        $img_bytes = base64_decode($image_b64);
 
-        $image_data = base64_decode($image_b64);
-        file_put_contents($upload_dir . $filename, $image_data);
+        if ($img_bytes === false || file_put_contents($tmp_in, $img_bytes) === false) {
+            http_response_code(500);
+            echo json_encode(['error' => 'No se pudo guardar la imagen temporal']);
+            break;
+        }
 
-        // Log metadata in vault
-        $meta = date('Y-m-d H:i') . ' | ' . $user . ' | ' . $category . ' | ' . $caption . ' | ' . $filename;
-        $log_dir = __DIR__ . '/knowledge_base/operaciones/';
-        if (!is_dir($log_dir)) mkdir($log_dir, 0755, true);
-        file_put_contents($log_dir . 'fotos-log.md', "\n" . $meta, FILE_APPEND);
+        // Llamar a AGT-01 para editar
+        $payload_json = json_encode(['input_path' => $tmp_in, 'output_path' => $tmp_out]);
+        $cmd = '/home/nosvers/venv/bin/python3 /home/nosvers/agents/agt01_visual.py process ' . escapeshellarg($payload_json) . ' 2>&1';
+        $output = shell_exec($cmd);
+        @unlink($tmp_in);
+
+        $result = json_decode(trim($output), true);
+        if (empty($result['ok'])) {
+            http_response_code(500);
+            echo json_encode(['error' => 'AGT-01 error: ' . ($result['error'] ?? $output)]);
+            break;
+        }
+
+        // Devolver imagen editada como base64 + sugerencia de caption
+        $edited_b64 = $result['base64'] ?? base64_encode(file_get_contents($tmp_out));
+        @unlink($tmp_out);
 
         echo json_encode([
-            'ok' => true,
-            'filename' => $filename,
-            'path' => '/granja/uploads/' . $filename
+            'ok'              => true,
+            'edited_base64'   => $edited_b64,
+            'caption_hint'    => $caption_hint,
+            'output_path'     => $result['output_path'] ?? $tmp_out,
+        ]);
+        break;
+
+    // ============================================================
+    //  PUBLISH INSTAGRAM — Publica foto llamando a AGT-02
+    // ============================================================
+    case 'publish_instagram':
+        $data       = json_decode(file_get_contents('php://input'), true);
+        $image_path = $data['image_path'] ?? '';
+        $caption    = $data['caption'] ?? '';
+
+        if (empty($image_path) || empty($caption)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan image_path y caption']);
+            break;
+        }
+
+        // Seguridad: solo rutas bajo /tmp/ o /home/nosvers/uploads/
+        if (!str_starts_with($image_path, '/tmp/') && !str_starts_with($image_path, '/home/nosvers/uploads/')) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Ruta no permitida']);
+            break;
+        }
+
+        $payload_json = json_encode(['image_path' => $image_path, 'caption' => $caption]);
+        $cmd = '/home/nosvers/venv/bin/python3 /home/nosvers/agents/agt02_instagram.py --publish-single ' . escapeshellarg($payload_json) . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        $result = json_decode(trim($output), true);
+        if (empty($result['ok'])) {
+            http_response_code(500);
+            echo json_encode(['error' => 'AGT-02 error: ' . ($result['error'] ?? $output)]);
+            break;
+        }
+
+        echo json_encode([
+            'ok'            => true,
+            'instagram_url' => $result['instagram_url'] ?? '',
+            'post_id'       => $result['post_id'] ?? '',
         ]);
         break;
 
