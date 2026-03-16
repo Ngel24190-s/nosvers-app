@@ -4183,7 +4183,7 @@ async function doLogin() {
       const ub = document.getElementById('userBadge'); if(ub) ub.style.display = 'block';
       const un = document.getElementById('userBadgeName'); if(un) un.textContent = data.user;
       const isAfrica = data.user === 'africa';
-      if (isAfrica) { activateAfricaMode(); } else { deactivateAfricaMode(); initApp(); }
+      if (isAfrica) { activateAfricaMode(); initApp(); } else { deactivateAfricaMode(); initApp(); }
       setTimeout(() => {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -4254,7 +4254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ls = document.getElementById('loginScreen'); if(ls) ls.style.display = 'none';
     const ub3 = document.getElementById('userBadge'); if(ub3) ub3.style.display = 'block';
     const ubn = document.getElementById('userBadgeName'); if(ubn) ubn.textContent = user;
-    if (user === 'africa') { activateAfricaMode(); } else { deactivateAfricaMode(); initApp(); }
+    if (user === 'africa') { activateAfricaMode(); initApp(); } else { deactivateAfricaMode(); initApp(); }
     // Start on director tab
     setTimeout(() => {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
