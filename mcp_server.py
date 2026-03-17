@@ -32,6 +32,10 @@ WP_URL         = os.getenv('WP_URL', 'https://nosvers.com/wp-json/wp/v2/')
 WP_USER        = os.getenv('WP_USER', 'claude_nosvers')
 WP_PASS        = os.getenv('WP_PASS', '')
 VAULT_PATH     = Path('/home/nosvers/public_html/knowledge_base')
+HOSTINGER_USER = os.getenv('HOSTINGER_USER', 'u859094205')
+HOSTINGER_PASS = os.getenv('HOSTINGER_PASS', '')
+HOSTINGER_PORT = os.getenv('HOSTINGER_PORT', '65002')
+HOSTINGER_HOST = os.getenv('HOSTINGER_HOST', 'nosvers.com')
 AGENTS_PATH    = Path('/home/nosvers/agents')
 LOG_PATH       = Path('/home/nosvers/logs')
 LOG_PATH.mkdir(parents=True, exist_ok=True)
@@ -499,7 +503,9 @@ def deploy_hostinger(archivo_local: str, destino: str) -> str:
     """
     import subprocess
     dest_full = f"domains/nosvers.com/public_html/{destino}"
-    cmd = f"sshpass -p 'Angelnosvers26!' scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -P 65002 {archivo_local} u859094205@nosvers.com:{dest_full}"
+    if not HOSTINGER_PASS:
+        return "❌ HOSTINGER_PASS no configurada en .env"
+    cmd = f"sshpass -p '{HOSTINGER_PASS}' scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -P {HOSTINGER_PORT} {archivo_local} {HOSTINGER_USER}@{HOSTINGER_HOST}:{dest_full}"
     try:
         r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
         if r.returncode == 0:
@@ -513,7 +519,9 @@ def deploy_hostinger(archivo_local: str, destino: str) -> str:
 def wp_listar_paginas() -> str:
     """Listar todas las páginas publicadas de WordPress."""
     import subprocess
-    cmd = """sshpass -p 'Angelnosvers26!' ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 65002 u859094205@nosvers.com 'cd domains/nosvers.com/public_html && wp --path=. post list --post_type=page --post_status=publish --fields=ID,post_title,post_name --format=table 2>/dev/null'"""
+    if not HOSTINGER_PASS:
+        return "❌ HOSTINGER_PASS no configurada en .env"
+    cmd = f"sshpass -p '{HOSTINGER_PASS}' ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -p {HOSTINGER_PORT} {HOSTINGER_USER}@{HOSTINGER_HOST} 'cd domains/nosvers.com/public_html && wp --path=. post list --post_type=page --post_status=publish --fields=ID,post_title,post_name --format=table 2>/dev/null'"
     try:
         r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
         lines = [l for l in r.stdout.split('\n') if l.strip() and 'Success' not in l and 'cache' not in l.lower()]

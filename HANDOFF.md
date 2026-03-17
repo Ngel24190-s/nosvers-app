@@ -44,7 +44,7 @@
 - Push a GitHub → autodeploy Hostinger
 - Agentes: ya en VPS /home/nosvers/agents/
 - Ruta Hostinger real: ~/domains/nosvers.com/public_html/granja/
-- SSH backup: sshpass -p 'Angelnosvers26!' scp -P 65002 [file] u859094205@nosvers.com:domains/nosvers.com/public_html/granja/
+- SSH backup: sshpass -p "$HOSTINGER_PASS" scp -P 65002 [file] u859094205@nosvers.com:domains/nosvers.com/public_html/granja/
 
 ## Completado hoy (2026-03-14)
 - [x] BLOQUE 1: UI HQ + Vista África (index.html completo)
