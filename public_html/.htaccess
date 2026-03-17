@@ -1,0 +1,14 @@
+
+# === SECURITY — Added by audit 2026-03-17 ===
+# Block direct access to JSON files
+<FilesMatch "\.json$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to knowledge_base directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^knowledge_base/ - [F,L]
+</IfModule>
+# === END SECURITY ===
