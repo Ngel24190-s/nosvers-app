@@ -401,3 +401,32 @@ NUNCA usar: Arial, Inter, Roboto, blanco puro #ffffff, ni verde genérico
 
 El Studio V2 de referencia está en: /home/nosvers/nosvers-studio-v2.html (84KB)
 Templates generados en: /home/nosvers/templates/
+
+---
+
+## 🤖 AGENTES ESPECIALIZADOS
+
+Agentes disponibles en `.claude/agents/` — cargar según la tarea:
+
+| Agente | Archivo | Cuándo usarlo |
+|--------|---------|---------------|
+| **El Sargento** | `orchestrator.md` | Coordinación, estado del sistema, briefings |
+| **La Voz** | `instagram-curator.md` | Contenido Instagram, captions FR, grille |
+| **El Investigador** | `seo-writer.md` | Artículos blog, SEO, keywords |
+| **El Ojo** | `visual-editor.md` | Fotos, edición, identidad visual |
+| **La Traductora** | `africa-content.md` | PDFs Club, contenido de África, guías |
+| **Growth Tracker** | `growth-tracker.md` | Ventas, métricas, ROI, experimentos |
+| **Infra Maintainer** | `infrastructure-maintainer.md` | VPS, WordPress, seguridad, backups |
+
+### Cómo cargar un agente
+
+Cuando trabajes en una tarea específica, carga el agente correspondiente:
+```
+/agent instagram-curator
+```
+O referencia múltiples agentes para tareas complejas que cruzan dominios.
+
+### Regla de oro
+
+> Todos los agentes pueden generar, preparar, organizar y proponer.
+> La decisión final de publicar, vender o contactar clientes es SIEMPRE de Angel.
