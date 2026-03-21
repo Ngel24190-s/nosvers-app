@@ -3414,6 +3414,31 @@ body.africa-mode .mobile-topbar-title::after {
 
   </div>
 
+
+  <!-- COUCHE 3: Opérations & Growth -->
+  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.6rem;margin-top:0.5rem">⚙️ Opérations & Growth</div>
+  <div class="agents-grid">
+
+    <div class="agent-specialist" id="card-growth" onclick="selectAgent('growth')" style="border-left:3px solid #1A6B3A">
+      <div class="agent-spec-icon" style="background:#E4F4EA;color:#1A6B3A">📈</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Growth Tracker</div>
+        <div class="agent-spec-desc">Ventas · ROI · Costes · Expériences</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#E4F4EA;color:#1A6B3A">Growth</div>
+    </div>
+
+    <div class="agent-specialist" id="card-infra" onclick="selectAgent('infra')" style="border-left:3px solid #5A3A2A">
+      <div class="agent-spec-icon" style="background:#F0E8E3;color:#5A3A2A">🔧</div>
+      <div class="agent-spec-info">
+        <div class="agent-spec-name">Infra Maintainer</div>
+        <div class="agent-spec-desc">VPS · WordPress · Sécurité · Agents</div>
+      </div>
+      <div class="agent-spec-badge" style="background:#F0E8E3;color:#5A3A2A">Infra</div>
+    </div>
+
+  </div>
+
   <!-- Panel consultation -->
   <div id="agentConsultPanel" style="display:none;margin-top:1.2rem">
     <div style="background:white;border:1.5px solid var(--border);border-radius:16px;overflow:hidden">
@@ -4601,6 +4626,35 @@ MÉTRIQUES: Instagram (engagement, portée, followers), WordPress (visites, page
 FORMAT RAPPORT: 4 chiffres clés en gras + ce qui a marché + ce qui peut s'améliorer + 1 recommandation pour Le Directeur.
 Réponds en français. Factuel. Chiffres. Pas de blabla.`,
 
+
+    growth: `Tu es le Growth Tracker de NosVers, ferme lombricole à Neuvic, Dordogne.
+
+FERME NOSVERS — PRODUITS ET MARGES:
+- Pack Engrais Vert: 9,90€ (coût ~3€, marge ~70%)
+- Lombricompost 5L: 9,90€ (coût ~2€, marge ~80%)
+- Kit Extrait Vivant: 45€ (coût ~15€, marge ~67%)
+- Service Frais: 25€ (coût ~8€, marge ~68%)
+- Atelier Sol Vivant: 85€ (coût ~10€, marge ~88%)
+- Club Sol Vivant: 15€/mois (coût ~2€, marge ~87%)
+OBJECTIF: M3=600€/mois, M6=2.000€/mois
+COÛTS FIXES: VPS ~10€/mois, API Claude ~15-25€/mois
+RÔLE: Mesurer ventes, coûts, ROI par canal. Proposer des expériences concrètes.
+Réponds en français. Chiffres d'abord, interprétation ensuite. Jamais gonfler les résultats.`,
+
+    infra: `Tu es l'Infrastructure Maintainer de NosVers, ferme lombricole à Neuvic, Dordogne.
+
+STACK TECHNIQUE:
+- VPS: Hostinger srv1313138.hstgr.cloud (Ubuntu 24.04, 16GB RAM, 4 cores)
+- WordPress: nosvers.com (WooCommerce + Rank Math SEO + LiteSpeed)
+- MCP Server: FastMCP sur port 8765 (systemd: nosvers-mcp)
+- Bot Telegram: @nosvers_hq_bot (systemd: nosvers-bot)
+- Agentes: 24 scripts Python dans /home/nosvers/agents/ avec cron
+- Vault: 50+ fichiers .md dans knowledge_base/
+- GitHub: Ngel24190-s/nosvers-app
+RÔLE: Vérifier que tout fonctionne. Diagnostiquer les pannes. Proposer des corrections.
+SÉCURITÉ: vérifier .htaccess, CORS, ports exposés, credentials dans le code.
+Réponds en français. Technique. Concis. Cause + solution + urgence.`,
+
     // ── LEGACY (compatibilité anciens boutons) ──────────────────
     vers: `Tu es Maître Eisenia, expert lombricompost de NosVers. Réponds comme l'agent eisenia.`,
     compost: `Tu es Le Composteur, expert compost de NosVers. Réponds comme l'agent composteur.`,
@@ -5588,6 +5642,8 @@ function selectAgent(domain) {
     // Marketing
     directeur: 'Le Directeur', oeil: "L'Œil",
     plume: 'La Plume', analyste: "L'Analyste",
+    // Ops & Growth
+    growth: 'Growth Tracker', infra: 'Infra Maintainer',
     // Legacy
     vers: 'Maître Eisenia', compost: 'Le Composteur',
     animaux: 'Le Berger', huerto: 'Le Jardinier',
@@ -5596,6 +5652,7 @@ function selectAgent(domain) {
     eisenia: '#3D5420', composteur: '#8B5A2B', ingham: '#3A5A7A',
     jardinier: '#4A7A3A', berger: '#7A4A2A', planificateur: '#7A3A6A',
     directeur: '#2A2A3A', oeil: '#2A4A7A', plume: '#7A6A2A', analyste: '#2A4A3A',
+    growth: '#1A6B3A', infra: '#5A3A2A',
     vers: '#3D5420', compost: '#8B5A2B', animaux: '#7A4A2A', huerto: '#4A7A3A',
   };
   const col = colors[domain] || '#666';
@@ -6045,6 +6102,8 @@ const agentMeta = {
   oeil:         { name: "L'Œil",          role: 'Visuels · Photos · Instagram',               color: '#2A4A7A', bg: '#E8EFF8', icon: '📸' },
   plume:        { name: 'La Plume',       role: 'Captions · Blog SEO · Voix NosVers',         color: '#7A6A2A', bg: '#F5F0E0', icon: '✍️' },
   analyste:     { name: "L'Analyste",     role: 'Métriques · Rapport hebdo · Ventes',         color: '#2A4A3A', bg: '#E8F3EE', icon: '📊' },
+  growth:       { name: 'Growth Tracker',  role: 'Ventas · ROI · Costes · Expériences',        color: '#1A6B3A', bg: '#E4F4EA', icon: '📈' },
+  infra:        { name: 'Infra Maintainer', role: 'VPS · WordPress · Sécurité · Agents',         color: '#5A3A2A', bg: '#F0E8E3', icon: '🔧' },
 };
 let agentConsultHistory = {};
 
