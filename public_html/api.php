@@ -336,21 +336,30 @@ switch ($action) {
         $type = $data['type'] ?? 'image/jpeg';
         $user = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['user'] ?? 'unknown'));
         $note = $data['note'] ?? '';
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['category'] ?? 'general'));
+        $agent = preg_replace('/[^a-z0-9_-]/', '', strtolower($data['agent'] ?? ''));
+        $validCats = ['instagram', 'huerto', 'vers', 'produits', 'general', 'animaux', 'ferme', 'compost'];
+        if (!in_array($category, $validCats)) $category = 'general';
         if (empty($image)) { http_response_code(400); echo json_encode(['error' => 'No image']); break; }
         $imageData = base64_decode($image);
         if ($imageData === false) { http_response_code(400); echo json_encode(['error' => 'Invalid base64']); break; }
         $ext = 'jpg';
         if (strpos($type, 'png') !== false) $ext = 'png';
         elseif (strpos($type, 'webp') !== false) $ext = 'webp';
-        $uploadDir = __DIR__ . '/uploads/' . $user;
+        // Organize by category
+        $uploadDir = __DIR__ . '/uploads/' . $category;
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-        $filename = date('Y-m-d_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $filename = date('Y-m-d_His') . '_' . $category . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
         $filepath = $uploadDir . '/' . $filename;
         if (file_put_contents($filepath, $imageData) === false) { http_response_code(500); echo json_encode(['error' => 'Save failed']); break; }
         try {
             $stmt = $pdo->prepare("INSERT INTO journal (domain, action, completed) VALUES (:d, :a, 1)");
-            $stmt->execute([':d' => $user, ':a' => 'Photo: ' . $filename . ($note ? ' - ' . $note : '')]);
+            $noteStr = $category . ': ' . $filename . ($note ? ' - ' . $note : '') . ($agent ? ' [' . $agent . ']' : '');
+            $stmt->execute([':d' => $user, ':a' => 'Photo: ' . $noteStr]);
         } catch (Exception $e) {}
+        // Write to photos log file for agents
+        $logLine = date('Y-m-d H:i') . " | $user | $category | $note | $filename | pending_drive_sync\n";
+        file_put_contents(__DIR__ . '/uploads/photos_log.txt', $logLine, FILE_APPEND);
         $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
         echo json_encode(['ok' => true, 'filename' => $filename, 'url' => $baseUrl . '/granja/uploads/' . $user . '/' . $filename, 'size' => strlen($imageData)]);
         break;
@@ -444,6 +453,35 @@ switch ($action) {
             'instagram_url' => $result['instagram_url'] ?? '',
             'post_id'       => $result['post_id'] ?? '',
         ]);
+        break;
+
+    // ============================================================
+    //  LIST PHOTOS — by category
+    // ============================================================
+    case 'list_photos':
+        $category = preg_replace('/[^a-z0-9_-]/', '', strtolower($_GET['category'] ?? ''));
+        $uploadsBase = __DIR__ . '/uploads/';
+        $result = [];
+        
+        $cats = $category ? [$category] : ['instagram', 'huerto', 'vers', 'produits', 'general', 'animaux', 'ferme', 'compost'];
+        foreach ($cats as $cat) {
+            $catDir = $uploadsBase . $cat;
+            if (!is_dir($catDir)) continue;
+            $files = array_diff(scandir($catDir, SCANDIR_SORT_DESCENDING), ['.', '..']);
+            foreach ($files as $f) {
+                $fp = $catDir . '/' . $f;
+                if (!is_file($fp)) continue;
+                $result[] = [
+                    'category' => $cat,
+                    'filename' => $f,
+                    'size' => filesize($fp),
+                    'date' => date('Y-m-d H:i', filemtime($fp)),
+                    'url' => 'uploads/' . $cat . '/' . $f,
+                    'drive_synced' => false
+                ];
+            }
+        }
+        echo json_encode(['ok' => true, 'photos' => $result, 'total' => count($result)]);
         break;
 
     default:
