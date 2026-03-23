@@ -3451,12 +3451,22 @@ body.africa-mode .mobile-topbar-title::after {
         <button onclick="closeAgentConsult()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer">✕</button>
       </div>
       <div id="agentConsultMessages" style="height:300px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem"></div>
-      <div style="padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:8px">
+      <!-- Photo preview -->
+      <div id="consultPhotoPreview" style="display:none;padding:0.5rem 0.75rem;border-top:1px solid var(--border);position:relative">
+        <img id="consultPhotoImg" style="max-height:120px;border-radius:8px;object-fit:cover" />
+        <button onclick="removeConsultPhoto()" style="position:absolute;top:8px;right:12px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      </div>
+      <!-- Input bar with photo button -->
+      <div style="padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center">
+        <input type="file" id="consultPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleConsultPhoto(this)">
+        <button id="btnConsultPhoto" onclick="document.getElementById('consultPhotoInput').click()"
+          style="background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:1.1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s"
+          title="Ajouter une photo">📷</button>
         <input id="agentConsultInput" type="text" placeholder="Posez votre question…"
           style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:0.6rem 0.8rem;font-size:16px;font-family:'DM Sans',sans-serif;background:var(--bg);outline:none"
           onkeydown="if(event.key==='Enter') sendAgentConsult()">
         <button onclick="sendAgentConsult()"
-          style="background:var(--primary);border:none;color:white;width:40px;height:40px;border-radius:10px;font-size:1rem;cursor:pointer">➤</button>
+          style="background:var(--primary);border:none;color:white;width:40px;height:40px;border-radius:10px;font-size:1rem;cursor:pointer;flex-shrink:0">➤</button>
       </div>
     </div>
   </div>
@@ -6170,11 +6180,18 @@ function addConsultMsg(domain, role, text) {
 async function sendAgentConsult() {
   const input = document.getElementById('agentConsultInput');
   const question = input?.value?.trim();
-  if (!question || !activeAgent) return;
+  if (!question && !currentPhotoBase64) return;
+  if (!activeAgent) return;
   
   input.value = '';
   input.disabled = true;
-  addConsultMsg(activeAgent, 'user', question);
+  
+  // Show photo in chat if attached
+  let displayMsg = question || '';
+  if (currentPhotoBase64) {
+    displayMsg = (question ? question + '\n' : '') + '📷 Photo jointe';
+  }
+  addConsultMsg(activeAgent, 'user', displayMsg);
   addConsultMsg(activeAgent, 'agent', '⏳ Réflexion en cours…');
   
   const prevMode = currentMode;
@@ -6198,7 +6215,49 @@ async function sendAgentConsult() {
   
   input.disabled = false;
   input.focus();
+  // Clear photo after sending
+  removeConsultPhoto();
 }
+
+
+// ── CONSULTATION PANEL PHOTO ─────────────────────────────
+function handleConsultPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  currentPhotoType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    currentPhotoBase64 = dataUrl.split(',')[1];
+    // Show preview
+    const img = document.getElementById('consultPhotoImg');
+    const wrap = document.getElementById('consultPhotoPreview');
+    const btn = document.getElementById('btnConsultPhoto');
+    if (img) img.src = dataUrl;
+    if (wrap) wrap.style.display = 'block';
+    if (btn) { btn.style.background = 'var(--primary)'; btn.style.color = 'white'; btn.style.borderColor = 'var(--primary)'; }
+    // Also save to server
+    const user = sessionStorage.getItem('nv_user') || 'unknown';
+    api('upload_photo', { image: currentPhotoBase64, type: currentPhotoType, user: user, note: (activeAgent || 'agent') + ': ' + file.name }).catch(err => console.warn(err));
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeConsultPhoto() {
+  currentPhotoBase64 = null;
+  currentPhotoType = null;
+  const img = document.getElementById('consultPhotoImg');
+  const wrap = document.getElementById('consultPhotoPreview');
+  const btn = document.getElementById('btnConsultPhoto');
+  const input = document.getElementById('consultPhotoInput');
+  if (img) img.src = '';
+  if (wrap) wrap.style.display = 'none';
+  if (btn) { btn.style.background = 'none'; btn.style.color = ''; btn.style.borderColor = 'var(--border)'; }
+  if (input) input.value = '';
+}
+
+// Override sendAgentConsult to show photo in chat + clear after send
+const _originalSendAgentConsult = sendAgentConsult;
 
 </script>
 
