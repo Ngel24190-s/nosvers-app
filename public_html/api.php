@@ -25,47 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_GET['action'] ?? '';
 
-// TEMP MIGRATION — remove after successful run
-if ($action === '_migrate_huerto') {
-    try {
-        $pdo_m = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        $pdo_m->exec("CREATE TABLE IF NOT EXISTS huerto_entradas (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            fecha DATE NOT NULL,
-            tipo ENUM('gasto','cosecha') NOT NULL,
-            variedad VARCHAR(100) NOT NULL,
-            cantidad DECIMAL(10,3) NOT NULL,
-            unidad ENUM('g','kg','unidades','botte','barquette') NOT NULL DEFAULT 'kg',
-            coste_eur DECIMAL(10,2) NULL,
-            precio_ref_eur_kg DECIMAL(10,2) NULL,
-            ahorro_eur DECIMAL(10,2) NULL,
-            proveedor VARCHAR(150) NULL,
-            origen ENUM('achat','semis_maison') NULL,
-            nota TEXT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_fecha (fecha),
-            INDEX idx_tipo (tipo),
-            INDEX idx_variedad (variedad)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        $pdo_m->exec("CREATE TABLE IF NOT EXISTS huerto_precios_ref (
-            variedad VARCHAR(100) PRIMARY KEY,
-            precio_eur_kg DECIMAL(10,2) NOT NULL,
-            peso_unidad_g INT NULL,
-            fuente VARCHAR(255) NULL,
-            fecha_actualizacion DATE NOT NULL,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        // Verify
-        $tables = $pdo_m->query("SHOW TABLES LIKE 'huerto_%'")->fetchAll(PDO::FETCH_COLUMN);
-        echo json_encode(['ok' => true, 'tables' => $tables]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
-    exit;
-}
-// END TEMP MIGRATION
-
 if ($action !== 'login') {
     $token = $_SERVER['HTTP_X_APP_TOKEN'] ?? '';
     if (!validarToken($token)) {
@@ -523,6 +482,212 @@ switch ($action) {
             }
         }
         echo json_encode(['ok' => true, 'photos' => $result, 'total' => count($result)]);
+        break;
+
+    // ============================================================
+    //  HUERTO TRACKING — 6 endpoints
+    // ============================================================
+
+    case 'huerto_entrada_add':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $tipo = $data['tipo'] ?? '';
+        if (!in_array($tipo, ['gasto','cosecha'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'tipo invalido']);
+            break;
+        }
+        $fecha = $data['fecha'] ?? date('Y-m-d');
+        $variedad = trim(strtolower($data['variedad'] ?? ''));
+        $cantidad = (float)($data['cantidad'] ?? 0);
+        $unidad = $data['unidad'] ?? 'kg';
+        $coste = isset($data['coste_eur']) ? (float)$data['coste_eur'] : null;
+        $proveedor = $data['proveedor'] ?? null;
+        $origen = $data['origen'] ?? null;
+        $nota = $data['nota'] ?? null;
+        $precio_ref = null;
+        $ahorro = null;
+
+        if ($tipo === 'cosecha') {
+            $stmt = $pdo->prepare("SELECT precio_eur_kg, peso_unidad_g FROM huerto_precios_ref WHERE variedad = :v");
+            $stmt->execute([':v' => $variedad]);
+            $ref = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($ref) {
+                $precio_ref = (float)$ref['precio_eur_kg'];
+                $peso_u = $ref['peso_unidad_g'] ? (int)$ref['peso_unidad_g'] : 200;
+                $cantidad_kg = $cantidad;
+                if ($unidad === 'g') $cantidad_kg = $cantidad / 1000;
+                elseif (in_array($unidad, ['unidades','botte','barquette'])) {
+                    $cantidad_kg = ($cantidad * $peso_u) / 1000;
+                }
+                $ahorro = round($cantidad_kg * $precio_ref, 2);
+            }
+        }
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO huerto_entradas
+             (fecha, tipo, variedad, cantidad, unidad, coste_eur, precio_ref_eur_kg, ahorro_eur, proveedor, origen, nota)
+             VALUES (:fecha,:tipo,:variedad,:cantidad,:unidad,:coste,:precio_ref,:ahorro,:proveedor,:origen,:nota)"
+        );
+        $stmt->execute([
+            ':fecha' => $fecha, ':tipo' => $tipo, ':variedad' => $variedad,
+            ':cantidad' => $cantidad, ':unidad' => $unidad, ':coste' => $coste,
+            ':precio_ref' => $precio_ref, ':ahorro' => $ahorro,
+            ':proveedor' => $proveedor, ':origen' => $origen, ':nota' => $nota
+        ]);
+        $id = $pdo->lastInsertId();
+
+        // Sync vault
+        $mes = substr($fecha, 0, 7);
+        $vault_dir = '/home/nosvers/public_html/knowledge_base/huerto';
+        if (!is_dir($vault_dir)) mkdir($vault_dir, 0755, true);
+        $vault_path = "$vault_dir/entradas-$mes.md";
+        if (!file_exists($vault_path)) {
+            file_put_contents($vault_path,
+                "# Entradas huerto $mes\n\n" .
+                "| Fecha | Tipo | Variedad | Cantidad | Unidad | Coste EUR | Ahorro EUR | Nota |\n" .
+                "|-------|------|----------|----------|--------|-----------|------------|------|\n"
+            );
+        }
+        $line = sprintf("| %s | %s | %s | %s | %s | %s | %s | %s |\n",
+            $fecha, $tipo, $variedad, $cantidad, $unidad,
+            $coste !== null ? number_format($coste, 2) : '-',
+            $ahorro !== null ? number_format($ahorro, 2) : '-',
+            $nota ? str_replace('|','/',$nota) : ''
+        );
+        file_put_contents($vault_path, $line, FILE_APPEND);
+
+        echo json_encode([
+            'ok' => true, 'id' => $id,
+            'precio_ref_eur_kg' => $precio_ref,
+            'ahorro_eur' => $ahorro,
+            'aviso_precio' => ($tipo === 'cosecha' && $precio_ref === null)
+                ? 'Prix non reference - Claude le cherchera lundi' : null
+        ]);
+        break;
+
+    case 'huerto_entradas_list':
+        $tipo = $_GET['tipo'] ?? null;
+        $mes = $_GET['mes'] ?? null;
+        $limit = min((int)($_GET['limit'] ?? 50), 500);
+        $where = [];
+        $params = [];
+        if ($tipo && in_array($tipo, ['gasto','cosecha'])) {
+            $where[] = 'tipo = :tipo';
+            $params[':tipo'] = $tipo;
+        }
+        if ($mes && preg_match('/^\d{4}-\d{2}$/', $mes)) {
+            $where[] = 'DATE_FORMAT(fecha,"%Y-%m") = :mes';
+            $params[':mes'] = $mes;
+        }
+        $sql = "SELECT * FROM huerto_entradas";
+        if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
+        $sql .= ' ORDER BY fecha DESC, id DESC LIMIT ' . $limit;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+
+    case 'huerto_entrada_delete':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($data['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo json_encode(['error'=>'id requerido']); break; }
+        $stmt = $pdo->prepare("DELETE FROM huerto_entradas WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        echo json_encode(['ok' => true, 'deleted' => $stmt->rowCount()]);
+        break;
+
+    case 'huerto_balance':
+        $mes = $_GET['mes'] ?? date('Y-m');
+        $where_mes = ($mes === 'total') ? '1=1' : 'DATE_FORMAT(fecha,"%Y-%m") = :mes';
+        $params = ($mes === 'total') ? [] : [':mes' => $mes];
+
+        $stmt = $pdo->prepare(
+            "SELECT
+                SUM(CASE WHEN tipo='gasto' THEN coste_eur ELSE 0 END) AS gasto_total,
+                SUM(CASE WHEN tipo='cosecha' THEN ahorro_eur ELSE 0 END) AS valor_cosecha,
+                COUNT(CASE WHEN tipo='gasto' THEN 1 END) AS n_gastos,
+                COUNT(CASE WHEN tipo='cosecha' THEN 1 END) AS n_cosechas
+             FROM huerto_entradas WHERE $where_mes"
+        );
+        $stmt->execute($params);
+        $totals = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare(
+            "SELECT variedad,
+                    SUM(CASE WHEN tipo='gasto' THEN coste_eur ELSE 0 END) AS gasto,
+                    SUM(CASE WHEN tipo='cosecha' THEN ahorro_eur ELSE 0 END) AS valor
+             FROM huerto_entradas WHERE $where_mes
+             GROUP BY variedad ORDER BY valor DESC LIMIT 20"
+        );
+        $stmt->execute($params);
+        $por_variedad = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->query(
+            "SELECT DATE_FORMAT(fecha,'%Y-%m') AS mes,
+                    SUM(CASE WHEN tipo='gasto' THEN coste_eur ELSE 0 END) AS gasto,
+                    SUM(CASE WHEN tipo='cosecha' THEN ahorro_eur ELSE 0 END) AS valor
+             FROM huerto_entradas
+             WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+             GROUP BY mes ORDER BY mes"
+        );
+        $serie = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $gasto = (float)($totals['gasto_total'] ?? 0);
+        $valor = (float)($totals['valor_cosecha'] ?? 0);
+
+        echo json_encode([
+            'mes' => $mes,
+            'gasto_total' => round($gasto, 2),
+            'valor_cosecha' => round($valor, 2),
+            'ahorro_neto' => round($valor - $gasto, 2),
+            'n_gastos' => (int)$totals['n_gastos'],
+            'n_cosechas' => (int)$totals['n_cosechas'],
+            'por_variedad' => $por_variedad,
+            'serie_mensual' => $serie
+        ]);
+        break;
+
+    case 'huerto_precios_get':
+        $stmt = $pdo->query(
+            "SELECT variedad, precio_eur_kg, peso_unidad_g, fuente, fecha_actualizacion
+             FROM huerto_precios_ref ORDER BY variedad"
+        );
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+
+    case 'huerto_precios_set':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $items = $data['items'] ?? [];
+        $stmt = $pdo->prepare(
+            "INSERT INTO huerto_precios_ref (variedad, precio_eur_kg, peso_unidad_g, fuente, fecha_actualizacion)
+             VALUES (:v, :p, :pu, :f, :fa)
+             ON DUPLICATE KEY UPDATE precio_eur_kg=:p2, peso_unidad_g=:pu2, fuente=:f2, fecha_actualizacion=:fa2"
+        );
+        $n = 0;
+        foreach ($items as $it) {
+            $v = trim(strtolower($it['variedad'] ?? ''));
+            if (!$v) continue;
+            $p = (float)$it['precio_eur_kg'];
+            $pu = isset($it['peso_unidad_g']) ? (int)$it['peso_unidad_g'] : null;
+            $f = $it['fuente'] ?? 'manuel';
+            $fa = $it['fecha_actualizacion'] ?? date('Y-m-d');
+            $stmt->execute([
+                ':v'=>$v, ':p'=>$p, ':pu'=>$pu, ':f'=>$f, ':fa'=>$fa,
+                ':p2'=>$p, ':pu2'=>$pu, ':f2'=>$f, ':fa2'=>$fa
+            ]);
+            $n++;
+        }
+        echo json_encode(['ok'=>true, 'updated'=>$n]);
+        break;
+
+    case 'huerto_variedades_distinct':
+        $stmt = $pdo->query(
+            "SELECT DISTINCT variedad FROM huerto_entradas
+             UNION
+             SELECT variedad FROM huerto_precios_ref
+             ORDER BY 1"
+        );
+        echo json_encode($stmt->fetchAll(PDO::FETCH_COLUMN));
         break;
 
     default:
