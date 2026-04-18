@@ -25,6 +25,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_GET['action'] ?? '';
 
+// TEMP MIGRATION — remove after successful run
+if ($action === '_migrate_huerto') {
+    try {
+        $pdo_m = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $pdo_m->exec("CREATE TABLE IF NOT EXISTS huerto_entradas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            fecha DATE NOT NULL,
+            tipo ENUM('gasto','cosecha') NOT NULL,
+            variedad VARCHAR(100) NOT NULL,
+            cantidad DECIMAL(10,3) NOT NULL,
+            unidad ENUM('g','kg','unidades','botte','barquette') NOT NULL DEFAULT 'kg',
+            coste_eur DECIMAL(10,2) NULL,
+            precio_ref_eur_kg DECIMAL(10,2) NULL,
+            ahorro_eur DECIMAL(10,2) NULL,
+            proveedor VARCHAR(150) NULL,
+            origen ENUM('achat','semis_maison') NULL,
+            nota TEXT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_fecha (fecha),
+            INDEX idx_tipo (tipo),
+            INDEX idx_variedad (variedad)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $pdo_m->exec("CREATE TABLE IF NOT EXISTS huerto_precios_ref (
+            variedad VARCHAR(100) PRIMARY KEY,
+            precio_eur_kg DECIMAL(10,2) NOT NULL,
+            peso_unidad_g INT NULL,
+            fuente VARCHAR(255) NULL,
+            fecha_actualizacion DATE NOT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        // Verify
+        $tables = $pdo_m->query("SHOW TABLES LIKE 'huerto_%'")->fetchAll(PDO::FETCH_COLUMN);
+        echo json_encode(['ok' => true, 'tables' => $tables]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
+}
+// END TEMP MIGRATION
+
 if ($action !== 'login') {
     $token = $_SERVER['HTTP_X_APP_TOKEN'] ?? '';
     if (!validarToken($token)) {
