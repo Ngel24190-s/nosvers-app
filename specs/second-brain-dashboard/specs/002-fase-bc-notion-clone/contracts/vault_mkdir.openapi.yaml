@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — vault mkdir
+  version: 0.2.0
+paths:
+  /vault/mkdir:
+    post:
+      summary: Crear una nueva carpeta dentro del vault
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [parent, name]
+              properties:
+                parent: { type: string, description: "Ruta relativa de la carpeta padre" }
+                name:
+                  type: string
+                  pattern: '^[A-Za-z0-9_\-]+$'
+                  maxLength: 64
+      responses:
+        "201":
+          description: Carpeta creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  path: { type: string }
+        "400": { description: Nombre inválido }
+        "401": { description: No autenticado }
+        "409": { description: Ya existe }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

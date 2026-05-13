@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — mover archivo dentro del vault
+  version: 0.2.0
+paths:
+  /vault/move:
+    post:
+      summary: Mover (o renombrar) un archivo del vault
+      description: |
+        Mantiene los wiki-links válidos (resolución por slug, D-012).
+        Si destino existe → 409.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [src, dst]
+              properties:
+                src: { type: string }
+                dst: { type: string }
+      responses:
+        "200":
+          description: Movido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  src: { type: string }
+                  dst: { type: string }
+        "401": { description: No autenticado }
+        "404": { description: src no existe }
+        "409": { description: dst ya existe }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

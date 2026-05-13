@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — restaurar nota archivada
+  version: 0.2.0
+paths:
+  /nota/restaurar:
+    post:
+      summary: Mover una nota desde dia/archivo/ de vuelta a dia/ y limpiar campos archived_*
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+                  example: "dia/archivo/2026-05-13-idea.md"
+      responses:
+        "200":
+          description: Nota restaurada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  new_path: { type: string, example: "dia/2026-05-13-idea.md" }
+        "401": { description: No autenticado }
+        "404": { description: Nota archivada no encontrada }
+        "409": { description: Conflicto (p.ej. ya existe nota con ese nombre en destino) }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — proyectos NosVers
+  version: 0.2.0
+paths:
+  /proyectos:
+    get:
+      summary: Listar proyectos del kanban
+      description: |
+        Lee knowledge_base/proyectos/*.md. Si la carpeta no existe, la crea
+        con un archivo bienvenida.md y devuelve solo ese proyecto.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de proyectos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proyectos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Proyecto"
+        "401": { description: No autenticado }
+    patch:
+      summary: Actualizar el estado (u otros campos) de un proyecto
+      description: |
+        Concurrencia optimista con If-Match.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: If-Match
+          required: true
+          schema: { type: string, format: date-time }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug]
+              properties:
+                slug: { type: string }
+                estado:
+                  type: string
+                  enum: [todo, doing, done, blocked]
+                titulo: { type: string }
+                responsable:
+                  type: string
+                  enum: [angel, africa]
+                deadline:
+                  type: string
+                  format: date
+                etiquetas:
+                  type: array
+                  items: { type: string }
+      responses:
+        "200":
+          description: Proyecto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Proyecto"
+        "401": { description: No autenticado }
+        "404": { description: Proyecto no encontrado }
+        "409": { description: stale_modified_at }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    Proyecto:
+      type: object
+      required: [slug, titulo, estado, modified_at]
+      properties:
+        slug: { type: string, example: "tienda-lemon-squeezy" }
+        titulo: { type: string }
+        estado:
+          type: string
+          enum: [todo, doing, done, blocked, sin_estado]
+        modified_at: { type: string, format: date-time }
+        responsable:
+          type: string
+          enum: [angel, africa]
+        deadline: { type: string, format: date }
+        etiquetas:
+          type: array
+          items: { type: string }
+        cuerpo: { type: string }

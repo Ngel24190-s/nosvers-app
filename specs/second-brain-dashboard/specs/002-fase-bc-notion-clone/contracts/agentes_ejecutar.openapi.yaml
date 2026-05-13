@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — ejecutar agente del unified-agent
+  version: 0.2.0
+paths:
+  /agentes/ejecutar:
+    post:
+      summary: Lanzar un agente del catálogo público con un clic
+      description: |
+        Invoca via import in-process (D-001). Timeout configurable, default 30s.
+        Si excede el timeout, devuelve 504 sin colgar la conexión (FR-033).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug]
+              properties:
+                slug:
+                  type: string
+                  enum: [agt05_africa, agt07_diario, agt_eisenia, orchestrator]
+                args:
+                  type: object
+                  additionalProperties: true
+                  description: Argumentos opcionales del agente
+      responses:
+        "200":
+          description: Output del agente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  slug: { type: string }
+                  output: { type: string }
+                  duration_s: { type: number }
+                  triggered_by:
+                    type: string
+                    enum: [angel, africa]
+        "401": { description: No autenticado }
+        "404": { description: Slug no está en el catálogo público }
+        "504": { description: Agente excedió el timeout (MCP_STALL) }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — vault tree
+  version: 0.2.0
+paths:
+  /vault/tree:
+    get:
+      summary: Listar los hijos directos de una carpeta del vault (lazy)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: path
+          schema: { type: string, default: "" }
+          description: Ruta relativa a knowledge_base/. Vacío = raíz.
+      responses:
+        "200":
+          description: Lista de nodos directos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path: { type: string }
+                  children:
+                    type: array
+                    items:
+                      type: object
+                      required: [name, type]
+                      properties:
+                        name: { type: string }
+                        type: { type: string, enum: [folder, file] }
+                        size: { type: integer }
+                        modified_at: { type: string, format: date-time }
+        "401": { description: No autenticado }
+        "404": { description: Carpeta inexistente }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

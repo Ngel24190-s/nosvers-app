@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — editar nota
+  version: 0.2.0
+servers:
+  - url: https://tablero.nosvers.com/tablero/api/v2
+paths:
+  /nota:
+    patch:
+      summary: Editar el cuerpo y/o frontmatter parcial de una nota viva
+      description: |
+        Concurrencia optimista: el header `If-Match` debe contener el `modified_at`
+        actual del archivo. Si no coincide, devuelve 409 sin tocar el archivo.
+        Escritura atómica via tmp+rename.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: If-Match
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: ISO modified_at en disco.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+                  description: Ruta relativa dentro de knowledge_base/
+                  example: "dia/2026-05-13-idea.md"
+                titulo:
+                  type: string
+                cuerpo:
+                  type: string
+                etiquetas:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Nota actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "../contracts/capturar.openapi.yaml#/components/schemas/Nota"
+        "401":
+          description: JWT ausente o inválido
+        "404":
+          description: Nota inexistente o archivada
+        "409":
+          description: Conflicto de modified_at
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, example: false }
+                  error: { type: string, example: "stale_modified_at" }
+                  current_modified_at: { type: string, format: date-time }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

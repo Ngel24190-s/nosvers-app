@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — Google Calendar
+  version: 0.2.0
+paths:
+  /google/calendar/events:
+    get:
+      summary: Listar eventos próximos 7 días naturales
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: calendarId
+          schema: { type: string, default: "primary" }
+      responses:
+        "200":
+          description: Eventos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items: { $ref: "#/components/schemas/CalendarEvent" }
+        "401": { description: No autenticado / token caducado }
+    post:
+      summary: Crear un nuevo evento básico
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [summary, start, end]
+              properties:
+                calendarId: { type: string, default: "primary" }
+                summary: { type: string }
+                description: { type: string }
+                start: { type: string, format: date-time }
+                end: { type: string, format: date-time }
+                attendees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email: { type: string, format: email }
+      responses:
+        "201":
+          description: Evento creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CalendarEvent" }
+        "401": { description: No autenticado / OAuth caducado }
+        "502": { description: Error upstream Google }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    CalendarEvent:
+      type: object
+      required: [id, summary, start, end, htmlLink]
+      properties:
+        id: { type: string }
+        summary: { type: string }
+        start: { type: string, format: date-time }
+        end: { type: string, format: date-time }
+        description: { type: string }
+        attendees:
+          type: array
+          items:
+            type: object
+            properties:
+              email: { type: string, format: email }
+        hangoutLink: { type: string, format: uri }
+        htmlLink: { type: string, format: uri }
+        calendarId: { type: string }

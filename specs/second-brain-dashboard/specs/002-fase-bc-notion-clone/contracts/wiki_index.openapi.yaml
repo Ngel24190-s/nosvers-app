@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — wiki-link index (backlinks)
+  version: 0.2.0
+paths:
+  /wiki-index:
+    get:
+      summary: Obtener el índice global de wiki-links/backlinks
+      description: |
+        Devuelve el dict { target_slug: [{source_slug, context}] }. Notas archivadas
+        no están incluidas. El backend lo mantiene in-memory (D-004) y lo reconstruye
+        en startup.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: target
+          schema: { type: string }
+          description: Si se pasa, filtra solo los backlinks hacia ese slug.
+      responses:
+        "200":
+          description: Índice
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generated_at: { type: string, format: date-time }
+                  index:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        required: [source_slug, source_path, context]
+                        properties:
+                          source_slug: { type: string }
+                          source_path: { type: string }
+                          source_autor:
+                            type: string
+                            enum: [angel, africa]
+                          source_modified_at: { type: string, format: date-time }
+                          context: { type: string, description: "±50 chars around the link" }
+        "401": { description: No autenticado }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

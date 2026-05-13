@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — capturar
+  version: 0.2.0
+servers:
+  - url: https://tablero.nosvers.com/tablero/api/v2
+  - url: http://localhost:8000/tablero/api/v2
+paths:
+  /capturar:
+    post:
+      summary: Crear una nueva nota diaria
+      description: |
+        Invoca `voz.capturar.dia_capturar_impl` con el autor inferido del JWT.
+        Devuelve la nota recién creada con su path relativa al vault y modified_at.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cuerpo]
+              properties:
+                titulo:
+                  type: string
+                  maxLength: 200
+                  description: Opcional; si falta se genera del primer renglón del cuerpo.
+                cuerpo:
+                  type: string
+                  maxLength: 1048576
+                  description: Markdown libre. Puede contener `[[wiki-links]]`.
+                etiquetas:
+                  type: array
+                  items:
+                    type: string
+                    enum: [trabajo, nosvers, familia, mental, idea, otro]
+                  maxItems: 6
+      responses:
+        "201":
+          description: Nota creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Nota"
+        "400":
+          description: Cuerpo inválido o demasiado grande
+        "401":
+          description: JWT ausente o inválido
+        "500":
+          description: Error escribiendo al vault
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Nota:
+      type: object
+      required: [path, autor, fecha, modified_at, titulo, cuerpo, etiquetas]
+      properties:
+        path:
+          type: string
+          example: "dia/2026-05-13-idea-lombrithé.md"
+        autor:
+          type: string
+          enum: [angel, africa]
+        fecha:
+          type: string
+          format: date
+        modified_at:
+          type: string
+          format: date-time
+        titulo:
+          type: string
+        cuerpo:
+          type: string
+        etiquetas:
+          type: array
+          items:
+            type: string

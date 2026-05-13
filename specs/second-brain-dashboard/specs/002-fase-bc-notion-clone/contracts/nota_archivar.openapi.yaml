@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — archivar nota (soft delete)
+  version: 0.2.0
+paths:
+  /nota/archivar:
+    post:
+      summary: Mover una nota a knowledge_base/dia/archivo/ y añadir archived_at
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: If-Match
+          required: true
+          schema: { type: string, format: date-time }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path: { type: string }
+                archive_reason: { type: string, maxLength: 500 }
+      responses:
+        "200":
+          description: Nota archivada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, example: true }
+                  new_path: { type: string, example: "dia/archivo/2026-05-13-idea.md" }
+                  archived_at: { type: string, format: date-time }
+        "401": { description: No autenticado }
+        "404": { description: Nota no encontrada }
+        "409": { description: stale_modified_at }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

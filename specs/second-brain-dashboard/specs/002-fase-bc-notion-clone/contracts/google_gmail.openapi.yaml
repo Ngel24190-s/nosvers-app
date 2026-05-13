@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: tablero v2 — Gmail bandeja prioritaria
+  version: 0.2.0
+paths:
+  /google/gmail/threads:
+    get:
+      summary: Hilos prioritarios filtrados
+      description: |
+        Filtro Gmail: `is:starred OR label:Lectura/Tech OR from:noreply@anthropic.com`.
+        Devuelve máximo 20 hilos ordenados por fecha desc.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de hilos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  threads:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        snippet: { type: string }
+                        historyId: { type: string }
+                        last_message:
+                          type: object
+                          properties:
+                            from: { type: string }
+                            subject: { type: string }
+                            date: { type: string, format: date-time }
+        "401": { description: No autenticado / OAuth caducado }
+  /google/gmail/thread/{threadId}:
+    get:
+      summary: Detalle de un hilo (último mensaje sanitizado)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: threadId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Hilo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        from: { type: string }
+                        subject: { type: string }
+                        date: { type: string, format: date-time }
+                        body_html_sanitized: { type: string }
+                        body_text: { type: string }
+        "401": { description: No autenticado }
+        "404": { description: Hilo no encontrado }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
