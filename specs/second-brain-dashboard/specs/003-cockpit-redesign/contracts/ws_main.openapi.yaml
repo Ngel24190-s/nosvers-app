@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Cockpit WebSocket Protocol (informational)
+  version: 0.3.0
+  description: |
+    OpenAPI no modela WS de forma nativa. Este archivo documenta el handshake +
+    protocolo de mensajes. El path es WS, no HTTP.
+paths:
+  /tablero/api/v2/ws:
+    get:
+      summary: WebSocket handshake (upgrade)
+      description: |
+        Cliente abre `wss://host/tablero/api/v2/ws?token=<JWT>`.
+        Servidor valida JWT con `voz.auth.validar_token`. Si OK: `101 Switching Protocols`.
+        Si inválido/ausente: close code 4401 (unauthorized).
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: { type: string }
+          description: JWT Bearer (ver `voz.auth`).
+      responses:
+        '101':
+          description: WebSocket upgrade aceptado
+        '4401':
+          description: JWT inválido o ausente (close code, no HTTP status)
+
+components:
+  schemas:
+    SubscribeMessage:
+      type: object
+      required: [type, channel]
+      properties:
+        type: { type: string, enum: [subscribe, unsubscribe] }
+        channel:
+          type: string
+          enum: [health, claude, activity, agentes, revenue, aegis, wake]
+
+    PingMessage:
+      type: object
+      required: [type]
+      properties:
+        type: { type: string, enum: [ping] }
+
+    ServerSnapshot:
+      type: object
+      required: [type, channel, payload, ts]
+      properties:
+        type: { type: string, enum: [snapshot, update] }
+        channel: { type: string }
+        payload: { type: object }
+        ts: { type: integer, description: "Unix epoch seconds" }
+
+    ServerPong:
+      type: object
+      required: [type, ts]
+      properties:
+        type: { type: string, enum: [pong] }
+        ts: { type: integer }
+
+    ServerError:
+      type: object
+      required: [type, code]
+      properties:
+        type: { type: string, enum: [error] }
+        code: { type: string, enum: [unknown_channel, bad_message, internal] }
+        channel: { type: string, nullable: true }

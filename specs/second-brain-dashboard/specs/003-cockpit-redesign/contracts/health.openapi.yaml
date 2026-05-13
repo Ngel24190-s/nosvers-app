@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: Cockpit Health Endpoint
+  version: 0.3.0
+  description: |
+    Snapshot síncrono de métricas del VPS via psutil. Útil si un cliente quiere
+    estado sin abrir WS (smoke tests, scripts externos).
+paths:
+  /tablero/api/v2/health:
+    get:
+      summary: VPS health snapshot
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema: { type: string }
+          description: "Bearer JWT. Opcional — endpoint es de bajo coste."
+      responses:
+        '200':
+          description: Snapshot OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [cpu_pct, ram_pct, disk_pct, uptime_s]
+                properties:
+                  cpu_pct: { type: number, format: float, example: 12.4 }
+                  ram_pct: { type: number, format: float, example: 67.1 }
+                  ram_used_mb: { type: integer, example: 5388 }
+                  ram_total_mb: { type: integer, example: 8023 }
+                  disk_pct: { type: number, format: float, example: 73.2 }
+                  disk_used_gb: { type: number, format: float, example: 36.5 }
+                  disk_total_gb: { type: number, format: float, example: 49.9 }
+                  load_1: { type: number, format: float, example: 0.34 }
+                  load_5: { type: number, format: float, example: 0.41 }
+                  load_15: { type: number, format: float, example: 0.39 }
+                  net_in_kbps: { type: number, format: float, example: 12.3 }
+                  net_out_kbps: { type: number, format: float, example: 8.7 }
+                  uptime_s: { type: integer, example: 1843200 }
+        '503':
+          description: psutil no disponible
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string, example: "psutil_unavailable" }
+                  detalle: { type: string, example: "module 'psutil' not installed" }
