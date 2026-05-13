@@ -38,6 +38,16 @@ from tablero.timeline import listar_timeline  # noqa: E402
 # Fase B+C handlers (v2 prefix, D-014)
 from tablero.v2.capturar import capturar_handler as _v2_capturar  # noqa: E402
 from tablero.v2.editar import editar_handler as _v2_editar  # noqa: E402
+from tablero.v2.archivar import (  # noqa: E402
+    archivar_handler as _v2_archivar,
+    restaurar_handler as _v2_restaurar,
+)
+from tablero.v2.proyectos import (  # noqa: E402
+    actualizar_handler as _v2_proyectos_patch,
+    listar_handler as _v2_proyectos_list,
+)
+from tablero.v2.vault_tree import vault_tree_handler as _v2_vault_tree  # noqa: E402
+from tablero.v2.wiki_endpoint import wiki_index_handler as _v2_wiki_index  # noqa: E402
 
 log = get_logger("tablero.rest")
 
@@ -268,6 +278,30 @@ async def v2_editar_handler(request: Request) -> JSONResponse:
     return await _v2_editar(request, _autenticar, _cors_headers, _log_line)
 
 
+async def v2_archivar_handler(request: Request) -> JSONResponse:
+    return await _v2_archivar(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_restaurar_handler(request: Request) -> JSONResponse:
+    return await _v2_restaurar(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_proyectos_get_handler(request: Request) -> JSONResponse:
+    return await _v2_proyectos_list(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_proyectos_patch_handler(request: Request) -> JSONResponse:
+    return await _v2_proyectos_patch(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_vault_tree_handler(request: Request) -> JSONResponse:
+    return await _v2_vault_tree(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_wiki_index_handler(request: Request) -> JSONResponse:
+    return await _v2_wiki_index(request, _autenticar, _cors_headers, _log_line)
+
+
 def _startup_wiki_index() -> None:
     """Inicializa el wiki_index al arrancar el proceso. D-004."""
     try:
@@ -290,10 +324,27 @@ ROUTES = [
     Route("/tablero/api/nota", nota_handler, methods=["GET"]),
     Route("/tablero/api/nota", options_handler, methods=["OPTIONS"]),
     # ── Fase B+C (D-014 prefijo /v2/) ────────────────────────────────────────
+    # US1 capturar
     Route("/tablero/api/v2/capturar", v2_capturar_handler, methods=["POST"]),
     Route("/tablero/api/v2/capturar", options_handler, methods=["OPTIONS"]),
+    # US2 editar
     Route("/tablero/api/v2/nota", v2_editar_handler, methods=["PATCH"]),
     Route("/tablero/api/v2/nota", options_handler, methods=["OPTIONS"]),
+    # US3 archivar / restaurar
+    Route("/tablero/api/v2/nota/archivar", v2_archivar_handler, methods=["POST"]),
+    Route("/tablero/api/v2/nota/archivar", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/nota/restaurar", v2_restaurar_handler, methods=["POST"]),
+    Route("/tablero/api/v2/nota/restaurar", options_handler, methods=["OPTIONS"]),
+    # US6 proyectos kanban
+    Route("/tablero/api/v2/proyectos", v2_proyectos_get_handler, methods=["GET"]),
+    Route("/tablero/api/v2/proyectos", v2_proyectos_patch_handler, methods=["PATCH"]),
+    Route("/tablero/api/v2/proyectos", options_handler, methods=["OPTIONS"]),
+    # US7 wiki-index
+    Route("/tablero/api/v2/wiki-index", v2_wiki_index_handler, methods=["GET"]),
+    Route("/tablero/api/v2/wiki-index", options_handler, methods=["OPTIONS"]),
+    # US8 vault tree
+    Route("/tablero/api/v2/vault/tree", v2_vault_tree_handler, methods=["GET"]),
+    Route("/tablero/api/v2/vault/tree", options_handler, methods=["OPTIONS"]),
 ]
 
 
