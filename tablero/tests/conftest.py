@@ -10,6 +10,16 @@ from starlette.testclient import TestClient
 
 sys.path.insert(0, "/home/nosvers")
 
+
+@pytest.fixture(autouse=True)
+def voz_jwt_secret(monkeypatch):
+    """Inyecta un secret JWT determinista para todos los tests del tablero."""
+    monkeypatch.setenv(
+        "VOZ_JWT_SECRET",
+        "test-secret-only-for-pytest-do-not-use-in-prod",
+    )
+
+
 from voz.auth import emitir_token  # noqa: E402
 from tablero.rest import ROUTES  # noqa: E402
 
