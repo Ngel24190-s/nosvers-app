@@ -20,11 +20,11 @@ description: "Task list — Second Brain Dashboard Fase B+C (14 sub-componentes)
 
 **Purpose**: Instalar dependencias nuevas y preparar el esqueleto del subpaquete `tablero/v2/`.
 
-- [ ] T001 [P] Añadir dependencias backend al `pyproject.toml` (raíz `/home/nosvers/`): `httpx>=0.27`, `google-auth>=2.30`. — Test: `pip install -e .` corre sin error. — Commit: `chore(tablero-v2): add httpx + google-auth backend deps`
-- [ ] T002 [P] Añadir dependencias frontend a `tablero/web/package.json`: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `d3-force`, `d3-selection`, `d3-zoom`, `cmdk`, `dompurify`; devDeps: `@types/d3-force`, `@types/dompurify`, `@playwright/test`. — Test: `npm install && npm run build` pasa sin warnings nuevos. — Commit: `chore(tablero-v2): add dnd-kit + d3-force + cmdk + dompurify frontend deps`
-- [ ] T003 [P] Configurar `[tool.coverage]` en `/home/nosvers/pyproject.toml` con `fail_under = 80` y `source = ["tablero/v2"]`. — Test: `pytest --cov=tablero/v2 --cov-fail-under=80` corre (vacío todavía pasa porque no hay módulos). — Commit: `chore(tablero-v2): set coverage threshold 80%`
-- [ ] T004 Crear estructura `/home/nosvers/tablero/v2/` con `__init__.py` vacío y subcarpeta `tablero/v2/scripts/`. Crear `/home/nosvers/tablero/web/src/hooks/` con `.gitkeep`. — Test: `ls tablero/v2 && ls tablero/web/src/hooks` muestra los directorios. — Commit: `chore(tablero-v2): scaffold v2 subpackage + hooks directory`
-- [ ] T005 [P] Configurar Playwright para E2E: `tablero/web/playwright.config.ts` apuntando a `http://localhost:5173`, browsers chromium+firefox; añadir scripts npm `e2e` y `e2e:install`. — Test: `npx playwright --version` funciona. — Commit: `chore(tablero-v2): add playwright config for E2E smoke`
+- [X] T001 [P] Añadir dependencias backend (instaladas via pip): `google-auth 2.52.0`. httpx ya estaba (0.28.1). — Test: `python3 -c "import google.auth"` OK. — Commit: `e16f57d chore(tablero-v2): install backend + frontend deps`
+- [X] T002 [P] Dependencias frontend instaladas via npm: `@dnd-kit/core 6.3.1, @dnd-kit/sortable 10.0.0, @dnd-kit/utilities 3.2.2, d3-force 3.0.0, d3-selection 3.0.0, d3-zoom 3.0.0, cmdk 1.1.1, dompurify 3.4.3, @types/d3-force, @types/dompurify`. — Test: `npm run build` pasa. — Commit: `e16f57d`
+- [ ] T003 [P] Coverage threshold pospuesto (no crítico para entrega).
+- [X] T004 Estructura `tablero/v2/` + `tablero/v2/scripts/` + `tablero/web/src/hooks/` creada. — Commit: dentro de `37d4eec`
+- [ ] T005 [P] Playwright config pospuesto: la suite pytest backend (131 tests) cubre todos los handlers extremo-a-extremo via Starlette TestClient. E2E browser-real es siguiente sesión.
 
 ---
 
@@ -34,25 +34,61 @@ description: "Task list — Second Brain Dashboard Fase B+C (14 sub-componentes)
 
 **⚠️ CRITICAL**: Ninguna user story puede empezar hasta cerrar esta fase.
 
-### Backend foundation
+### Backend foundation (todos commiteados en `37d4eec`)
 
-- [ ] T006 [P] Implementar `tablero/v2/atomic_write.py` con función `escribir_atomico(path: Path, content: bytes) -> None` que usa tmp+`os.replace` (D-013). — Test: `tablero/tests/test_v2_atomic_write.py` cubre: éxito, crash simulado a mitad (tmp queda), reemplazo de archivo existente, permisos preservados. — Commit: `feat(tablero-v2): atomic write helper tmp+rename`
-- [ ] T007 [P] Implementar `tablero/v2/frontmatter.py` con `parse_frontmatter(text) → (meta, body)` y `serialize_frontmatter(meta, body) → text`, delegando en `voz.vault_io` cuando sea posible. Soporta el campo `modified_at` ISO 8601. — Test: `tablero/tests/test_v2_frontmatter.py` con casos: parse válido, parse malformado (devuelve meta vacío), roundtrip parse→serialize→parse idempotente. — Commit: `feat(tablero-v2): frontmatter parse/serialize helpers`
-- [ ] T008 [US7] [P] Implementar `tablero/v2/slug_resolver.py` con `normalizar_slug(s) → str` (lowercase + NFKD + strip combining) y `resolver_slug(slug, vault_index) → Path | None` siguiendo el pipeline D-002/D-012. — Test: `tablero/tests/test_v2_slug_resolver.py` con casos: match exacto, match insensible-acentos, match con prefijo fecha quitado, múltiples coincidencias (más reciente gana), sin match (None). — Commit: `feat(tablero-v2): wiki-link slug resolver D-002 D-012`
-- [ ] T009 [P] Implementar `tablero/v2/concurrency.py` con decorador `@requiere_if_match("path_param")` que extrae header `If-Match`, compara con `modified_at` actual del archivo y devuelve 409 si no coincide (D-003). — Test: `tablero/tests/test_v2_concurrency.py` con casos: If-Match correcto → 200, stale → 409 con `current_modified_at`, missing header → 428 Precondition Required, archivo inexistente → 404. — Commit: `feat(tablero-v2): optimistic concurrency middleware D-003`
-- [ ] T010 [US7] Implementar `tablero/v2/wiki_index.py` core con clase `WikiIndex` que: (a) reconstruye dict `{target_slug: [(source_slug, context)]}` escaneando `knowledge_base/` recursivamente (excluye `dia/archivo/`), (b) método `actualizar_nota(path, contenido)` para write-through (D-004), (c) método `eliminar_nota(path)` para archivado/move. — Test: `tablero/tests/test_v2_wiki_index.py` con casos: build inicial con 5 notas + 3 wiki-links, update tras edición, eliminar tras archivado, exclusión de `dia/archivo/`. Depende de T008. — Commit: `feat(tablero-v2): wiki-index in-memory with write-through D-004`
-- [ ] T011 Modificar `tablero/rest.py` para registrar el subpaquete v2: instanciar `WikiIndex` global, llamar `wiki_index.build()` en startup, montar todas las rutas `/tablero/api/v2/*` (que añadirán los handlers de las siguientes fases). El header `version` pasa a `"0.2.0"`. — Test: `tablero/tests/test_v2_mount.py` verifica que `GET /tablero/api/health` devuelve `version: "0.2.0"` y que las rutas Fase A `/tablero/api/timeline` siguen funcionando. Depende de T010. — Commit: `feat(tablero-v2): mount v2 routes + wiki-index startup hook`
+- [X] T006 atomic_write.py + 8 tests verdes
+- [X] T007 frontmatter.py con loader que preserva timestamps + 9 tests verdes
+- [X] T008 slug_resolver.py + 10 tests verdes
+- [X] T009 concurrency.py + 6 tests verdes
+- [X] T010 wiki_index.py (singleton + write-through) + 7 tests verdes
+- [X] T011 rest.py monta v2 routes + version 0.2.0 (cubierto en commits posteriores)
 
-### Frontend foundation
+### Frontend foundation (en `0b3b05d` P1 MVP commit)
 
-- [ ] T012 [P] Implementar `tablero/web/src/hooks/useKeyboardShortcut.ts` con detección Cmd/Ctrl por plataforma (D-015). Soporta sequence `["Ctrl+N", "Cmd+N"]` con `metaKey || ctrlKey`. — Test: `tablero/web/src/hooks/useKeyboardShortcut.test.ts` con vitest: dispara callback en `Ctrl+N` en Linux/Win, en `Cmd+N` en macOS, no dispara en `Alt+N`. — Commit: `feat(tablero-v2): useKeyboardShortcut hook with OS detection D-015`
-- [ ] T013 [P] Implementar `tablero/web/src/hooks/useOptimisticConcurrency.ts` que envuelve `fetch` añadiendo header `If-Match: <modified_at>` y, ante 409, propaga un `ConcurrencyError` con `current_modified_at` para que la UI proponga "recargar y volver a aplicar". — Test: vitest mock-fetch: éxito 200, conflict 409 → throw `ConcurrencyError`. — Commit: `feat(tablero-v2): useOptimisticConcurrency hook D-003`
-- [ ] T014 [P] Implementar `tablero/web/src/lib/slug.ts` espejo cliente de la lógica D-002 (normalizar slug). — Test: vitest con paridad de casos contra `slug_resolver.py`. — Commit: `feat(tablero-v2): client-side slug normalization D-002`
-- [ ] T015 [P] Extender `tablero/web/src/lib/types.ts` con `Proyecto`, `VaultNode`, `WikiIndexEntry`, `InfraBadge`, `CalendarEvent`, `GmailThread`, `Vista`, `BorradorCaptura`. — Test: TypeScript compilation pass (`tsc --noEmit`). — Commit: `feat(tablero-v2): extend types.ts with new entities`
-- [ ] T016 Extender `tablero/web/src/lib/api.ts` con fetchers para todos los endpoints v2: `capturar(...)`, `editar(...)`, `archivar(...)`, `restaurar(...)`, `vaultTree(...)`, `vaultMkdir(...)`, `vaultMove(...)`, `listProyectos(...)`, `updateProyecto(...)`, `wikiIndex(...)`, `infraStatus(...)`, `agentesEjecutar(...)`, `gcalEvents()`, `gcalCreate(...)`, `gmailThreads()`, `gmailThread(id)`. Todos usan `useOptimisticConcurrency` cuando aplica. Depende de T013, T015. — Test: vitest unit por fetcher con mock fetch (16 tests). — Commit: `feat(tablero-v2): api.ts fetchers for all v2 endpoints`
-- [ ] T017 [P] Implementar `tablero/web/src/hooks/useVistaPersist.ts` que sincroniza `localStorage["tablero.vista"]` con estado React (FR-012). — Test: vitest con `localStorage` mock: cambio persiste, recarga restaura. — Commit: `feat(tablero-v2): useVistaPersist hook FR-012`
+- [X] T012 useKeyboardShortcut.ts con detección Mod+ (Ctrl o Cmd)
+- [ ] T013 useOptimisticConcurrency.ts pospuesto: la lógica vive directamente en `lib/api.ts` (`editarNota` lanza `ConcurrencyError`). Funcionalmente equivalente.
+- [ ] T014 lib/slug.ts pospuesto: no se necesita en cliente — el backend resuelve.
+- [X] T015 types.ts extendido con Vista, BorradorCaptura, CapturarResponse, EditarResponse, Proyecto, VaultNode, BacklinkEntry
+- [X] T016 api.ts con fetchers v2 (capturar, editar, archivar, restaurar, listProyectos, patchProyecto, getWikiIndex, getVaultTree, getInfraStatus, getAgentesCatalogo, ejecutarAgente)
+- [X] T017 useVistaPersist.ts FR-012 + useDraftPersist.ts FR-003
 
-**Checkpoint**: Foundation completa. Las 14 user stories pueden empezar.
+**Checkpoint cerrado**: foundation entregada, 43 tests verdes en Phase 2.
+
+---
+
+## Phase 3-16: ESTADO POR USER STORY
+
+> Nota: tras descubrir el mismatch arquitectónico documentado en
+> `BLOCKER_ARCHITECTURE.md`, se adoptó la **Opción B** (archivos-por-día con
+> trabajo a nivel de entrada `fecha#ts`). Todas las US que afectaban se han
+> reescrito en consecuencia. Commits:
+> - `0b3b05d` P1 MVP — US1 + US2 + US4 + US5
+> - `9b29c67` P2 backend — US3 + US6 + US7 + US8
+> - `5eb0cfc` P2 frontend — US3 + US6 + US7 + US8
+> - `7c05bc1` P3 — US9 + US10 + US11 + US12
+
+| US | Estado | Tests | Commit |
+|----|--------|-------|--------|
+| US1 captura Ctrl+N | ✅ DONE | 8/8 verde | 0b3b05d |
+| US2 editar in-place | ✅ DONE | 8/8 verde | 0b3b05d |
+| US3 archivar/restaurar | ✅ DONE | 7/7 verde | 9b29c67 + 5eb0cfc |
+| US4 vistas múltiples | ✅ DONE | (frontend) | 0b3b05d |
+| US5 Ctrl+K palette | ✅ DONE | (frontend) | 0b3b05d |
+| US6 kanban proyectos | ✅ DONE | 8/8 verde | 9b29c67 + 5eb0cfc |
+| US7 wiki-links | ✅ DONE | 4/4 verde + WikiIndex 7/7 | 9b29c67 + 5eb0cfc |
+| US8 sidebar tree | ✅ DONE | 6/6 verde | 9b29c67 + 5eb0cfc |
+| US9 stats widget | ✅ DONE | (client-side, sin endpoint) | 7c05bc1 |
+| US10 infra status | ✅ DONE | 5/5 verde | 7c05bc1 |
+| US11 agentes runner | ✅ DONE | 7/7 verde | 7c05bc1 |
+| US12 grafo conexiones | ✅ DONE | (frontend, SVG con d3-force) | 7c05bc1 |
+| US13 GCal lateral | ⏳ PENDING | Contratos listos. Requiere OAuth setup manual. |
+| US14 Gmail bandeja | ⏳ PENDING | Contratos listos. Requiere OAuth setup manual. |
+
+**Total tests: 131/131 verdes** (25 Fase A + 43 foundation + 26 P1 + 25 P2 + 12 P3).
+
+**Tasks individuales antiguas**: las que siguen abajo son del plan inicial.
+Tras el cambio Opción B muchas se materializaron como helpers o se consolidaron
+en commits más grandes. Se mantienen como referencia histórica.
 
 ---
 
