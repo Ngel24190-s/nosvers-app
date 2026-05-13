@@ -23,7 +23,7 @@ from typing import Optional
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
-from starlette.routing import Route
+from starlette.routing import Route, WebSocketRoute
 
 sys.path.insert(0, "/home/nosvers")
 
@@ -53,6 +53,10 @@ from tablero.v2.agentes import (  # noqa: E402
     agentes_handler as _v2_agentes,
     catalogo_handler as _v2_agentes_catalogo,
 )
+
+# Fase D Cockpit (WS + health)
+from tablero.v2.health import health_handler as _v2_health  # noqa: E402
+from tablero.v2.ws import ws_main_handler as _v2_ws_main  # noqa: E402
 
 log = get_logger("tablero.rest")
 
@@ -370,7 +374,36 @@ ROUTES = [
     Route("/tablero/api/v2/agentes/ejecutar", v2_agentes_handler, methods=["POST"]),
     Route("/tablero/api/v2/agentes/ejecutar", options_handler, methods=["OPTIONS"]),
     Route("/tablero/api/v2/agentes/catalogo", options_handler, methods=["OPTIONS"]),
+    # Fase D — Cockpit Mission Control
+    Route("/tablero/api/v2/health", _v2_health, methods=["GET"]),
+    Route("/tablero/api/v2/health", options_handler, methods=["OPTIONS"]),
+    WebSocketRoute("/tablero/api/v2/ws", _v2_ws_main),
 ]
+
+
+def _startup_cockpit_workers() -> None:
+    """Arranca workers asyncio del cockpit. Llamado desde montar_en_fastmcp."""
+    try:
+        import asyncio as _asyncio
+        from tablero.v2.workers import register_all, start_activity_worker
+        from tablero.v2.ws import start_all_workers
+        register_all()
+
+        async def _spawn():
+            await start_all_workers()
+            start_activity_worker()
+
+        try:
+            loop = _asyncio.get_event_loop()
+            if loop.is_running():
+                _asyncio.create_task(_spawn())
+            else:
+                loop.create_task(_spawn())
+        except RuntimeError:
+            # No event loop yet — usaremos un startup hook al app si está disponible
+            log.info("cockpit workers diferidos: no event loop activo (se lanzarán en app startup)")
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"cockpit workers startup error: {e}")
 
 
 def montar_en_fastmcp(mcp_app) -> None:
@@ -397,5 +430,30 @@ def montar_en_fastmcp(mcp_app) -> None:
         for r in ROUTES:
             app.router.routes.append(r)
         log.info(f"tablero/REST montado: {len(ROUTES)} rutas bajo /tablero/api/")
+
+        # Registrar cockpit workers en el lifespan/startup de la app si soporta el hook
+        try:
+            from tablero.v2.workers import register_all, start_activity_worker
+            from tablero.v2.ws import start_all_workers
+            register_all()
+
+            async def _on_startup() -> None:
+                try:
+                    await start_all_workers()
+                    start_activity_worker()
+                    log.info("cockpit workers arrancados (startup hook)")
+                except Exception as _err:  # noqa: BLE001
+                    log.exception(f"cockpit workers startup falló: {_err}")
+
+            if hasattr(app, "router") and hasattr(app.router, "on_startup"):
+                app.router.on_startup.append(_on_startup)
+                log.info("cockpit workers: startup hook registrado")
+            elif hasattr(app, "on_event"):
+                app.on_event("startup")(_on_startup)
+                log.info("cockpit workers: on_event('startup') registrado")
+            else:
+                log.warning("cockpit workers: no encontré hook startup — usar _startup_cockpit_workers() manual")
+        except Exception as _e:  # noqa: BLE001
+            log.exception(f"cockpit workers no registrados: {_e}")
     except Exception as e:  # noqa: BLE001
         log.exception(f"Error montando tablero/REST: {e}")
