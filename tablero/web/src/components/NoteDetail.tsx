@@ -1,17 +1,29 @@
-import { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { X, Archive } from 'lucide-react';
 import type { NoteFull } from '../lib/types';
 import { AuthorChip } from './AuthorChip';
 import { TagChip } from './TagChip';
 import { MarkdownBody } from '../lib/markdown';
 import { formatDateES, formatTimeES } from '../lib/format';
+import { BacklinksPanel } from './BacklinksPanel';
 
 interface Props {
   nota: NoteFull | null;
   onClose: () => void;
+  onArchive?: () => void;
 }
 
-export function NoteDetail({ nota, onClose }: Props) {
+function slugForBacklinks(path: string): string {
+  // path es "dia/2026-05-13.md#<ts>"; slug = ts (D-002 a nivel de entrada)
+  if (path.includes('#')) {
+    return path.split('#', 2)[1] ?? '';
+  }
+  // fallback al filename
+  const last = path.split('/').pop() ?? '';
+  return last.replace(/\.md$/, '');
+}
+
+export function NoteDetail({ nota, onClose, onArchive }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -19,6 +31,8 @@ export function NoteDetail({ nota, onClose }: Props) {
     if (nota) window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [nota, onClose]);
+
+  const slug = useMemo(() => (nota ? slugForBacklinks(nota.path) : ''), [nota]);
 
   if (!nota) return null;
 
@@ -29,13 +43,11 @@ export function NoteDetail({ nota, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-tinta/30 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden
       />
-      {/* Panel — side on desktop, full-screen on mobile */}
       <aside className="relative ml-auto h-full w-full sm:max-w-2xl bg-cream shadow-2xl overflow-y-auto">
         <header className="sticky top-0 z-10 bg-cream/95 backdrop-blur border-b border-tinta/10 px-4 py-3 flex items-center gap-2">
           <AuthorChip autor={autor} />
@@ -47,14 +59,27 @@ export function NoteDetail({ nota, onClose }: Props) {
               <TagChip etiqueta={etiqueta} />
             </span>
           )}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="cerrar"
-            className="ml-auto rounded-full p-1.5 text-tinta/60 hover:bg-tinta/5 hover:text-tinta"
-          >
-            <X size={18} />
-          </button>
+          <span className="ml-auto flex items-center gap-1">
+            {onArchive && (
+              <button
+                type="button"
+                onClick={onArchive}
+                aria-label="archivar"
+                title="Archivar nota"
+                className="rounded-full p-1.5 text-amber-700 hover:bg-amber-50"
+              >
+                <Archive size={16} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="cerrar"
+              className="rounded-full p-1.5 text-tinta/60 hover:bg-tinta/5 hover:text-tinta"
+            >
+              <X size={18} />
+            </button>
+          </span>
         </header>
 
         <section className="px-4 py-3">
@@ -76,6 +101,12 @@ export function NoteDetail({ nota, onClose }: Props) {
         <section className="px-4 py-4">
           <MarkdownBody body={body_markdown} attachments={attachments} />
         </section>
+
+        {slug && (
+          <section className="px-4 pb-4">
+            <BacklinksPanel slug={slug} />
+          </section>
+        )}
       </aside>
     </div>
   );

@@ -110,6 +110,67 @@ export function capturarNota(body: CapturarRequest) {
   });
 }
 
+// Fase B+C P2 fetchers
+
+export function archivarNota(path: string, ifMatch: string, archive_reason?: string) {
+  return fetchJSON<{ ok: true; new_path: string; archived_at: string }>(
+    '/tablero/api/v2/nota/archivar',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'If-Match': ifMatch },
+      body: JSON.stringify({ path, archive_reason }),
+    },
+  );
+}
+
+export function restaurarNota(path: string) {
+  return fetchJSON<{ ok: true; new_path: string; fecha: string; ts: string }>(
+    '/tablero/api/v2/nota/restaurar',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    },
+  );
+}
+
+export function listProyectos() {
+  return fetchJSON<{ ok: true; proyectos: import('./types').Proyecto[] }>(
+    '/tablero/api/v2/proyectos',
+  );
+}
+
+export function patchProyecto(slug: string, ifMatch: string, fields: Partial<import('./types').Proyecto>) {
+  return fetchJSON<import('./types').Proyecto & { ok: true }>(
+    '/tablero/api/v2/proyectos',
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'If-Match': ifMatch },
+      body: JSON.stringify({ slug, ...fields }),
+    },
+  );
+}
+
+export function getWikiIndex(target?: string) {
+  const qs = target ? `?target=${encodeURIComponent(target)}` : '';
+  return fetchJSON<{
+    ok: true;
+    target?: string;
+    backlinks?: import('./types').BacklinkEntry[];
+    index?: Record<string, import('./types').BacklinkEntry[]>;
+    generated_at: string;
+  }>(`/tablero/api/v2/wiki-index${qs}`);
+}
+
+export function getVaultTree(path = '') {
+  const qs = path ? `?path=${encodeURIComponent(path)}` : '';
+  return fetchJSON<{
+    ok: true;
+    path: string;
+    children: import('./types').VaultNode[];
+  }>(`/tablero/api/v2/vault/tree${qs}`);
+}
+
 /**
  * Edita una entrada con concurrencia optimista (D-003).
  * `ifMatch` debe ser el concurrency_token de la nota (modified_at o ts).

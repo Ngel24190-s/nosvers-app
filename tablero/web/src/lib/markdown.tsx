@@ -6,6 +6,8 @@ import type { NoteFull } from './types';
 interface Props {
   body: string;
   attachments?: NoteFull['attachments'];
+  /** Callback opcional al hacer clic en un wiki-link [[slug]]. */
+  onWikiLink?: (slug: string) => void;
 }
 
 function attachmentExistsMap(attachments: NoteFull['attachments'] | undefined): Map<string, boolean> {
@@ -15,8 +17,28 @@ function attachmentExistsMap(attachments: NoteFull['attachments'] | undefined): 
   return m;
 }
 
-export function MarkdownBody({ body, attachments }: Props) {
+// Wiki-link regex: [[slug]] o [[slug|texto]]
+const WIKILINK_RE = /\[\[([^\]\|]+)(?:\|([^\]]*))?\]\]/g;
+
+/**
+ * Transform pre-render: convertir [[slug]] en algo que react-markdown pueda
+ * renderizar como link clickeable. Usamos un placeholder de etiqueta HTML
+ * personalizada con un componente React mapeado.
+ *
+ * Estrategia: reemplazar [[slug]] por una marca markdown link especial
+ *   [texto](wiki:slug)
+ * y luego en components.a interceptar href que empieza con "wiki:".
+ */
+function preprocessWikilinks(body: string): string {
+  return body.replace(WIKILINK_RE, (_, slug, label) => {
+    const visible = label ?? slug;
+    return `[${visible}](wiki:${slug})`;
+  });
+}
+
+export function MarkdownBody({ body, attachments, onWikiLink }: Props) {
   const existMap = attachmentExistsMap(attachments);
+  const processedBody = preprocessWikilinks(body);
 
   return (
     <div className="md-body">
@@ -24,7 +46,8 @@ export function MarkdownBody({ body, attachments }: Props) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
         urlTransform={(url) => {
-          // Rewrite attachments/* → /attachments/* so nginx serves them.
+          // Preservar wiki:* esquema custom
+          if (url.startsWith('wiki:')) return url;
           if (url.startsWith('attachments/')) {
             return '/' + url;
           }
@@ -48,9 +71,24 @@ export function MarkdownBody({ body, attachments }: Props) {
             const finalSrc = isAttachment && !original.startsWith('/') ? '/' + original : original;
             return <img src={finalSrc} alt={alt ?? ''} loading="lazy" />;
           },
+          a: ({ href, children, ...rest }) => {
+            if (typeof href === 'string' && href.startsWith('wiki:')) {
+              const slug = href.slice('wiki:'.length);
+              return (
+                <button
+                  type="button"
+                  onClick={() => onWikiLink?.(slug)}
+                  className="inline-block rounded bg-emerald-50 px-1 font-medium text-emerald-700 underline decoration-dotted hover:bg-emerald-100"
+                >
+                  {children}
+                </button>
+              );
+            }
+            return <a href={href} {...rest}>{children}</a>;
+          },
         }}
       >
-        {body}
+        {processedBody}
       </ReactMarkdown>
     </div>
   );

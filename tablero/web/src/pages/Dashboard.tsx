@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LogOut, Plus, Edit3, Command as CommandIcon } from 'lucide-react';
+import { LogOut, Plus, Edit3, Command as CommandIcon, Layout, Trello, Archive, Folder } from 'lucide-react';
 import { ApiError, getBuscar, getNota, getTimeline } from '../lib/api';
 import { clearToken } from '../lib/auth';
 import {
@@ -27,9 +27,15 @@ import { TableView } from '../components/TableView';
 import { KanbanByTagView } from '../components/KanbanByTagView';
 import { CalendarMonthView } from '../components/CalendarMonthView';
 import { GalleryView } from '../components/GalleryView';
+import { ArchiveDialog } from '../components/ArchiveDialog';
+import { PapeleraView } from '../components/PapeleraView';
+import { ProyectosKanban } from '../components/ProyectosKanban';
+import { VaultTreeSidebar } from '../components/VaultTreeSidebar';
 import { getCachedTimeline, setCachedTimeline, setCachedNote, getCachedNote } from '../lib/cache';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { useVistaPersist } from '../hooks/useVistaPersist';
+
+type Modo = 'timeline' | 'proyectos' | 'papelera';
 
 interface Props {
   identitySub: 'angel' | 'africa';
@@ -74,6 +80,9 @@ export function Dashboard({ identitySub }: Props) {
   const [captureOpen, setCaptureOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [vista, setVista] = useVistaPersist();
+  const [modo, setModo] = useState<Modo>('timeline');
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Online/offline tracker
   useEffect(() => {
@@ -220,12 +229,62 @@ export function Dashboard({ identitySub }: Props) {
     return null;
   }
 
+  function navFile(path: string) {
+    // path es relativo a knowledge_base/; abrir si es nota de dia/
+    if (path.startsWith('dia/') && path.endsWith('.md') && !path.includes('archivo/')) {
+      // Recordatorio: aún sin selector por ts dentro del día via tree → solo abre el primer día
+      // En MVP redirigimos al backend timeline; aquí solo cerramos el drawer
+      setSidebarOpen(false);
+    }
+  }
+
   return (
     <div className="min-h-full flex flex-col">
       <header className="sticky top-0 z-30 bg-cream/95 backdrop-blur border-b border-tinta/10">
-        <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-3">
+        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label="Sidebar vault"
+            className="rounded-full p-1.5 text-tinta/60 hover:bg-tinta/5 hover:text-tinta"
+            title="Árbol del vault"
+          >
+            <Folder size={16} />
+          </button>
           <h1 className="font-display text-xl">Tablero</h1>
-          <SearchBar onSearch={onSearch} />
+
+          {/* Mode switcher */}
+          <nav className="hidden sm:flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setModo('timeline')}
+              className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+                modo === 'timeline' ? 'bg-emerald-600 text-white' : 'text-tinta/70 hover:bg-tinta/5'
+              }`}
+            >
+              <Layout size={12} /> Timeline
+            </button>
+            <button
+              type="button"
+              onClick={() => setModo('proyectos')}
+              className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+                modo === 'proyectos' ? 'bg-emerald-600 text-white' : 'text-tinta/70 hover:bg-tinta/5'
+              }`}
+            >
+              <Trello size={12} /> Proyectos
+            </button>
+            <button
+              type="button"
+              onClick={() => setModo('papelera')}
+              className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+                modo === 'papelera' ? 'bg-emerald-600 text-white' : 'text-tinta/70 hover:bg-tinta/5'
+              }`}
+            >
+              <Archive size={12} /> Papelera
+            </button>
+          </nav>
+
+          {modo === 'timeline' && <SearchBar onSearch={onSearch} />}
           <span className="ml-auto flex items-center gap-2">
             <button
               type="button"
@@ -259,9 +318,30 @@ export function Dashboard({ identitySub }: Props) {
         </div>
       </header>
 
+      {/* Sidebar drawer */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-tinta/20"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden
+          />
+          <aside className="fixed left-0 top-[57px] z-40 h-[calc(100vh-57px)] w-72 overflow-y-auto border-r border-tinta/10 bg-cream/95 p-3 shadow-lg">
+            <h2 className="mb-2 text-xs font-medium uppercase text-tinta/60">knowledge_base/</h2>
+            <VaultTreeSidebar onSelectFile={navFile} />
+          </aside>
+        </>
+      )}
+
       <OfflineBanner visible={offline} />
 
-      <main className="flex-1 mx-auto w-full max-w-5xl px-4 py-4 flex flex-col gap-4">
+      <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-4 flex flex-col gap-4">
+        {modo === 'proyectos' ? (
+          <ProyectosKanban />
+        ) : modo === 'papelera' ? (
+          <PapeleraView onRestaurada={() => void refreshTimeline()} />
+        ) : (
+          <>
         {!showSearch && (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <FilterBar filters={filters} onChange={setFilters} />
@@ -302,6 +382,8 @@ export function Dashboard({ identitySub }: Props) {
         ) : (
           renderVista()
         )}
+        </>
+        )}
       </main>
 
       {/* Detail panel — read-only */}
@@ -312,6 +394,7 @@ export function Dashboard({ identitySub }: Props) {
             setSelectedNote(null);
             setSelectedPath(null);
           }}
+          onArchive={() => setArchiveOpen(true)}
         />
       )}
 
@@ -380,6 +463,20 @@ export function Dashboard({ identitySub }: Props) {
             setVista(a.slice('vista:'.length) as Vista);
           }
         }}
+      />
+
+      {/* US3: archive dialog */}
+      <ArchiveDialog
+        open={archiveOpen}
+        notePath={selectedPath}
+        concurrencyToken={concurrencyToken}
+        onArchived={() => {
+          setArchiveOpen(false);
+          setSelectedNote(null);
+          setSelectedPath(null);
+          void refreshTimeline();
+        }}
+        onCancel={() => setArchiveOpen(false)}
       />
     </div>
   );
