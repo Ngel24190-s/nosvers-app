@@ -1,0 +1,59 @@
+openapi: 3.1.0
+info:
+  title: Tablero — Identity endpoint
+  version: 0.1.0
+  description: |
+    Returns the identity attached to the current JWT — used by the frontend to
+    learn `sub` (angel|africa), token expiry (for pre-emptive re-auth), and the
+    device label. Does not touch the vault.
+servers:
+  - url: https://tablero.nosvers.com
+  - url: http://localhost:8765
+paths:
+  /tablero/api/whoami:
+    get:
+      summary: Decode current JWT and return identity
+      operationId: getWhoami
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Identity payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, identidad]
+                properties:
+                  ok: { type: boolean, const: true }
+                  identidad:
+                    type: object
+                    required: [sub, device, jti, exp]
+                    properties:
+                      sub: { type: string, enum: [angel, africa] }
+                      device: { type: string }
+                      jti: { type: string }
+                      exp: { type: integer, description: Unix epoch seconds }
+        '401':
+          description: Missing/invalid JWT.
+  /tablero/api/health:
+    get:
+      summary: Liveness check (no auth)
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is up.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, const: true }
+                  service: { type: string, const: tablero }
+                  version: { type: string }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

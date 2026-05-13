@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: Tablero — Note detail endpoint
+  version: 0.1.0
+  description: |
+    Returns the raw markdown body + parsed frontmatter of a single vault note,
+    located by its path (with the intra-day `#ts` disambiguator). Read-only;
+    JWT auth required. Path safety enforced server-side to block traversal.
+servers:
+  - url: https://tablero.nosvers.com
+  - url: http://localhost:8765
+paths:
+  /tablero/api/nota:
+    get:
+      summary: Read a single note's full content
+      operationId: getNota
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: |
+            Vault-relative path with the disambiguator, e.g.
+            `dia/2026-05-13.md#2026-05-13T17:23:45+00:00`.
+            Must resolve under `knowledge_base/dia/`; otherwise 400 path_unsafe.
+      responses:
+        '200':
+          description: Full note payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, nota]
+                properties:
+                  ok: { type: boolean, const: true }
+                  nota:
+                    $ref: '#/components/schemas/NoteFull'
+        '400':
+          description: Bad path (missing query param, traversal attempt, malformed disambiguator).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, const: false }
+                  error:
+                    type: string
+                    enum: [parametro_invalido, path_unsafe]
+                  detalle: { type: string }
+        '401':
+          description: Missing/invalid JWT.
+        '404':
+          description: No note matches the path (day file missing OR `ts` not found inside it).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, const: false }
+                  error: { type: string, const: not_found }
+        '500':
+          description: Unhandled error.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    NoteFull:
+      type: object
+      required: [path, frontmatter, body_markdown, mtime]
+      properties:
+        path:
+          type: string
+          description: Echo of the request `path`, useful as cache key.
+        frontmatter:
+          type: object
+          additionalProperties: true
+          description: |
+            Parsed YAML frontmatter. Controlled keys (`autor`, `etiqueta`, `origen`)
+            are normalized by `voz.vault_io`. Unknown keys are passed through verbatim.
+          properties:
+            ts: { type: string }
+            autor: { type: string, enum: [angel, africa] }
+            etiqueta: { type: string, enum: [trabajo, nosvers, familia, mental, idea, otro] }
+            origen: { type: string }
+            audio: { type: string, nullable: true }
+            clasificador_confianza: { type: number }
+            clasificador_modelo: { type: string }
+        body_markdown:
+          type: string
+          description: Raw markdown body, post-frontmatter, unmodified.
+        mtime:
+          type: string
+          format: date-time
+          description: Server filesystem mtime of the day file.
+        attachments:
+          type: array
+          items:
+            type: object
+            required: [src, exists, kind]
+            properties:
+              src: { type: string }
+              exists: { type: boolean }
+              kind:
+                type: string
+                enum: [image, audio, other]

@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    min-height: 100vh;
+  }
+  body {
+    background: #FEFAF4;
+    color: #1c1510;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer components {
+  .skeleton {
+    @apply animate-pulse bg-tinta/5 rounded;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .card {
+    @apply rounded-2xl border border-tinta/10 bg-white shadow-sm hover:shadow-md transition-shadow;
+  }
+}
+
+/* react-markdown defaults */
+.md-body :is(h1, h2, h3, h4) {
+  font-family: 'Playfair Display', Georgia, serif;
+  margin: 1.25rem 0 0.5rem;
+  line-height: 1.2;
+}
+.md-body h1 { font-size: 1.5rem; }
+.md-body h2 { font-size: 1.25rem; }
+.md-body h3 { font-size: 1.1rem; }
+.md-body p { margin: 0.5rem 0; line-height: 1.6; }
+.md-body ul, .md-body ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+.md-body li { margin: 0.25rem 0; }
+.md-body pre { background: #1c1510; color: #FEFAF4; padding: 0.75rem 1rem; border-radius: 8px; overflow-x: auto; }
+.md-body code { background: rgba(28, 21, 16, 0.08); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.9em; }
+.md-body pre code { background: transparent; padding: 0; }
+.md-body a { color: #3D6B20; text-decoration: underline; }
+.md-body blockquote { border-left: 3px solid #5A7A2E; padding-left: 0.75rem; color: #1c1510aa; margin: 0.75rem 0; }
+.md-body img { max-width: 100%; height: auto; border-radius: 8px; }
+.md-body table { border-collapse: collapse; margin: 0.75rem 0; }
+.md-body th, .md-body td { border: 1px solid #1c151022; padding: 0.4rem 0.75rem; }
+.md-body mark { background: #5A7A2E33; padding: 0 2px; }

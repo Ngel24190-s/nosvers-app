@@ -1,0 +1,126 @@
+openapi: 3.1.0
+info:
+  title: Tablero — Search endpoint
+  version: 0.1.0
+  description: |
+    Full-text search across the vault, thin proxy over `voz.buscar.dia_buscar_impl`.
+    Read-only (GET only). JWT bearer auth required.
+servers:
+  - url: https://tablero.nosvers.com
+  - url: http://localhost:8765
+paths:
+  /tablero/api/buscar:
+    get:
+      summary: Full-text search across the vault notes
+      operationId: getBuscar
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          description: Search query. Accent-insensitive, case-insensitive (handled by `voz.buscar._normalizar`).
+        - name: autor
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [angel, africa]
+          description: Empty / omitted means both.
+        - name: etiqueta
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [trabajo, nosvers, familia, mental, idea, otro]
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, query, resultados, total]
+                properties:
+                  ok: { type: boolean, const: true }
+                  query: { type: string }
+                  filtro_autor:
+                    type: string
+                    nullable: true
+                    enum: [angel, africa, null]
+                  rango:
+                    type: object
+                    properties:
+                      desde: { type: string }
+                      hasta: { type: string }
+                  total: { type: integer }
+                  resultados:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchHit'
+        '400':
+          description: Invalid query (e.g., empty q).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, const: false }
+                  error: { type: string, enum: [input_vacio, parametro_invalido] }
+                  detalle: { type: string }
+        '401':
+          description: Missing/invalid JWT.
+        '500':
+          description: Unhandled error.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SearchHit:
+      type: object
+      description: |
+        One match returned by `dia_buscar_impl`. The `fragmento` already contains
+        `<mark>…</mark>` highlight tags around the matched substring — the only
+        HTML tag the frontend permits when rendering this field.
+      required: [fecha, ts, autor, etiqueta, fragmento]
+      properties:
+        fecha: { type: string, format: date }
+        ts:    { type: string, format: date-time }
+        autor:
+          type: string
+          enum: [angel, africa]
+        etiqueta:
+          type: string
+          enum: [trabajo, nosvers, familia, mental, idea, otro]
+        origen:
+          type: string
+          enum: [voz_movil, voz_linux, texto_directo, otro]
+        fragmento:
+          type: string
+          description: HTML snippet containing exactly `<mark>` tags around the match.

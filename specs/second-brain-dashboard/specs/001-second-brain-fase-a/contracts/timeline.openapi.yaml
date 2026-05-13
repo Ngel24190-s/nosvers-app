@@ -1,0 +1,198 @@
+openapi: 3.1.0
+info:
+  title: Tablero — Timeline endpoint
+  version: 0.1.0
+  description: |
+    Returns vault notes (Angel + África) in a single chronological list, filterable
+    by author / tag / date range. Read-only (GET only). JWT bearer auth required.
+    Sourced from `knowledge_base/dia/*.md` via `voz.vault_io.{listar_dias, leer_dia}`.
+servers:
+  - url: https://tablero.nosvers.com
+    description: Production
+  - url: http://localhost:8765
+    description: Local dev (uvicorn)
+paths:
+  /tablero/api/timeline:
+    get:
+      summary: List notes (default last 30 days, both authors)
+      operationId: getTimeline
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Inclusive start date. Default = today - 30 days.
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Inclusive end date. Default = today.
+        - name: autor
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [angel, africa, ambos]
+            default: ambos
+        - name: etiqueta
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [trabajo, nosvers, familia, mental, idea, otro]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 200
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Timeline payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, entradas, total, rango]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  entradas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimelineEntry'
+                  total:
+                    type: integer
+                    description: Total entries returned (≤ limit).
+                  rango:
+                    type: object
+                    properties:
+                      desde: { type: string, format: date }
+                      hasta: { type: string, format: date }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    options:
+      summary: CORS preflight
+      operationId: optionsTimeline
+      responses:
+        '204':
+          description: CORS headers only.
+          headers:
+            Access-Control-Allow-Origin:
+              schema: { type: string }
+            Access-Control-Allow-Methods:
+              schema: { type: string }
+            Access-Control-Allow-Headers:
+              schema: { type: string }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT issued by `voz.auth.emitir_token`. Claims required:
+        `sub` ∈ {`angel`, `africa`}, `jti` (revocation handle), `device`, `exp`.
+  schemas:
+    TimelineEntry:
+      type: object
+      required: [path, fecha, ts, autor, etiqueta]
+      properties:
+        path:
+          type: string
+          description: Vault-relative path with intra-day disambiguator, e.g. `dia/2026-05-13.md#2026-05-13T17:23:45+00:00`.
+        fecha:
+          type: string
+          format: date
+        ts:
+          type: string
+          format: date-time
+        autor:
+          type: string
+          enum: [angel, africa]
+        etiqueta:
+          type: string
+          enum: [trabajo, nosvers, familia, mental, idea, otro]
+        origen:
+          type: string
+          enum: [voz_movil, voz_linux, texto_directo, otro]
+        titulo:
+          type: string
+          nullable: true
+          maxLength: 120
+        preview:
+          type: string
+          description: First ~200 chars of body, newlines collapsed.
+        tiene_audio:
+          type: boolean
+        metadata_incompleta:
+          type: boolean
+          description: True if frontmatter parsing fell back to defaults.
+  responses:
+    BadRequest:
+      description: Invalid query parameter.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error400'
+    Unauthorized:
+      description: Missing/expired/revoked JWT.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [ok, error]
+            properties:
+              ok: { type: boolean, const: false }
+              error: { type: string, const: auth_invalido }
+    RateLimited:
+      description: nginx limit_req triggered.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ok: { type: boolean, const: false }
+              error: { type: string, const: rate_limited }
+    InternalError:
+      description: Unhandled server error. Triggers Telegram alert (FR-019, dedupe window).
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ok: { type: boolean, const: false }
+              error: { type: string, const: internal_error }
+  schemas-error:
+    Error400:
+      type: object
+      required: [ok, error]
+      properties:
+        ok: { type: boolean, const: false }
+        error:
+          type: string
+          enum: [parametro_invalido]
+        detalle:
+          type: string

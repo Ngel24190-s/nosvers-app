@@ -1,0 +1,294 @@
+"""
+tablero.rest — Starlette REST routes for the Second Brain Dashboard.
+
+Mounted on the same uvicorn process as `voz.rest` (see `mcp_server.py`). All routes
+are GET (Constitution VI / FR-014: read-only Fase A). JWT validation reuses voz.auth.
+
+Routes (all under /tablero/api/):
+  GET  /health           — liveness (no auth)
+  GET  /whoami           — decode current JWT
+  GET  /timeline         — list notes (default last 30d, both authors)
+  GET  /buscar           — full-text search proxy over voz.buscar.dia_buscar_impl
+  GET  /nota             — single note detail (markdown body + frontmatter)
+  OPTIONS *              — CORS preflight
+"""
+from __future__ import annotations
+
+import os
+import sys
+import time
+import uuid
+from datetime import date
+from typing import Optional
+
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
+from starlette.routing import Route
+
+sys.path.insert(0, "/home/nosvers")
+
+from voz.auth import validar_token  # noqa: E402
+from voz.buscar import dia_buscar_impl  # noqa: E402
+from voz.vault_io import AUTORES_VALIDOS, ETIQUETAS_VALIDAS  # noqa: E402
+
+from tablero.log import alert_critical, get_logger  # noqa: E402
+from tablero.nota import NotaNotFound, PathUnsafe, leer_nota  # noqa: E402
+from tablero.timeline import listar_timeline  # noqa: E402
+
+log = get_logger("tablero.rest")
+
+VERSION = "0.1.0"
+_PROD_ORIGIN = "https://tablero.nosvers.com"
+_DEV_ORIGIN = "http://localhost:5173"
+
+
+def _allowed_origin() -> str:
+    return _DEV_ORIGIN if os.getenv("TABLERO_DEV") == "1" else _PROD_ORIGIN
+
+
+def _cors_headers() -> dict:
+    return {
+        "Access-Control-Allow-Origin": _allowed_origin(),
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id",
+        "Access-Control-Max-Age": "86400",
+        "Vary": "Origin",
+    }
+
+
+def _json(data: dict, status: int = 200) -> JSONResponse:
+    return JSONResponse(data, status_code=status, headers=_cors_headers())
+
+
+def _err(code: str, status: int, detalle: Optional[str] = None) -> JSONResponse:
+    payload: dict = {"ok": False, "error": code}
+    if detalle:
+        payload["detalle"] = detalle
+    return _json(payload, status)
+
+
+async def _autenticar(request: Request) -> dict | None:
+    auth = request.headers.get("authorization", "")
+    if not auth.lower().startswith("bearer "):
+        return None
+    token = auth[7:].strip()
+    payload = validar_token(token)
+    if not payload:
+        return None
+    sub = payload.get("sub", "")
+    if sub not in AUTORES_VALIDOS:
+        return None
+    return payload
+
+
+async def options_handler(request: Request) -> Response:
+    return Response(status_code=204, headers=_cors_headers())
+
+
+def _req_id(request: Request) -> str:
+    return request.headers.get("x-request-id") or uuid.uuid4().hex[:12]
+
+
+def _log_line(rid: str, sub: str, route: str, status: int, latency_ms: float, extra: str = "") -> None:
+    msg = f"rid={rid} sub={sub or '-'} route={route} status={status} latency_ms={latency_ms:.1f}"
+    if extra:
+        msg += f" {extra}"
+    log.info(msg)
+
+
+async def health_handler(request: Request) -> JSONResponse:
+    return _json({"ok": True, "service": "tablero", "version": VERSION})
+
+
+async def whoami_handler(request: Request) -> JSONResponse:
+    t0 = time.perf_counter()
+    rid = _req_id(request)
+    payload = await _autenticar(request)
+    if not payload:
+        _log_line(rid, "", "whoami", 401, (time.perf_counter() - t0) * 1000)
+        return _err("auth_invalido", 401)
+    body = {
+        "ok": True,
+        "identidad": {
+            "sub": payload.get("sub", ""),
+            "device": payload.get("device", ""),
+            "jti": payload.get("jti", ""),
+            "exp": int(payload.get("exp", 0)),
+        },
+    }
+    _log_line(rid, payload.get("sub", ""), "whoami", 200, (time.perf_counter() - t0) * 1000)
+    return _json(body)
+
+
+def _parse_date_q(qp, name: str) -> date | None:
+    raw = qp.get(name, "").strip()
+    if not raw:
+        return None
+    try:
+        return date.fromisoformat(raw)
+    except ValueError:
+        raise ValueError(f"{name} no es ISO date (YYYY-MM-DD)")
+
+
+async def timeline_handler(request: Request) -> JSONResponse:
+    t0 = time.perf_counter()
+    rid = _req_id(request)
+    payload = await _autenticar(request)
+    if not payload:
+        _log_line(rid, "", "timeline", 401, (time.perf_counter() - t0) * 1000)
+        return _err("auth_invalido", 401)
+
+    qp = request.query_params
+    try:
+        desde = _parse_date_q(qp, "desde")
+        hasta = _parse_date_q(qp, "hasta")
+    except ValueError as e:
+        _log_line(rid, payload.get("sub", ""), "timeline", 400, (time.perf_counter() - t0) * 1000, str(e))
+        return _err("parametro_invalido", 400, str(e))
+
+    autor = qp.get("autor", "ambos").strip().lower() or "ambos"
+    etiqueta = qp.get("etiqueta", "").strip().lower()
+    if autor not in AUTORES_VALIDOS and autor != "ambos":
+        return _err("parametro_invalido", 400, f"autor inválido: {autor!r}")
+    if etiqueta and etiqueta not in ETIQUETAS_VALIDAS:
+        return _err("parametro_invalido", 400, f"etiqueta inválida: {etiqueta!r}")
+    try:
+        limit = int(qp.get("limit", "200"))
+        offset = int(qp.get("offset", "0"))
+    except ValueError:
+        return _err("parametro_invalido", 400, "limit/offset deben ser enteros")
+    if desde and hasta and desde > hasta:
+        return _err("parametro_invalido", 400, "hasta < desde")
+
+    try:
+        result = listar_timeline(desde=desde, hasta=hasta, autor=autor, etiqueta=etiqueta, limit=limit, offset=offset)
+    except ValueError as e:
+        _log_line(rid, payload.get("sub", ""), "timeline", 400, (time.perf_counter() - t0) * 1000, str(e))
+        return _err("parametro_invalido", 400, str(e))
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"rid={rid} timeline 500: {e}")
+        alert_critical("timeline_500", f"{type(e).__name__}: {e}")
+        _log_line(rid, payload.get("sub", ""), "timeline", 500, (time.perf_counter() - t0) * 1000)
+        return _err("internal_error", 500)
+
+    _log_line(rid, payload.get("sub", ""), "timeline", 200, (time.perf_counter() - t0) * 1000,
+              f"total={result['total']}")
+    return _json(result)
+
+
+async def buscar_handler(request: Request) -> JSONResponse:
+    t0 = time.perf_counter()
+    rid = _req_id(request)
+    payload = await _autenticar(request)
+    if not payload:
+        _log_line(rid, "", "buscar", 401, (time.perf_counter() - t0) * 1000)
+        return _err("auth_invalido", 401)
+
+    qp = request.query_params
+    q = qp.get("q", "").strip()
+    if not q:
+        _log_line(rid, payload.get("sub", ""), "buscar", 400, (time.perf_counter() - t0) * 1000, "q vacío")
+        return _err("input_vacio", 400, "query vacío")
+
+    try:
+        limite = int(qp.get("limite", "20"))
+    except ValueError:
+        return _err("parametro_invalido", 400, "limite debe ser entero")
+    autor = qp.get("autor", "").strip().lower()
+    etiqueta = qp.get("etiqueta", "").strip().lower()
+    desde = qp.get("desde", "").strip()
+    hasta = qp.get("hasta", "").strip()
+
+    try:
+        result = dia_buscar_impl(
+            query=q,
+            desde=desde,
+            hasta=hasta,
+            limite=limite,
+            etiqueta=etiqueta,
+            autor=autor,
+        )
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"rid={rid} buscar 500: {e}")
+        alert_critical("buscar_500", f"{type(e).__name__}: {e}")
+        _log_line(rid, payload.get("sub", ""), "buscar", 500, (time.perf_counter() - t0) * 1000)
+        return _err("internal_error", 500)
+
+    status = 200 if result.get("ok") else 400
+    _log_line(rid, payload.get("sub", ""), "buscar", status, (time.perf_counter() - t0) * 1000,
+              f"q={q!r} total={result.get('total', '?')}")
+    return _json(result, status)
+
+
+async def nota_handler(request: Request) -> JSONResponse:
+    t0 = time.perf_counter()
+    rid = _req_id(request)
+    payload = await _autenticar(request)
+    if not payload:
+        _log_line(rid, "", "nota", 401, (time.perf_counter() - t0) * 1000)
+        return _err("auth_invalido", 401)
+
+    path = request.query_params.get("path", "").strip()
+    if not path:
+        return _err("parametro_invalido", 400, "path requerido")
+
+    try:
+        nota = leer_nota(path)
+    except PathUnsafe as e:
+        _log_line(rid, payload.get("sub", ""), "nota", 400, (time.perf_counter() - t0) * 1000, "path_unsafe")
+        return _err("path_unsafe", 400, str(e))
+    except ValueError as e:
+        _log_line(rid, payload.get("sub", ""), "nota", 400, (time.perf_counter() - t0) * 1000, "param_inv")
+        return _err("parametro_invalido", 400, str(e))
+    except NotaNotFound as e:
+        _log_line(rid, payload.get("sub", ""), "nota", 404, (time.perf_counter() - t0) * 1000, "not_found")
+        return _err("not_found", 404, str(e))
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"rid={rid} nota 500: {e}")
+        alert_critical("nota_500", f"{type(e).__name__}: {e}")
+        _log_line(rid, payload.get("sub", ""), "nota", 500, (time.perf_counter() - t0) * 1000)
+        return _err("internal_error", 500)
+
+    _log_line(rid, payload.get("sub", ""), "nota", 200, (time.perf_counter() - t0) * 1000)
+    return _json({"ok": True, "nota": nota})
+
+
+ROUTES = [
+    Route("/tablero/api/health", health_handler, methods=["GET"]),
+    Route("/tablero/api/whoami", whoami_handler, methods=["GET"]),
+    Route("/tablero/api/whoami", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/timeline", timeline_handler, methods=["GET"]),
+    Route("/tablero/api/timeline", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/buscar", buscar_handler, methods=["GET"]),
+    Route("/tablero/api/buscar", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/nota", nota_handler, methods=["GET"]),
+    Route("/tablero/api/nota", options_handler, methods=["OPTIONS"]),
+]
+
+
+def montar_en_fastmcp(mcp_app) -> None:
+    """Mount the tablero routes on FastMCP's underlying HTTP app.
+
+    Mirrors `voz.rest.montar_en_fastmcp`. Defensive: logs and continues on any error.
+    """
+    try:
+        candidates = [
+            getattr(mcp_app, "http_app", None),
+            getattr(mcp_app, "_http_app", None),
+            getattr(mcp_app, "app", None),
+        ]
+        app = None
+        for c in candidates:
+            if c is None:
+                continue
+            app = c() if callable(c) else c
+            if app and hasattr(app, "router"):
+                break
+        if app is None or not hasattr(app, "router"):
+            log.warning("No pude localizar app HTTP de FastMCP — tablero REST no montado")
+            return
+        for r in ROUTES:
+            app.router.routes.append(r)
+        log.info(f"tablero/REST montado: {len(ROUTES)} rutas bajo /tablero/api/")
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"Error montando tablero/REST: {e}")
