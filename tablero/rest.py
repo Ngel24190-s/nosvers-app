@@ -323,6 +323,54 @@ async def v2_agentes_catalogo_handler(request: Request) -> JSONResponse:
     return await _v2_agentes_catalogo(request, _autenticar, _cors_headers, _log_line)
 
 
+# ── Automation Engine (proyecto 004) ────────────────────────────────────────
+from tablero.v2.automatizaciones import rest as _v2_auto_rest  # noqa: E402
+
+
+async def v2_auto_list(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.list_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_create(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.create_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_get(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.get_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_update(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.update_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_delete(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.delete_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_run(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.run_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_test(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.test_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_logs(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.logs_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_catalogo(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.catalogo_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_reload(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.reload_handler(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_auto_webhook_stripe(request: Request) -> JSONResponse:
+    return await _v2_auto_rest.webhook_stripe_handler(request, _autenticar, _cors_headers, _log_line)
+
+
 def _startup_wiki_index() -> None:
     """Inicializa el wiki_index al arrancar el proceso. D-004."""
     try:
@@ -378,6 +426,25 @@ ROUTES = [
     Route("/tablero/api/v2/health", _v2_health, methods=["GET"]),
     Route("/tablero/api/v2/health", options_handler, methods=["OPTIONS"]),
     WebSocketRoute("/tablero/api/v2/ws", _v2_ws_main),
+    # ── Automation Engine (proyecto 004) ───────────────────────────────────
+    Route("/tablero/api/v2/automatizaciones", v2_auto_list, methods=["GET"]),
+    Route("/tablero/api/v2/automatizaciones", v2_auto_create, methods=["POST"]),
+    Route("/tablero/api/v2/automatizaciones", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/catalogo", v2_auto_catalogo, methods=["GET"]),
+    Route("/tablero/api/v2/automatizaciones/catalogo", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/reload", v2_auto_reload, methods=["POST"]),
+    Route("/tablero/api/v2/automatizaciones/reload", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/webhook/stripe", v2_auto_webhook_stripe, methods=["POST"]),
+    Route("/tablero/api/v2/automatizaciones/{id}", v2_auto_get, methods=["GET"]),
+    Route("/tablero/api/v2/automatizaciones/{id}", v2_auto_update, methods=["PUT"]),
+    Route("/tablero/api/v2/automatizaciones/{id}", v2_auto_delete, methods=["DELETE"]),
+    Route("/tablero/api/v2/automatizaciones/{id}", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/run", v2_auto_run, methods=["POST"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/run", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/test", v2_auto_test, methods=["POST"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/test", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/logs", v2_auto_logs, methods=["GET"]),
+    Route("/tablero/api/v2/automatizaciones/{id}/logs", options_handler, methods=["OPTIONS"]),
 ]
 
 
@@ -444,6 +511,14 @@ def montar_en_fastmcp(mcp_app) -> None:
                     log.info("cockpit workers arrancados (startup hook)")
                 except Exception as _err:  # noqa: BLE001
                     log.exception(f"cockpit workers startup falló: {_err}")
+                # Automation Engine (004)
+                try:
+                    from tablero.v2.automatizaciones.motor import motor
+                    from tablero.v2.ws import broker as _broker
+                    await motor.start(_broker)
+                    log.info("automation engine arrancado")
+                except Exception as _err:  # noqa: BLE001
+                    log.exception(f"automation engine startup falló: {_err}")
 
             if hasattr(app, "router") and hasattr(app.router, "on_startup"):
                 app.router.on_startup.append(_on_startup)

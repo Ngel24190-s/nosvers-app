@@ -7,7 +7,8 @@ export type CockpitChannel =
   | 'agentes'
   | 'revenue'
   | 'aegis'
-  | 'wake';
+  | 'wake'
+  | 'automation';
 
 export type WsStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed';
 

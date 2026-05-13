@@ -15,6 +15,7 @@ export type WidgetId =
   | 'gmail'
   | 'calendar'
   | 'freqtrade'
+  | 'automation'
   | 'stripe-toaster'; // floating; no en grid pero lo mantenemos por simetría
 
 // Layout default — grid 12 col, rowHeight 80.
@@ -33,6 +34,7 @@ export const DEFAULT_LAYOUT: Layout = [
   { i: 'gmail', x: 3, y: 9, w: 3, h: 4, minW: 2, minH: 3 },
   { i: 'calendar', x: 6, y: 9, w: 3, h: 4, minW: 2, minH: 3 },
   { i: 'freqtrade', x: 9, y: 9, w: 3, h: 4, minW: 2, minH: 3 },
+  { i: 'automation', x: 0, y: 13, w: 6, h: 4, minW: 3, minH: 3 },
 ];
 
 function loadLayout(sub: string): Layout {

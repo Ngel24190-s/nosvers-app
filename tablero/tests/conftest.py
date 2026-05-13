@@ -11,6 +11,16 @@ from starlette.testclient import TestClient
 sys.path.insert(0, "/home/nosvers")
 
 
+def pytest_collection_modifyitems(config, items):
+    """Enable asyncio mode for tests marked with @pytest.mark.asyncio."""
+    for item in items:
+        if item.get_closest_marker("asyncio"):
+            item.add_marker(pytest.mark.asyncio)
+
+
+pytest_plugins = ("pytest_asyncio",)
+
+
 @pytest.fixture(autouse=True)
 def voz_jwt_secret(monkeypatch):
     """Inyecta un secret JWT determinista para todos los tests del tablero."""

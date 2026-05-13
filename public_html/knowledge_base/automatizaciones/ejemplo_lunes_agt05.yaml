@@ -1,0 +1,19 @@
+id: ejemplo_2026_05_13_lunes_agt05
+nombre: Lunes 9h — relanzar agt05_africa
+autor: angel
+creado: 2026-05-13T00:00:00Z
+modificado: 2026-05-13T00:00:00Z
+activo: false
+trigger:
+  tipo: cron
+  rrule: '0 9 * * 1'
+acciones:
+  - tipo: ejecutar_agente
+    agente: agt05_africa
+    params: {}
+  - tipo: cockpit_toast
+    level: ok
+    text: 'agt05_africa lanzado (lunes 9h)'
+metadatos:
+  descripcion: Ejemplo de trigger cron — proyecto 004.
+  tags: [ejemplo, cron, agt05]

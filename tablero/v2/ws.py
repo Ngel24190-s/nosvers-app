@@ -35,7 +35,7 @@ from voz.auth import validar_token  # noqa: E402
 log = logging.getLogger("tablero.v2.ws")
 
 # Canales válidos
-VALID_CHANNELS = {"health", "claude", "activity", "agentes", "revenue", "aegis", "wake"}
+VALID_CHANNELS = {"health", "claude", "activity", "agentes", "revenue", "aegis", "wake", "automation"}
 
 
 @dataclass(eq=False)
@@ -64,6 +64,19 @@ class Broker:
         self._lock = asyncio.Lock()
         # cache del último snapshot por canal (para snapshot-on-subscribe)
         self._last_snapshots: dict[str, dict] = {}
+        # listeners internos por canal — invocados en cada broadcast sin pasar
+        # por WebSocket. Usados por el Automation Engine (proyecto 004) para
+        # reaccionar a eventos publicados por los cockpit workers.
+        self._internal_listeners: dict[str, list[Callable[[dict], Awaitable[None]]]] = {
+            ch: [] for ch in VALID_CHANNELS
+        }
+
+    def add_internal_listener(self, channel: str, callback: "Callable[[dict], Awaitable[None]]") -> bool:
+        """Registra un callback async que recibirá cada payload publicado en `channel`."""
+        if channel not in VALID_CHANNELS:
+            return False
+        self._internal_listeners.setdefault(channel, []).append(callback)
+        return True
 
     async def register(self, conn: Connection) -> None:
         async with self._lock:
@@ -107,8 +120,15 @@ class Broker:
         # snapshot de la lista bajo lock para evitar mutación durante iteración
         async with self._lock:
             targets = list(self._channels.get(channel, set()))
+            listeners = list(self._internal_listeners.get(channel, []))
         for conn in targets:
             await conn.send(msg)
+        # Dispatch a listeners internos — errores no rompen el broadcast.
+        for cb in listeners:
+            try:
+                await cb(payload)
+            except Exception as _e:  # noqa: BLE001
+                log.debug(f"internal listener error on {channel}: {_e}")
         return len(targets)
 
     @property

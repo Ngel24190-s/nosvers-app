@@ -1,0 +1,23 @@
+id: ejemplo_2026_05_13_stripe_pago_grande
+nombre: Notificar pagos Stripe grandes
+autor: angel
+creado: 2026-05-13T00:00:00Z
+modificado: 2026-05-13T00:00:00Z
+activo: false
+trigger:
+  tipo: webhook_stripe
+  evento: payment_intent.succeeded
+  filtros:
+    amount_gte_eur: 100
+acciones:
+  - tipo: dia_capturar
+    texto: 'Pago Stripe {{trigger.amount}}€ de {{trigger.customer}}'
+    etiqueta: auto
+  - tipo: telegram
+    mensaje: '💰 {{trigger.amount}}€ — {{trigger.customer}} acaba de comprar'
+  - tipo: cockpit_toast
+    level: ok
+    text: 'Pago Stripe {{trigger.amount}}€'
+metadatos:
+  descripcion: Ejemplo de cadena disparada por webhook Stripe (proyecto 004).
+  tags: [ejemplo, stripe, ingresos]

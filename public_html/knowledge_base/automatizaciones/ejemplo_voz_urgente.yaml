@@ -1,0 +1,21 @@
+id: ejemplo_2026_05_13_voz_urgente
+nombre: Dictado contiene 'urgente' → Telegram + nota
+autor: angel
+creado: 2026-05-13T00:00:00Z
+modificado: 2026-05-13T00:00:00Z
+activo: false
+trigger:
+  tipo: voz_keyword
+  keywords:
+    - urgente
+    - prioridad
+    - inmediato
+acciones:
+  - tipo: telegram
+    mensaje: '🚨 Dictado URGENTE — {{trigger.texto}}'
+  - tipo: dia_capturar
+    texto: 'URGENTE — {{trigger.texto}}'
+    etiqueta: urgente
+metadatos:
+  descripcion: Ejemplo trigger voz — proyecto 004.
+  tags: [ejemplo, voz, urgente]

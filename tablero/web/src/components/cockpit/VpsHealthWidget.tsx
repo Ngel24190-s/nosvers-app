@@ -37,13 +37,13 @@ function gaugeColor(pct: number): string {
   return '#34d399';
 }
 
-function Gauge({ label, pct }: { label: string; pct: number }) {
+function Gauge({ label, pct, tooltip }: { label: string; pct: number; tooltip?: string }) {
   const radius = 22;
   const circ = 2 * Math.PI * radius;
   const dashOffset = circ * (1 - pct / 100);
   const color = gaugeColor(pct);
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center" title={tooltip ?? `${label}: ${pct.toFixed(1)}%`}>
       <div className="relative">
         <svg width="56" height="56" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
@@ -103,29 +103,42 @@ export function VpsHealthWidget({ ws, index }: { ws: UseWebSocketReturn; index: 
       }
     >
       <div className="flex flex-col h-full justify-between">
-        <div className="grid grid-cols-4 gap-1">
-          <Gauge label="CPU" pct={cpu} />
-          <Gauge label="RAM" pct={ram} />
-          <Gauge label="DISK" pct={disk} />
-          <Gauge label="LOAD" pct={loadPct} />
-        </div>
-        <div className="mt-2">
-          <div className="flex justify-between mb-1 cockpit-mono text-[9px] text-cockpit-textDim">
-            <span>CPU 60min</span>
-            <span>
-              ↓{(data?.net_in_kbps ?? 0).toFixed(0)}k ↑{(data?.net_out_kbps ?? 0).toFixed(0)}k
-            </span>
+        {data === null ? (
+          <div className="flex-1 flex flex-col gap-2 p-2">
+            <div className="grid grid-cols-4 gap-1">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-14 w-14 rounded-full skeleton mx-auto" />
+              ))}
+            </div>
+            <div className="h-8 skeleton rounded" />
           </div>
-          <div className="h-8">
-            <SparkAreaChart
-              data={chart}
-              categories={['y']}
-              index="x"
-              colors={['cyan']}
-              className="h-8 w-full"
-            />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-4 gap-1">
+              <Gauge label="CPU" pct={cpu} tooltip={`CPU ${cpu.toFixed(1)}% · load ${load.toFixed(2)}`} />
+              <Gauge label="RAM" pct={ram} tooltip={`RAM ${ram.toFixed(1)}% · ${(data.ram_used_mb / 1024).toFixed(1)}/${(data.ram_total_mb / 1024).toFixed(1)} GB`} />
+              <Gauge label="DISK" pct={disk} tooltip={`DISK ${disk.toFixed(1)}% · ${data.disk_used_gb.toFixed(0)}/${data.disk_total_gb.toFixed(0)} GB`} />
+              <Gauge label="LOAD" pct={loadPct} tooltip={`load1 ${data.load_1.toFixed(2)} · load5 ${data.load_5.toFixed(2)} · load15 ${data.load_15.toFixed(2)}`} />
+            </div>
+            <div className="mt-2">
+              <div className="flex justify-between mb-1 cockpit-mono text-[9px] text-cockpit-textDim">
+                <span>CPU 60min</span>
+                <span title={`net in ${data.net_in_kbps.toFixed(1)} kbps / out ${data.net_out_kbps.toFixed(1)} kbps`}>
+                  ↓{(data.net_in_kbps ?? 0).toFixed(0)}k ↑{(data.net_out_kbps ?? 0).toFixed(0)}k
+                </span>
+              </div>
+              <div className="h-8" title={history.length ? `últimos ${history.length} ticks · max ${Math.max(...history).toFixed(1)}% · min ${Math.min(...history).toFixed(1)}%` : 'sin historial aún'}>
+                <SparkAreaChart
+                  data={chart}
+                  categories={['y']}
+                  index="x"
+                  colors={['cyan']}
+                  className="h-8 w-full"
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </WidgetCard>
   );

@@ -19,6 +19,8 @@ import { GmailMiniWidget } from '../components/cockpit/GmailMiniWidget';
 import { CalendarWidget } from '../components/cockpit/CalendarWidget';
 import { FreqtradeWidget } from '../components/cockpit/FreqtradeWidget';
 import { StripeToaster } from '../components/cockpit/StripeToaster';
+import { AutomationsWidget } from '../components/cockpit/AutomationsWidget';
+import { ShortcutsModal } from '../components/cockpit/ShortcutsModal';
 import '../styles/cockpit.css';
 
 function wsUrl(): string {
@@ -139,13 +141,13 @@ export default function Cockpit({ identitySub, onExit }: CockpitProps) {
           onLayoutChange={(curr: Layout) => onLayoutChange([...curr])}
           dragConfig={{ handle: '.cockpit-glass' }}
         >
-          <div key="claude">
+          <div key="claude" data-widget="claude">
             <ClaudeStatusWidget ws={ws} index={0} />
           </div>
-          <div key="vps">
+          <div key="vps" data-widget="vps">
             <VpsHealthWidget ws={ws} index={1} />
           </div>
-          <div key="revenue">
+          <div key="revenue" data-widget="revenue">
             <RevenueWidget ws={ws} index={2} />
           </div>
           <div key="aegis">
@@ -172,6 +174,9 @@ export default function Cockpit({ identitySub, onExit }: CockpitProps) {
           <div key="freqtrade">
             <FreqtradeWidget index={10} />
           </div>
+          <div key="automation">
+            <AutomationsWidget ws={ws} index={11} />
+          </div>
         </ResponsiveGridLayout>
         </div>
         <div className="text-center cockpit-mono text-[9px] text-cockpit-dim mt-4">
@@ -181,6 +186,7 @@ export default function Cockpit({ identitySub, onExit }: CockpitProps) {
       </main>
 
       <StripeToaster ws={ws} />
+      <ShortcutsModal />
       <Toaster
         position="bottom-right"
         theme="dark"

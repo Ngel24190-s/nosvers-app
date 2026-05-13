@@ -68,31 +68,41 @@ export function RevenueWidget({ ws, index }: { ws: UseWebSocketReturn; index: nu
       }
     >
       <div className="flex flex-col h-full justify-between">
-        <div>
-          <div className="cockpit-mono text-3xl font-bold text-accent-orange">
-            €{month.toFixed(0)}
+        {data === null ? (
+          <div className="flex-1 flex flex-col gap-3 p-2">
+            <div className="h-10 skeleton rounded" />
+            <div className="h-3 skeleton rounded w-2/3" />
+            <div className="h-2 skeleton rounded" />
           </div>
-          <div className="cockpit-mono text-[10px] text-cockpit-textDim mt-1">
-            mes · objetivo €{target.toFixed(0)}
-          </div>
-        </div>
-        <div>
-          <div className="relative h-2 bg-cockpit-panelHi rounded-full overflow-hidden">
-            <motion.div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent-orange to-accent-amber"
-              style={{ boxShadow: '0 0 12px rgba(251, 146, 60, 0.6)' }}
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            />
-          </div>
-          <div className="flex justify-between mt-1 cockpit-mono text-[9px] text-cockpit-textDim">
-            <span>{pct.toFixed(0)}%</span>
-            {data?.last_payment && (
-              <span className="truncate ml-2">últ. €{data.last_payment.amount_eur.toFixed(0)}</span>
-            )}
-          </div>
-        </div>
+        ) : (
+          <>
+            <div>
+              <div className="cockpit-mono text-3xl font-bold text-accent-orange" title={`mes €${data.month_eur.toFixed(2)} · hoy €${data.day_eur.toFixed(2)}`}>
+                €{month.toFixed(0)}
+              </div>
+              <div className="cockpit-mono text-[10px] text-cockpit-textDim mt-1">
+                mes · objetivo €{target.toFixed(0)}
+              </div>
+            </div>
+            <div>
+              <div className="relative h-2 bg-cockpit-panelHi rounded-full overflow-hidden" title={`${pct.toFixed(1)}% del objetivo`}>
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent-orange to-accent-amber"
+                  style={{ boxShadow: '0 0 12px rgba(251, 146, 60, 0.6)' }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                />
+              </div>
+              <div className="flex justify-between mt-1 cockpit-mono text-[9px] text-cockpit-textDim">
+                <span>{pct.toFixed(0)}%</span>
+                {data.last_payment && (
+                  <span className="truncate ml-2" title={data.last_payment.desc}>últ. €{data.last_payment.amount_eur.toFixed(0)}</span>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </WidgetCard>
   );

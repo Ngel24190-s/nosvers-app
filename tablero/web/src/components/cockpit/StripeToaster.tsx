@@ -3,6 +3,26 @@ import { toast } from 'sonner';
 import { Euro } from 'lucide-react';
 import type { UseWebSocketReturn } from '../../hooks/useWebSocket';
 
+function beepFallback() {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ac = new AC();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g);
+    g.connect(ac.destination);
+    o.frequency.value = 880;
+    g.gain.value = 0.08;
+    o.start();
+    setTimeout(() => {
+      o.stop();
+      ac.close();
+    }, 180);
+  } catch {
+    /* ignore */
+  }
+}
+
 interface RevenuePayload {
   day_eur: number;
   month_eur: number;
@@ -43,23 +63,13 @@ export function StripeToaster({ ws }: { ws: UseWebSocketReturn }) {
             { duration: 8000 },
           );
           if (localStorage.getItem('cockpit_sound') === 'on') {
-            // beep simple sin assets
+            // Si existe un asset cha-ching.mp3, usarlo; si no, fallback a beep WebAudio.
             try {
-              const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-              const ac = new AC();
-              const o = ac.createOscillator();
-              const g = ac.createGain();
-              o.connect(g);
-              g.connect(ac.destination);
-              o.frequency.value = 880;
-              g.gain.value = 0.08;
-              o.start();
-              setTimeout(() => {
-                o.stop();
-                ac.close();
-              }, 180);
+              const audio = new Audio('/sounds/cha-ching.mp3');
+              audio.volume = 0.4;
+              audio.play().catch(() => beepFallback());
             } catch {
-              /* ignore */
+              beepFallback();
             }
           }
         }

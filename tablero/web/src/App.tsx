@@ -4,20 +4,31 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 
 const Cockpit = lazy(() => import('./pages/Cockpit'));
+const AutomationListPage = lazy(() =>
+  import('./components/automatizaciones/AutomationListPage').then((m) => ({ default: m.AutomationListPage })),
+);
 
-function isCockpitRoute(): boolean {
-  if (typeof window === 'undefined') return false;
+type Route = 'dashboard' | 'cockpit' | 'automatizaciones';
+
+function routeFromLocation(): Route {
+  if (typeof window === 'undefined') return 'dashboard';
   const path = window.location.pathname;
   const hash = window.location.hash;
-  return path.endsWith('/cockpit') || hash === '#cockpit' || hash === '#/cockpit';
+  if (hash === '#cockpit/automatizaciones' || hash === '#/cockpit/automatizaciones') {
+    return 'automatizaciones';
+  }
+  if (path.endsWith('/cockpit') || hash === '#cockpit' || hash === '#/cockpit') {
+    return 'cockpit';
+  }
+  return 'dashboard';
 }
 
 export default function App() {
   const { identity, loading } = useIdentity();
-  const [cockpit, setCockpit] = useState<boolean>(isCockpitRoute());
+  const [route, setRoute] = useState<Route>(routeFromLocation());
 
   useEffect(() => {
-    const onChange = () => setCockpit(isCockpitRoute());
+    const onChange = () => setRoute(routeFromLocation());
     window.addEventListener('hashchange', onChange);
     window.addEventListener('popstate', onChange);
     return () => {
@@ -36,7 +47,26 @@ export default function App() {
   if (!identity) {
     return <Login />;
   }
-  if (cockpit) {
+
+  if (route === 'automatizaciones') {
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] text-[#9ca3af] font-mono text-xs">
+            cargando editor…
+          </div>
+        }
+      >
+        <AutomationListPage
+          onBack={() => {
+            window.location.hash = 'cockpit';
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  if (route === 'cockpit') {
     const exitToDashboard = () => {
       const path = window.location.pathname;
       if (path.endsWith('/cockpit')) {
@@ -45,7 +75,7 @@ export default function App() {
       if (window.location.hash) {
         window.history.replaceState({}, '', window.location.pathname + window.location.search);
       }
-      setCockpit(false);
+      setRoute('dashboard');
     };
     return (
       <Suspense
@@ -59,6 +89,7 @@ export default function App() {
       </Suspense>
     );
   }
+
   return (
     <>
       <Dashboard identitySub={identity.sub} />

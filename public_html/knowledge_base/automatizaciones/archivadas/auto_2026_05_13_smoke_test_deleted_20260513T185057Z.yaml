@@ -1,0 +1,18 @@
+id: auto_2026_05_13_smoke_test
+nombre: Smoke test
+autor: angel
+creado: '2026-05-13T18:50:57.740169Z'
+modificado: '2026-05-13T18:50:57.740169Z'
+activo: false
+trigger:
+  tipo: cron
+  rrule: '*/5 * * * *'
+acciones:
+- tipo: dia_capturar
+  texto: Tick {{now}}
+  etiqueta: ''
+  autor: null
+- tipo: telegram
+  mensaje: ping
+  chat_id: null
+metadatos: {}
