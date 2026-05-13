@@ -344,7 +344,7 @@ en commits más grandes. Se mantienen como referencia histórica.
 - [ ] T093 Ejecutar `npx playwright test` (8 specs E2E: us1, us2, us3, us4, us5, us6, us7, us8). — Test: todos pasan. — Commit: `test(tablero-v2): 8 E2E smoke specs green`
 - [ ] T094 [P] Verificación de no-regresión: smoke manual del bot Telegram, agt07_diario, freqtrade health, WordPress. — Test: manual checklist en quickstart.md sección "smoke no-regresión". Constitución V. — Commit: `chore(tablero-v2): verify no regression on existing services`
 - [ ] T095 Build prod + rsync a nginx doc-root + restart uvicorn. Smoke remoto vs `tablero.72.61.160.108.nip.io`. — Test: `curl /tablero/api/health` devuelve version 0.2.0, login + Ctrl+N + capturar funcionan en remoto. — Commit: `chore(tablero-v2): deploy to tablero.72.61.160.108.nip.io dev`
-- [ ] T096 Enviar Telegram a Angel con resumen final (Task #6 del runner). Si `telegram_enviar` se cuelga > 30 s, abortar + reintentar 1 vez + marcar `MCP_STALL_FASE_BC` en logs. — Test: mensaje llega a `5752097691` o se documenta el stall. — Commit: `chore(tablero-v2): notify CEO via Telegram on close`
+- [!] T096 MCP_STALL_RESOLVED_BY_OPUS_MOBILE — `mcp__claude_ai_nosvers-mcp-2026__telegram_enviar` desde Claude Code sigue colgándose pese a permisos aprobados. Angel envía el Telegram final desde su sesión Opus móvil con el resumen de los 8 commits. Regla guardada en memoria (`feedback_telegram_enviar_solo_al_final.md`): no usar telegram_enviar desde Code excepto al cierre absoluto, y si se cuelga marcar esta vía.
 
 ---
 
