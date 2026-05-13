@@ -35,9 +35,13 @@ from tablero.log import alert_critical, get_logger  # noqa: E402
 from tablero.nota import NotaNotFound, PathUnsafe, leer_nota  # noqa: E402
 from tablero.timeline import listar_timeline  # noqa: E402
 
+# Fase B+C handlers (v2 prefix, D-014)
+from tablero.v2.capturar import capturar_handler as _v2_capturar  # noqa: E402
+from tablero.v2.editar import editar_handler as _v2_editar  # noqa: E402
+
 log = get_logger("tablero.rest")
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 _PROD_ORIGIN = "https://tablero.nosvers.com"
 _DEV_ORIGIN = "http://localhost:5173"
 
@@ -49,8 +53,8 @@ def _allowed_origin() -> str:
 def _cors_headers() -> dict:
     return {
         "Access-Control-Allow-Origin": _allowed_origin(),
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id",
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id, If-Match",
         "Access-Control-Max-Age": "86400",
         "Vary": "Origin",
     }
@@ -253,6 +257,28 @@ async def nota_handler(request: Request) -> JSONResponse:
     return _json({"ok": True, "nota": nota})
 
 
+# -----------------------------------------------------------------------------
+# Fase B+C wrappers — inyectan dependencies sin acoplar los handlers a este módulo
+# -----------------------------------------------------------------------------
+async def v2_capturar_handler(request: Request) -> JSONResponse:
+    return await _v2_capturar(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_editar_handler(request: Request) -> JSONResponse:
+    return await _v2_editar(request, _autenticar, _cors_headers, _log_line)
+
+
+def _startup_wiki_index() -> None:
+    """Inicializa el wiki_index al arrancar el proceso. D-004."""
+    try:
+        from tablero.v2.wiki_index import get_index
+        idx = get_index()
+        idx.build()
+        log.info(f"wiki_index built: {idx.stats()}")
+    except Exception as e:  # noqa: BLE001
+        log.exception(f"wiki_index startup failed: {e}")
+
+
 ROUTES = [
     Route("/tablero/api/health", health_handler, methods=["GET"]),
     Route("/tablero/api/whoami", whoami_handler, methods=["GET"]),
@@ -263,6 +289,11 @@ ROUTES = [
     Route("/tablero/api/buscar", options_handler, methods=["OPTIONS"]),
     Route("/tablero/api/nota", nota_handler, methods=["GET"]),
     Route("/tablero/api/nota", options_handler, methods=["OPTIONS"]),
+    # ── Fase B+C (D-014 prefijo /v2/) ────────────────────────────────────────
+    Route("/tablero/api/v2/capturar", v2_capturar_handler, methods=["POST"]),
+    Route("/tablero/api/v2/capturar", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/nota", v2_editar_handler, methods=["PATCH"]),
+    Route("/tablero/api/v2/nota", options_handler, methods=["OPTIONS"]),
 ]
 
 

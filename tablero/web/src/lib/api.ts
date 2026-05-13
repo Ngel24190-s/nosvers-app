@@ -1,12 +1,23 @@
 import { getToken, clearToken } from './auth';
 import type {
+  CapturarRequest,
+  CapturarResponse,
+  EditarRequest,
+  EditarResponse,
   ErrorResponse,
   NoteResponse,
   SearchResponse,
+  StaleModifiedAtError,
   TimelineFilters,
   TimelineResponse,
   WhoamiResponse,
 } from './types';
+
+export class ConcurrencyError extends Error {
+  constructor(public readonly currentModifiedAt: string) {
+    super(`stale_modified_at; current=${currentModifiedAt}`);
+  }
+}
 
 const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? '';
 
@@ -87,4 +98,50 @@ export function getBuscar(params: { q: string; autor?: string; etiqueta?: string
 export function getNota(path: string) {
   const p = new URLSearchParams({ path });
   return fetchJSON<NoteResponse>(`/tablero/api/nota?${p}`);
+}
+
+// ─── Fase B+C v2 endpoints ────────────────────────────────────────────────────
+
+export function capturarNota(body: CapturarRequest) {
+  return fetchJSON<CapturarResponse>('/tablero/api/v2/capturar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+/**
+ * Edita una entrada con concurrencia optimista (D-003).
+ * `ifMatch` debe ser el concurrency_token de la nota (modified_at o ts).
+ * Lanza ConcurrencyError ante 409 stale_modified_at.
+ */
+export async function editarNota(body: EditarRequest, ifMatch: string): Promise<EditarResponse> {
+  try {
+    return await fetchJSON<EditarResponse>('/tablero/api/v2/nota', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'If-Match': ifMatch,
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 409) {
+      // Re-fetch body para obtener current_modified_at — necesitamos el response body
+      // El error ya tiene detalle pero falta current_modified_at; haremos un fetch raw
+      const token = getToken();
+      const res = await fetch('/tablero/api/v2/nota', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'If-Match': ifMatch,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+      const data = (await res.json().catch(() => ({}))) as Partial<StaleModifiedAtError>;
+      throw new ConcurrencyError(data.current_modified_at ?? '');
+    }
+    throw e;
+  }
 }

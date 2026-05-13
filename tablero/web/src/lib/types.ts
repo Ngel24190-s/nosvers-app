@@ -101,3 +101,92 @@ export const DEFAULT_FILTERS: TimelineFilters = {
   desde: '',
   hasta: '',
 };
+
+// ─── Fase B+C types ──────────────────────────────────────────────────────────
+
+/** Vista activa del timeline (FR-010, FR-012). */
+export type Vista = 'lista' | 'tabla' | 'kanban' | 'calendario' | 'galeria';
+
+export const VISTAS: readonly Vista[] = ['lista', 'tabla', 'kanban', 'calendario', 'galeria'] as const;
+
+/** Borrador de captura persistido en localStorage (FR-003). */
+export interface BorradorCaptura {
+  titulo: string;
+  cuerpo: string;
+  etiquetas: Etiqueta[];
+  savedAt: string;
+}
+
+/** Response de POST /tablero/api/v2/capturar (US1). */
+export interface CapturarResponse {
+  ok: true;
+  path: string;              // "dia/<fecha>.md#<ts>"
+  fecha: string;             // YYYY-MM-DD
+  ts: string;                // ISO 8601
+  autor: Autor;
+  etiqueta: Etiqueta;
+  concurrency_token: string;
+}
+
+/** Response de PATCH /tablero/api/v2/nota (US2). */
+export interface EditarResponse {
+  ok: true;
+  path: string;
+  fecha: string;
+  ts: string;
+  autor: Autor;
+  etiqueta: Etiqueta;
+  concurrency_token: string;
+  modified_at: string;
+}
+
+/** Body para POST /tablero/api/v2/capturar (US1). */
+export interface CapturarRequest {
+  titulo?: string;
+  cuerpo: string;
+  etiquetas?: Etiqueta[];
+}
+
+/** Body para PATCH /tablero/api/v2/nota (US2). */
+export interface EditarRequest {
+  path: string;              // "dia/<fecha>.md#<ts>"
+  cuerpo?: string;
+  titulo?: string;
+  etiqueta?: Etiqueta;
+}
+
+/** Error 409 stale_modified_at — propagado como ConcurrencyError. */
+export interface StaleModifiedAtError {
+  ok: false;
+  error: 'stale_modified_at';
+  current_modified_at: string;
+}
+
+// Proyectos (US6 — futuro)
+export interface Proyecto {
+  slug: string;
+  titulo: string;
+  estado: 'todo' | 'doing' | 'done' | 'blocked' | 'sin_estado';
+  modified_at: string;
+  responsable?: Autor;
+  deadline?: string;
+  etiquetas?: string[];
+  cuerpo?: string;
+}
+
+// Vault tree (US8 — futuro)
+export interface VaultNode {
+  name: string;
+  type: 'folder' | 'file';
+  size?: number;
+  modified_at?: string;
+}
+
+// Wiki-index (US7 — futuro)
+export interface BacklinkEntry {
+  source_slug: string;
+  source_path: string;
+  source_autor?: Autor;
+  source_modified_at?: string;
+  context: string;
+}
