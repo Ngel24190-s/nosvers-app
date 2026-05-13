@@ -171,6 +171,55 @@ export function getVaultTree(path = '') {
   }>(`/tablero/api/v2/vault/tree${qs}`);
 }
 
+// P3 fetchers
+
+export interface InfraBadge {
+  id: string;
+  status: 'ok' | 'warn' | 'error';
+  value?: string | number;
+  detail?: string;
+  link?: string;
+  last_check: string;
+  crones?: Array<{
+    name: string;
+    status: 'ok' | 'warn' | 'error';
+    last_run?: string;
+    expected_interval_s: number;
+    detail?: string;
+  }>;
+}
+
+export function getInfraStatus() {
+  return fetchJSON<{ ok: true; generated_at: string; badges: InfraBadge[] }>(
+    '/tablero/api/v2/infra/status',
+  );
+}
+
+export interface AgenteCatalogo {
+  slug: string;
+  label: string;
+  timeout_s: number;
+}
+
+export function getAgentesCatalogo() {
+  return fetchJSON<{ ok: true; agentes: AgenteCatalogo[] }>('/tablero/api/v2/agentes/catalogo');
+}
+
+export function ejecutarAgente(slug: string, timeout_s?: number) {
+  return fetchJSON<{
+    ok: boolean;
+    slug: string;
+    output: string;
+    duration_s: number;
+    triggered_by: string;
+    error?: string;
+  }>('/tablero/api/v2/agentes/ejecutar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, timeout_s }),
+  });
+}
+
 /**
  * Edita una entrada con concurrencia optimista (D-003).
  * `ifMatch` debe ser el concurrency_token de la nota (modified_at o ts).

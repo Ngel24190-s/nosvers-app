@@ -48,6 +48,11 @@ from tablero.v2.proyectos import (  # noqa: E402
 )
 from tablero.v2.vault_tree import vault_tree_handler as _v2_vault_tree  # noqa: E402
 from tablero.v2.wiki_endpoint import wiki_index_handler as _v2_wiki_index  # noqa: E402
+from tablero.v2.infra import infra_handler as _v2_infra  # noqa: E402
+from tablero.v2.agentes import (  # noqa: E402
+    agentes_handler as _v2_agentes,
+    catalogo_handler as _v2_agentes_catalogo,
+)
 
 log = get_logger("tablero.rest")
 
@@ -302,6 +307,18 @@ async def v2_wiki_index_handler(request: Request) -> JSONResponse:
     return await _v2_wiki_index(request, _autenticar, _cors_headers, _log_line)
 
 
+async def v2_infra_handler(request: Request) -> JSONResponse:
+    return await _v2_infra(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_agentes_handler(request: Request) -> JSONResponse:
+    return await _v2_agentes(request, _autenticar, _cors_headers, _log_line)
+
+
+async def v2_agentes_catalogo_handler(request: Request) -> JSONResponse:
+    return await _v2_agentes_catalogo(request, _autenticar, _cors_headers, _log_line)
+
+
 def _startup_wiki_index() -> None:
     """Inicializa el wiki_index al arrancar el proceso. D-004."""
     try:
@@ -345,6 +362,14 @@ ROUTES = [
     # US8 vault tree
     Route("/tablero/api/v2/vault/tree", v2_vault_tree_handler, methods=["GET"]),
     Route("/tablero/api/v2/vault/tree", options_handler, methods=["OPTIONS"]),
+    # US10 infra status
+    Route("/tablero/api/v2/infra/status", v2_infra_handler, methods=["GET"]),
+    Route("/tablero/api/v2/infra/status", options_handler, methods=["OPTIONS"]),
+    # US11 agentes
+    Route("/tablero/api/v2/agentes/catalogo", v2_agentes_catalogo_handler, methods=["GET"]),
+    Route("/tablero/api/v2/agentes/ejecutar", v2_agentes_handler, methods=["POST"]),
+    Route("/tablero/api/v2/agentes/ejecutar", options_handler, methods=["OPTIONS"]),
+    Route("/tablero/api/v2/agentes/catalogo", options_handler, methods=["OPTIONS"]),
 ]
 
 

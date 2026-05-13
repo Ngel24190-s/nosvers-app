@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LogOut, Plus, Edit3, Command as CommandIcon, Layout, Trello, Archive, Folder } from 'lucide-react';
+import { LogOut, Plus, Edit3, Command as CommandIcon, Layout, Trello, Archive, Folder, BarChart3, Network, Activity } from 'lucide-react';
 import { ApiError, getBuscar, getNota, getTimeline } from '../lib/api';
 import { clearToken } from '../lib/auth';
 import {
@@ -31,11 +31,14 @@ import { ArchiveDialog } from '../components/ArchiveDialog';
 import { PapeleraView } from '../components/PapeleraView';
 import { ProyectosKanban } from '../components/ProyectosKanban';
 import { VaultTreeSidebar } from '../components/VaultTreeSidebar';
+import { StatsWidget } from '../components/StatsWidget';
+import { InfraSidebar } from '../components/InfraSidebar';
+import { GraphView } from '../components/GraphView';
 import { getCachedTimeline, setCachedTimeline, setCachedNote, getCachedNote } from '../lib/cache';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { useVistaPersist } from '../hooks/useVistaPersist';
 
-type Modo = 'timeline' | 'proyectos' | 'papelera';
+type Modo = 'timeline' | 'proyectos' | 'papelera' | 'stats' | 'grafo';
 
 interface Props {
   identitySub: 'angel' | 'africa';
@@ -282,6 +285,24 @@ export function Dashboard({ identitySub }: Props) {
             >
               <Archive size={12} /> Papelera
             </button>
+            <button
+              type="button"
+              onClick={() => setModo('stats')}
+              className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+                modo === 'stats' ? 'bg-emerald-600 text-white' : 'text-tinta/70 hover:bg-tinta/5'
+              }`}
+            >
+              <BarChart3 size={12} /> Stats
+            </button>
+            <button
+              type="button"
+              onClick={() => setModo('grafo')}
+              className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+                modo === 'grafo' ? 'bg-emerald-600 text-white' : 'text-tinta/70 hover:bg-tinta/5'
+              }`}
+            >
+              <Network size={12} /> Grafo
+            </button>
           </nav>
 
           {modo === 'timeline' && <SearchBar onSearch={onSearch} />}
@@ -340,6 +361,16 @@ export function Dashboard({ identitySub }: Props) {
           <ProyectosKanban />
         ) : modo === 'papelera' ? (
           <PapeleraView onRestaurada={() => void refreshTimeline()} />
+        ) : modo === 'stats' ? (
+          <section className="space-y-3">
+            <h2 className="font-display text-lg">Estadísticas</h2>
+            <StatsWidget entradas={entries} />
+          </section>
+        ) : modo === 'grafo' ? (
+          <section className="space-y-3">
+            <h2 className="font-display text-lg">Grafo de conexiones</h2>
+            <GraphView />
+          </section>
         ) : (
           <>
         {!showSearch && (
@@ -464,6 +495,11 @@ export function Dashboard({ identitySub }: Props) {
           }
         }}
       />
+
+      {/* US10+US11: infra sidebar (siempre visible bottom-right en desktop) */}
+      <div className="fixed bottom-4 right-4 z-30 hidden w-72 lg:block">
+        <InfraSidebar />
+      </div>
 
       {/* US3: archive dialog */}
       <ArchiveDialog
