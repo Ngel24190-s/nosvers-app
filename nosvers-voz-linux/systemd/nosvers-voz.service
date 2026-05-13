@@ -1,0 +1,21 @@
+[Unit]
+Description=NosVers · Asistente de Voz Personal (wake word Claudio + STT/TTS local)
+After=default.target sound.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Asume venv en %h/nosvers-voz-linux/.venv. Ajusta si está en otro sitio.
+WorkingDirectory=%h/nosvers-voz-linux
+Environment=PYTHONUNBUFFERED=1
+# ANTHROPIC_API_KEY: definir en %h/.config/nosvers-voz/env y descomentar la línea
+# EnvironmentFile=%h/.config/nosvers-voz/env
+ExecStart=%h/nosvers-voz-linux/.venv/bin/python -m nosvers_voz
+Restart=on-failure
+RestartSec=5
+# Limita CPU/memoria por si algo se desboca
+CPUQuota=120%
+MemoryMax=2G
+
+[Install]
+WantedBy=default.target

@@ -20,3 +20,17 @@ logs/
 # IDE
 .vscode/
 .idea/
+
+# Voice assistant — privacidad y secretos
+# Pool común multi-usuario (BRIEF §14): notas y audios nunca al repo.
+public_html/knowledge_base/dia/
+public_html/knowledge_base/system/speakers/
+knowledge_base/angel/dia/audio/
+# Tokens JWT activos
+voz/data/
+voz/__pycache__/
+agents/agt07_diario/__pycache__/
+# Cliente Linux casa
+nosvers-voz-linux/.pytest_cache/
+nosvers-voz-linux/models/*.onnx
+nosvers-voz-linux/**/__pycache__/
