@@ -1,0 +1,23 @@
+# Pautas de medicación activas — alimenta medicacion_recordar()
+# Schema:
+#   items:
+#     - quien: angel | africa | bris
+#       medicamento: str
+#       dosis: str (ej "1 comprimido", "10 gotas")
+#       horas: [HH:MM, ...]              ← horas del día
+#       cada_n_dias: int (default 1)     ← 1 = diario
+#       desde: YYYY-MM-DD                ← inicio del tratamiento
+#       hasta: YYYY-MM-DD (opcional)     ← fin si es ciclo cerrado
+#       notas: str (opcional)
+#       activo: bool (default true)
+#
+# Ejemplo (descomentar al activar):
+#
+#   - quien: bris
+#     medicamento: Antiparasitario Milbemax
+#     dosis: 1 comprimido
+#     horas: ['08:00']
+#     cada_n_dias: 30
+#     desde: 2026-04-01
+
+items: []

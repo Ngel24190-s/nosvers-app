@@ -1,0 +1,29 @@
+# Cargos recurrentes — alimenta recurrente_alertar()
+# Schema:
+#   items:
+#     - nombre: str
+#       monto_eur: float
+#       dia_mes: int (1-31)            ← día del mes en que se carga
+#       cada_n_meses: int (default 1)   ← 1 = mensual, 12 = anual
+#       categoria: str
+#       autor: angel | africa | compartido
+#       desde: YYYY-MM-DD (opcional)    ← primera ocurrencia
+#       activo: bool (default true)
+#
+# Ejemplos comentados (descomentar y editar al activar):
+#
+#   - nombre: Netflix
+#     monto_eur: 17.99
+#     dia_mes: 5
+#     categoria: ocio
+#     autor: angel
+#
+#   - nombre: Seguro coche AXA
+#     monto_eur: 612.00
+#     dia_mes: 22
+#     cada_n_meses: 12
+#     categoria: coche
+#     autor: angel
+#     desde: 2025-11-22
+
+items: []

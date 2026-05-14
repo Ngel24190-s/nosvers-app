@@ -1,0 +1,16 @@
+# Inventario electrodomésticos / aparatos importantes
+# Schema:
+#   items:
+#     - nombre: str
+#       marca: str
+#       modelo: str
+#       n_serie: str (opcional)
+#       fecha_compra: YYYY-MM-DD
+#       garantia_hasta: YYYY-MM-DD (opcional)
+#       lugar: str (ej "cocina", "garaje")
+#       manual_pdf: ruta dentro de documentos/ (opcional)
+#       notas: str (opcional)
+#
+# Útil para: garantías, reclamaciones, fechas de revisión.
+
+items: []

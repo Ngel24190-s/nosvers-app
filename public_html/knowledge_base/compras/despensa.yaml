@@ -1,0 +1,12 @@
+# Despensa estable — qué hay en casa (granel, conservas, congelados)
+# Schema:
+#   items:
+#     - producto: str
+#       cantidad: str (ej "2kg", "5 botes", "1L")
+#       categoria: str (cereales | legumbres | conservas | congelados | aceites | otros)
+#       comprado: YYYY-MM-DD (opcional)
+#       caducidad: YYYY-MM-DD (opcional)
+#
+# Fase 2+: alimenta menu_sugerir filtrando recetas que matchean lo disponible.
+
+items: []
