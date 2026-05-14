@@ -53,6 +53,9 @@ from tablero.v2.agentes import (  # noqa: E402
     agentes_handler as _v2_agentes,
     catalogo_handler as _v2_agentes_catalogo,
 )
+from tablero.v2.agente_ejecutar import (  # noqa: E402
+    agente_ejecutar_handler as _v2_agente_ejecutar,
+)
 
 # Fase D Cockpit (WS + health)
 from tablero.v2.health import health_handler as _v2_health  # noqa: E402
@@ -332,6 +335,10 @@ async def v2_agentes_catalogo_handler(request: Request) -> JSONResponse:
     return await _v2_agentes_catalogo(request, _autenticar, _cors_headers, _log_line)
 
 
+async def v2_agente_ejecutar_handler(request: Request) -> JSONResponse:
+    return await _v2_agente_ejecutar(request, _autenticar, _cors_headers, _log_line)
+
+
 # ── Automation Engine (proyecto 004) ────────────────────────────────────────
 from tablero.v2.automatizaciones import rest as _v2_auto_rest  # noqa: E402
 
@@ -431,6 +438,9 @@ ROUTES = [
     Route("/tablero/api/v2/agentes/ejecutar", v2_agentes_handler, methods=["POST"]),
     Route("/tablero/api/v2/agentes/ejecutar", options_handler, methods=["OPTIONS"]),
     Route("/tablero/api/v2/agentes/catalogo", options_handler, methods=["OPTIONS"]),
+    # 010 — fire-and-forget agente ejecutor (whitelist 14 agentes)
+    Route("/tablero/api/v2/agente_ejecutar", v2_agente_ejecutar_handler, methods=["POST"]),
+    Route("/tablero/api/v2/agente_ejecutar", options_handler, methods=["OPTIONS"]),
     # Fase D — Cockpit Mission Control
     Route("/tablero/api/v2/health", _v2_health, methods=["GET"]),
     Route("/tablero/api/v2/health", options_handler, methods=["OPTIONS"]),

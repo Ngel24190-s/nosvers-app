@@ -314,3 +314,207 @@ export interface AgentesSnapshot {
   ts?: string;
   empty?: boolean;
 }
+
+// Canal `agentes` real (vienen del worker `agentes_tick`)
+export interface AgenteEstado {
+  id: string;
+  state: 'idle' | 'running' | 'error' | 'missing';
+  last_run_ts: number;
+  last_status: string | null;
+}
+
+export interface AgentesWorkerSnapshot {
+  agentes: AgenteEstado[];
+}
+
+// === 010 — NosVers completo ==================================================
+
+export interface BriefingAfricaSnapshot {
+  fecha: string;
+  titulo: string;
+  extracto: string;
+  items: Array<{ titulo: string; extracto: string }>;
+  ts: string;
+}
+
+export interface ProximaPublicacionSnapshot {
+  estado: 'en_cola' | 'publicados' | 'vacio';
+  siguiente: {
+    n: number;
+    dia: string;
+    hora: string;
+    tipo: string;
+    caption: string;
+    status: string;
+  } | null;
+  pendientes: number;
+  aprobados: number;
+  total?: number;
+  ts: string;
+}
+
+export interface VermiculturaSnapshot {
+  eisenia: {
+    bacs: number;
+    biomasa_kg: number;
+    produccion_lombricompost_kg_mes: number;
+    ultima_recolte: string;
+  };
+  dendrobaena: {
+    stock_g: number;
+    reservadas_g: number;
+    proxima_entrega: string;
+  };
+  aappma: {
+    pedido_activo: {
+      cliente: string;
+      cantidad_g: number;
+      fecha_entrega: string;
+      estado: string;
+    };
+    concours_proximo: string;
+  };
+  thierry: {
+    nombre: string;
+    rol: string;
+    telefono: string;
+    email: string;
+    ultimo_contacto: string;
+  };
+  ts: string;
+}
+
+export interface ComposteurSnapshot {
+  activo: boolean;
+  nota: string;
+  temperatura_c: number;
+  humedad_pct: number;
+  fase: string;
+  ultima_volteada: string;
+  proxima_volteada: string;
+  alertas: string[];
+  ts: string;
+}
+
+export interface TareasDiaSnapshot {
+  fecha: string;
+  tareas: Array<{
+    texto: string;
+    categoria: string;
+    hecha: boolean;
+    prioridad: number;
+  }>;
+  total: number;
+  pendientes: number;
+  hechas: number;
+  ts: string;
+}
+
+export interface EiseniaRunSnapshot {
+  ultima_ejecucion: string | null;
+  alertas: Array<{
+    type: string;
+    bac: string;
+    jours: number | null;
+    kg_estimes: number | null;
+    urgence: string;
+  }>;
+  estado: 'alertas' | 'ok' | 'sin_datos';
+  urgentes?: number;
+  resumen: string;
+  ts: string;
+}
+
+export interface WebTrafficSnapshot {
+  fuente: string;
+  dominio: string;
+  rango_dias: number;
+  total_visitas: number;
+  total_paginas: number;
+  visitas_hoy: number;
+  visitas_ayer: number;
+  delta_dia: number;
+  series: Array<{ fecha: string; visitas: number; paginas_vistas: number }>;
+  ts: string;
+}
+
+export interface SearchConsoleSnapshot {
+  fuente: string;
+  rango_dias: number;
+  total_impresiones: number;
+  total_clicks: number;
+  ctr_pct: number;
+  posicion_media: number;
+  queries_top: Array<{ query: string; impresiones: number; clicks: number; posicion_media: number }>;
+  series: Array<{ fecha: string; impresiones: number; clicks: number }>;
+  ts: string;
+}
+
+export interface AhrefsSnapshot {
+  fuente: string;
+  dominio: string;
+  domain_rating: number;
+  url_rating: number;
+  backlinks: number;
+  referring_domains: number;
+  organic_keywords: number;
+  organic_traffic: number;
+  top_backlinks: Array<{ url: string; dr: number; anchor: string }>;
+  ts: string;
+}
+
+export interface EngagementRedesSnapshot {
+  fuente: string;
+  rango_dias: number;
+  instagram: {
+    followers: number;
+    posts_semana: number;
+    likes_total: number;
+    comments_total: number;
+    engagement_rate_pct: number;
+    agente_logs_semana: number;
+  };
+  youtube: {
+    subs: number;
+    videos_semana: number;
+    views_semana: number;
+    watch_time_min: number;
+    agente_logs_semana: number;
+  };
+  facebook: {
+    page_likes: number;
+    posts_semana: number;
+    reach: number;
+    engagements: number;
+    agente_logs_semana: number;
+  };
+  ts: string;
+}
+
+export interface ComentariosWpSnapshot {
+  fuente: string;
+  pendientes: number;
+  items: Array<{
+    id: number;
+    autor: string;
+    post: string;
+    extracto: string;
+    fecha: string;
+  }>;
+  ts: string;
+}
+
+export interface TelegramResumenSnapshot {
+  fuente: string;
+  total: number;
+  items: Array<{ ts: string; autor: string; texto: string }>;
+  ts: string;
+}
+
+export interface LogsErroresSnapshot {
+  fuente: string;
+  total_errores: number;
+  ventana_horas: number;
+  por_agente: Record<string, { n: number; ultimo: string; mtime: number }>;
+  ts: string;
+}

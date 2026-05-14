@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { Sprout, Leaf, ShoppingBag, Fish, Activity } from 'lucide-react';
+import { Sunrise, Sprout, Globe, Mail, Bot } from 'lucide-react';
 import ContextSwitcher from '../ContextSwitcher';
 import BottomTabs, { type Tab } from '../BottomTabs';
-import HoyGranja from './tabs/HoyGranja';
-import Huerto from './tabs/Huerto';
-import Tienda from './tabs/Tienda';
-import AAPPMA from './tabs/AAPPMA';
-import CockpitMini from './tabs/CockpitMini';
+import Hoy from './tabs/Hoy';
+import Granja from './tabs/Granja';
+import Web from './tabs/Web';
+import Mails from './tabs/Mails';
+import Agentes from './tabs/Agentes';
 
 const TABS: Tab[] = [
-  { id: 'hoy', label: 'Granja', Icon: Sprout },
-  { id: 'huerto', label: 'Huerto', Icon: Leaf },
-  { id: 'tienda', label: 'Tienda', Icon: ShoppingBag },
-  { id: 'aappma', label: 'AAPPMA', Icon: Fish },
-  { id: 'cockpit', label: 'Cockpit', Icon: Activity },
+  { id: 'hoy', label: 'Hoy', Icon: Sunrise },
+  { id: 'granja', label: 'Granja', Icon: Sprout },
+  { id: 'web', label: 'Web', Icon: Globe },
+  { id: 'mails', label: 'Mails', Icon: Mail },
+  { id: 'agentes', label: 'Agentes', Icon: Bot },
 ];
 
 export default function NosVersShell() {
   const [active, setActive] = useState('hoy');
   let panel: JSX.Element;
   switch (active) {
-    case 'huerto': panel = <Huerto />; break;
-    case 'tienda': panel = <Tienda />; break;
-    case 'aappma': panel = <AAPPMA />; break;
-    case 'cockpit': panel = <CockpitMini />; break;
-    default: panel = <HoyGranja />;
+    case 'granja': panel = <Granja />; break;
+    case 'web': panel = <Web />; break;
+    case 'mails': panel = <Mails />; break;
+    case 'agentes': panel = <Agentes />; break;
+    default: panel = <Hoy />;
   }
   return (
     <div className="min-h-screen flex flex-col bg-bg text-fg">

@@ -46,6 +46,10 @@ VALID_CHANNELS = {
     # 009-claudio-pwa-widgets-ricos
     "huerto_estado", "pedidos_stripe", "aappma_stock", "clima_neuvic",
     "chantiers_activos", "chantiers_agenda", "equipe", "documentos_trabajo",
+    # 010-claudio-nosvers-completo
+    "briefing_africa", "proxima_publicacion", "vermicultura", "composteur",
+    "tareas_dia", "eisenia_run", "web_traffic", "search_console", "ahrefs",
+    "engagement_redes", "comentarios_wp", "telegram_resumen", "logs_errores",
 }
 
 # Canales que requieren scope JWT específico (007 §FR-E-6).

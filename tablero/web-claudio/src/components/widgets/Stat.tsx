@@ -4,7 +4,7 @@ interface Props {
   label: string;
   value: ReactNode;
   sub?: ReactNode;
-  accent?: 'primary' | 'di' | 'emerald' | 'amber' | 'neutral';
+  accent?: 'primary' | 'di' | 'emerald' | 'amber' | 'neutral' | 'lime';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -14,6 +14,7 @@ const VALUE_TONE: Record<NonNullable<Props['accent']>, string> = {
   emerald: 'text-emerald-700',
   amber: 'text-amber-700',
   neutral: 'text-fg',
+  lime: 'text-lime-700',
 };
 
 const VALUE_SIZE: Record<NonNullable<Props['size']>, string> = {
