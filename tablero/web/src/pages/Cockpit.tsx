@@ -21,6 +21,14 @@ import { FreqtradeWidget } from '../components/cockpit/FreqtradeWidget';
 import { StripeToaster } from '../components/cockpit/StripeToaster';
 import { AutomationsWidget } from '../components/cockpit/AutomationsWidget';
 import { ShortcutsModal } from '../components/cockpit/ShortcutsModal';
+// 006 — familia/admin
+import { RecordatoriosWidget } from '../components/cockpit/RecordatoriosWidget';
+import { GastosMesWidget } from '../components/cockpit/GastosMesWidget';
+import { ComprasWidget } from '../components/cockpit/ComprasWidget';
+import { MedicacionWidget } from '../components/cockpit/MedicacionWidget';
+import { CocheStatusWidget } from '../components/cockpit/CocheStatusWidget';
+import { MenuHoyWidget } from '../components/cockpit/MenuHoyWidget';
+import { BrisWidget } from '../components/cockpit/BrisWidget';
 import '../styles/cockpit.css';
 
 function wsUrl(): string {
@@ -176,6 +184,28 @@ export default function Cockpit({ identitySub, onExit }: CockpitProps) {
           </div>
           <div key="automation">
             <AutomationsWidget ws={ws} index={11} />
+          </div>
+          {/* 006 — familia/admin */}
+          <div key="recordatorios">
+            <RecordatoriosWidget ws={ws} index={12} />
+          </div>
+          <div key="compras">
+            <ComprasWidget ws={ws} index={13} />
+          </div>
+          <div key="menu_dia">
+            <MenuHoyWidget ws={ws} index={14} />
+          </div>
+          <div key="gastos">
+            <GastosMesWidget ws={ws} index={15} />
+          </div>
+          <div key="coche">
+            <CocheStatusWidget ws={ws} index={16} />
+          </div>
+          <div key="medicacion">
+            <MedicacionWidget ws={ws} index={17} />
+          </div>
+          <div key="bris">
+            <BrisWidget ws={ws} index={18} />
           </div>
         </ResponsiveGridLayout>
         </div>

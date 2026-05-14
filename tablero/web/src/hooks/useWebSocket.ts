@@ -8,7 +8,15 @@ export type CockpitChannel =
   | 'revenue'
   | 'aegis'
   | 'wake'
-  | 'automation';
+  | 'automation'
+  // 006-claudio-voz-cockpit: familia/admin
+  | 'recordatorios'
+  | 'gastos'
+  | 'compras'
+  | 'medicacion'
+  | 'coche'
+  | 'menu_dia'
+  | 'bris';
 
 export type WsStatus = 'connecting' | 'connected' | 'reconnecting' | 'failed';
 

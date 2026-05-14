@@ -16,12 +16,21 @@ export type WidgetId =
   | 'calendar'
   | 'freqtrade'
   | 'automation'
+  // 006-claudio-voz-cockpit: familia/admin
+  | 'recordatorios'
+  | 'gastos'
+  | 'compras'
+  | 'medicacion'
+  | 'coche'
+  | 'menu_dia'
+  | 'bris'
   | 'stripe-toaster'; // floating; no en grid pero lo mantenemos por simetría
 
 // Layout default — grid 12 col, rowHeight 80.
-// Fila superior (h=4): claude(3) | vps(3) | revenue(3) | aegis(3)
-// Fila media   (h=4): activity(6) | wake(3) | vault(3)
-// Fila baja    (h=4): agentes(3) | gmail(3) | calendar(3) | freqtrade(3)
+// Filas 1-4: cockpit core (12 widgets existentes, y=0..16).
+// 006 — Familia (y=17): recordatorios(6) | compras(3) | menu_dia(3)
+// 006 — Admin (y=21): gastos(6) | coche(3) | medicacion(3)
+// 006 — Mascota (y=25): bris(3)
 export const DEFAULT_LAYOUT: Layout = [
   { i: 'claude', x: 0, y: 0, w: 3, h: 4, minW: 2, minH: 3 },
   { i: 'vps', x: 3, y: 0, w: 3, h: 4, minW: 2, minH: 3 },
@@ -35,6 +44,16 @@ export const DEFAULT_LAYOUT: Layout = [
   { i: 'calendar', x: 6, y: 9, w: 3, h: 4, minW: 2, minH: 3 },
   { i: 'freqtrade', x: 9, y: 9, w: 3, h: 4, minW: 2, minH: 3 },
   { i: 'automation', x: 0, y: 13, w: 6, h: 4, minW: 3, minH: 3 },
+  // 006 — familia
+  { i: 'recordatorios', x: 0, y: 17, w: 6, h: 4, minW: 3, minH: 3 },
+  { i: 'compras', x: 6, y: 17, w: 3, h: 4, minW: 2, minH: 3 },
+  { i: 'menu_dia', x: 9, y: 17, w: 3, h: 4, minW: 2, minH: 3 },
+  // 006 — admin
+  { i: 'gastos', x: 0, y: 21, w: 6, h: 4, minW: 3, minH: 3 },
+  { i: 'coche', x: 6, y: 21, w: 3, h: 4, minW: 2, minH: 3 },
+  { i: 'medicacion', x: 9, y: 21, w: 3, h: 4, minW: 2, minH: 3 },
+  // 006 — bris
+  { i: 'bris', x: 9, y: 25, w: 3, h: 4, minW: 2, minH: 3 },
 ];
 
 function loadLayout(sub: string): Layout {
