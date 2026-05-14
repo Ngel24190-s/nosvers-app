@@ -43,6 +43,9 @@ VALID_CHANNELS = {
     "bris",
     # 007-claudio-pwa-contextos: contexto trabajo
     "trabajo",
+    # 009-claudio-pwa-widgets-ricos
+    "huerto_estado", "pedidos_stripe", "aappma_stock", "clima_neuvic",
+    "chantiers_activos", "chantiers_agenda", "equipe", "documentos_trabajo",
 }
 
 # Canales que requieren scope JWT específico (007 §FR-E-6).
@@ -50,6 +53,11 @@ VALID_CHANNELS = {
 # incluya el contexto, devolvemos error y NO entregamos snapshot.
 CHANNEL_SCOPE = {
     "trabajo": "trabajo",
+    # 009: tabs trabajo requieren scope
+    "chantiers_activos": "trabajo",
+    "chantiers_agenda": "trabajo",
+    "equipe": "trabajo",
+    "documentos_trabajo": "trabajo",
 }
 
 

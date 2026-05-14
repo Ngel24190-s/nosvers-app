@@ -1,72 +1,92 @@
-import { useEffect, useState } from 'react';
-import { apiJson, ApiError } from '../../../lib/api';
-import type { DocumentoResumen } from '../../../lib/api-types';
+import { useState } from 'react';
+import { useChannel } from '../../../lib/ws';
+import type { DocumentosTrabajoSnapshot, DocItem } from '../../../lib/api-types';
 
-const FILTROS = ['todos', 'ppsps', 'devis', 'certificats', 'plans-retrait', 'diag-amiante'];
+const TIPOS_LABEL: Record<string, string> = {
+  ppsps: 'PPSPS',
+  plan_retrait: 'PLAN RETRAIT',
+  devis: 'DEVIS',
+  certificat: 'CERTIFICATS',
+  diag_amiante: 'DIAG AMIANTE',
+  autre: 'AUTRES',
+};
+
+const TIPOS_ORDEN = ['ppsps', 'plan_retrait', 'devis', 'certificat', 'diag_amiante', 'autre'];
+
+function DocRow({ d }: { d: DocItem }) {
+  return (
+    <div className="border-t-2 border-black/10 py-2.5 first:border-0 first:pt-0">
+      <div className="font-bold text-sm leading-tight">{d.nombre}</div>
+      <div className="flex items-center gap-2 mt-1 text-[10px] di-title text-neutral-600">
+        {d.chantier && d.chantier !== '—' && (
+          <span>{d.chantier}</span>
+        )}
+        {d.size_kb != null && <span>· {d.size_kb.toFixed(1)} KB</span>}
+        {d.fecha && <span>· {d.fecha}</span>}
+      </div>
+    </div>
+  );
+}
 
 export default function Docs() {
-  const [filtro, setFiltro] = useState('todos');
-  const [items, setItems] = useState<DocumentoResumen[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { data } = useChannel<DocumentosTrabajoSnapshot>('documentos_trabajo');
+  const por_tipo = data?.por_tipo ?? {};
+  const tiposPresentes = TIPOS_ORDEN.filter((t) => (por_tipo[t]?.length ?? 0) > 0);
+  const [tipoActivo, setTipoActivo] = useState<string>('todos');
 
-  useEffect(() => {
-    setItems(null);
-    setError(null);
-    apiJson<{ documents: DocumentoResumen[]; total: number }>(
-      `/tablero/api/v3/trabajo/documents?tipo=${encodeURIComponent(filtro)}`,
-      { context: 'trabajo' }
-    )
-      .then((r) => setItems(r.documents))
-      .catch((e: ApiError) => setError(e.code ?? e.message));
-  }, [filtro]);
+  const visibles = tipoActivo === 'todos'
+    ? tiposPresentes.flatMap((t) => por_tipo[t] ?? [])
+    : por_tipo[tipoActivo] ?? [];
 
   return (
     <div className="space-y-4">
-      <h2 className="di-title text-2xl">Documents</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="di-title text-2xl">DOCUMENTS</h2>
+        <span className="di-chip">{data?.total ?? 0}</span>
+      </div>
 
-      <div className="flex flex-wrap gap-2">
-        {FILTROS.map((f) => (
+      <div className="flex flex-wrap gap-1.5">
+        <button
+          onClick={() => setTipoActivo('todos')}
+          className={`di-chip ${tipoActivo === 'todos' ? 'bg-[#D62828] border-[#D62828]' : ''}`}
+        >
+          TOUS
+        </button>
+        {tiposPresentes.map((t) => (
           <button
-            key={f}
-            onClick={() => setFiltro(f)}
-            className={`di-chip ${
-              filtro === f ? 'bg-[#D62828] border-[#D62828]' : ''
-            }`}
+            key={t}
+            onClick={() => setTipoActivo(t)}
+            className={`di-chip ${tipoActivo === t ? 'bg-[#D62828] border-[#D62828]' : ''}`}
           >
-            {f}
+            {TIPOS_LABEL[t]} · {por_tipo[t]?.length}
           </button>
         ))}
       </div>
 
-      {error && (
-        <div className="di-card p-3 text-sm">
-          <span className="di-title text-[#D62828]">Erreur:</span> {error}
+      {visibles.length === 0 ? (
+        <div className="di-card p-4 text-sm">Aucun document.</div>
+      ) : tipoActivo === 'todos' ? (
+        <div className="space-y-3">
+          {tiposPresentes.map((t) => (
+            <div key={t} className="di-card p-4">
+              <div className="bg-black text-white di-title text-xs px-2 py-1 inline-block mb-2">
+                {TIPOS_LABEL[t]} · {por_tipo[t]?.length}
+              </div>
+              <div>
+                {(por_tipo[t] ?? []).slice(0, 4).map((d, i) => (
+                  <DocRow key={`${t}-${i}`} d={d} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="di-card p-4">
+          {visibles.map((d, i) => (
+            <DocRow key={i} d={d} />
+          ))}
         </div>
       )}
-
-      {items === null && !error && (
-        <div className="text-sm text-neutral-700">Chargement…</div>
-      )}
-
-      {items && items.length === 0 && !error && (
-        <div className="di-card p-4 text-sm">
-          Aucun document {filtro !== 'todos' ? `de type ${filtro}` : ''}.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-3">
-        {items?.map((d) => (
-          <div key={`${d.tipo}-${d.nombre}`} className="di-card p-3">
-            <div className="font-black uppercase tracking-tight text-xs">
-              {d.tipo}
-            </div>
-            <div className="text-sm mt-1">{d.nombre}</div>
-            <div className="text-[10px] text-neutral-600 mt-1">
-              {(d.size / 1024).toFixed(1)} KB
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

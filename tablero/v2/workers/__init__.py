@@ -25,6 +25,16 @@ from tablero.v2.workers.menu_dia import menu_dia_tick
 from tablero.v2.workers.bris import bris_tick
 # 007: contexto trabajo (DI Environnement)
 from tablero.v2.workers.trabajo import trabajo_tick
+# 009: widgets ricos — NosVers
+from tablero.v2.workers.huerto_estado import huerto_estado_tick
+from tablero.v2.workers.pedidos_stripe import pedidos_stripe_tick
+from tablero.v2.workers.aappma_stock import aappma_stock_tick
+from tablero.v2.workers.clima_neuvic import clima_neuvic_tick
+# 009: widgets ricos — Trabajo
+from tablero.v2.workers.chantiers_activos import chantiers_activos_tick
+from tablero.v2.workers.chantiers_agenda import chantiers_agenda_tick
+from tablero.v2.workers.equipe_status import equipe_tick
+from tablero.v2.workers.documentos_trabajo import documentos_trabajo_tick
 
 log = logging.getLogger("tablero.v2.workers")
 
@@ -50,10 +60,29 @@ def register_all() -> None:
     register_worker(Worker(name="bris", interval_s=300.0, tick=bris_tick))
     # 007 — contexto trabajo
     register_worker(Worker(name="trabajo", interval_s=60.0, tick=trabajo_tick))
+    # 009 — widgets ricos NosVers
+    register_worker(Worker(name="huerto_estado", interval_s=300.0,
+                           tick=huerto_estado_tick))
+    register_worker(Worker(name="pedidos_stripe", interval_s=120.0,
+                           tick=pedidos_stripe_tick))
+    register_worker(Worker(name="aappma_stock", interval_s=600.0,
+                           tick=aappma_stock_tick))
+    register_worker(Worker(name="clima_neuvic", interval_s=1800.0,
+                           tick=clima_neuvic_tick))
+    # 009 — widgets ricos Trabajo
+    register_worker(Worker(name="chantiers_activos", interval_s=60.0,
+                           tick=chantiers_activos_tick))
+    register_worker(Worker(name="chantiers_agenda", interval_s=60.0,
+                           tick=chantiers_agenda_tick))
+    register_worker(Worker(name="equipe", interval_s=60.0, tick=equipe_tick))
+    register_worker(Worker(name="documentos_trabajo", interval_s=300.0,
+                           tick=documentos_trabajo_tick))
     log.info(
         "workers registrados: health, claude, agentes, revenue, aegis, wake, "
         "recordatorios, gastos, compras, medicacion, coche, menu_dia, bris, "
-        "trabajo (+activity bg)"
+        "trabajo, huerto_estado, pedidos_stripe, aappma_stock, clima_neuvic, "
+        "chantiers_activos, chantiers_agenda, equipe, documentos_trabajo "
+        "(+activity bg)"
     )
 
 
