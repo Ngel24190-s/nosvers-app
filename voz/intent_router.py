@@ -384,7 +384,7 @@ async def route_intent(
         _cache_set(text, autor, result)
         return result
 
-    if confidence < threshold and tool != "dia_capturar":
+    if confidence < threshold and tool != "dia_capturar" and tool != "claudio_conversar":
         # Confidence baja con tool no-capturar → fallback a captura
         result = _fallback(text, f"confidence {confidence:.2f} < {threshold}", modelo)
         result.raw = parsed

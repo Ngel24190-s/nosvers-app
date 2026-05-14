@@ -15,6 +15,8 @@ from collections import deque
 
 import requests
 
+from .agentic import agentic_responder
+
 log = logging.getLogger("voz.conversar")
 
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -84,8 +86,44 @@ def _push_history(autor: str, contexto: str, user_text: str, assistant_text: str
     _HISTORY[key] = (time.monotonic(), msgs)
 
 
+# Verbos que indican que el usuario quiere ACTUAR (no solo conversar)
+_VERBOS_ACCION = (
+    "ejecuta", "ejecutar", "lanza", "arranca", "corre el", "pon en marcha",
+    "para ", "detén", "detener", "reinicia", "reiniciar",
+    "lee", "leer", "léeme", "abre", "muéstrame", "muestra", "enséñame",
+    "dime el estado", "dime la lista", "dime cuántos", "dime qué",
+    "lista los", "lista las", "listar", "lístame",
+    "cuántos", "cuántas",
+    "escribe en", "guarda en", "apunta en", "anota en el vault",
+    "git pull", "actualiza el código", "hacer pull",
+    "busca en el vault", "qué dice el log", "qué hay en", "qué hay en el",
+    "estado del", "estado de", "cómo está", "está activo",
+    "ejecutar comando", "corre el comando", "lanza comando",
+    "agentes", "agente ", "vault",
+    "qué hay nuevo", "qué pasa con", "qué tal va",
+)
+
+
+def _es_peticion_de_accion(texto: str) -> bool:
+    """Heurística rápida: ¿el texto pide actuar (modo agentic) o solo conversar?"""
+    t = texto.lower().strip()
+    return any(v in t for v in _VERBOS_ACCION)
+
+
 def conversar(texto: str, autor: str = "angel", contexto: str = "casa") -> dict:
-    """Conversación libre con Claudio. Devuelve {ok, texto, model, latency_ms}."""
+    """Conversación libre con Claudio. Devuelve {ok, texto, model, latency_ms}.
+
+    Si el texto pide ACTUAR (verbos de acción), enruta a agentic_responder
+    que tiene tools para ejecutar agentes, leer/escribir vault, comandos VPS, etc.
+    """
+    if _es_peticion_de_accion(texto):
+        log.info(f"agentic mode: autor={autor} ctx={contexto} text={texto[:60]!r}")
+        try:
+            return agentic_responder(texto, autor=autor, contexto=contexto)
+        except Exception as e:
+            log.exception(f"agentic_responder fallo: {e}")
+            # Cae a conversación normal abajo
+
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
         return {"ok": False, "error": "anthropic_key_missing",
