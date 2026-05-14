@@ -176,6 +176,8 @@ def dia_capturar_impl(
         "archivo": str(archivo.relative_to(VAULT_BASE.parent)),
         "ts": nota.ts,
         "autor": autor_n,
+        "texto": texto.strip(),
+        "transcripcion": texto.strip(),
         "etiqueta_aplicada": etiqueta_final,
         "confianza": round(confianza, 3),
         "modelo": modelo,

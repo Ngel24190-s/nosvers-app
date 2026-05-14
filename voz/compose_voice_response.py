@@ -202,6 +202,13 @@ def _t_dia_buscar(args: dict, result: str, autor: str) -> str:
     return "Te leo lo que encontré."
 
 
+def _t_claudio_conversar(args: dict, result: str, autor: str) -> str:
+    """Para conversación libre: extrae el texto del resultado de Haiku."""
+    if result.startswith("💬 "):
+        return result[2:].strip()
+    return result.strip() or "Hecho."
+
+
 _TEMPLATES = {
     # finanzas
     "gasto_anotar": _t_gasto_anotar,
@@ -238,6 +245,7 @@ _TEMPLATES = {
     # fallback
     "dia_capturar": _t_dia_capturar,
     "dia_buscar": _t_dia_buscar,
+    "claudio_conversar": _t_claudio_conversar,
 }
 
 

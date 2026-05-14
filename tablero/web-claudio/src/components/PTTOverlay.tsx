@@ -158,7 +158,12 @@ export default function PTTOverlay({ context }: Props) {
   }, []);
 
   // Gestos del FAB
-  const onPointerDown = (e: React.PointerEvent) => {
+  // FIX-MOBILE 2026-05-14: getUserMedia debe arrancar SÍNCRONO al gesto (iOS/Chrome
+  // rechazan permiso fuera del handler). setPointerCapture para no perder eventos
+  // cuando el dedo se sale del botón. preventDefault para evitar long-press menu.
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
     pointerStartY.current = e.clientY;
     cancelArmed.current = false;
 
@@ -178,16 +183,16 @@ export default function PTTOverlay({ context }: Props) {
     }
     lastTapRef.current = now;
 
-    // Hold detection
-    window.setTimeout(() => {
-      if (pointerStartY.current !== null && phase === 'idle' && !recRef.current) {
-        beginRecording();
-      }
-    }, HOLD_MS);
+    // Hold = empezar a grabar YA (sync) — getUserMedia necesita el gesto vivo.
+    // Si el usuario suelta antes de HOLD_MS, descartamos el audio en pointerUp.
+    if (phase === 'idle' && !recRef.current) {
+      beginRecording();
+    }
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (pointerStartY.current === null) return;
+    e.preventDefault();
     const dy = e.clientY - pointerStartY.current;
     if (dy < CANCEL_DY) {
       if (!cancelArmed.current) {
@@ -200,12 +205,16 @@ export default function PTTOverlay({ context }: Props) {
     }
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
     const wasArmed = cancelArmed.current;
+    const heldMs = Date.now() - startedAtRef.current;
     pointerStartY.current = null;
     cancelArmed.current = false;
     if (phase === 'recording' && !conversationModeRef.current) {
-      stopRecording(wasArmed);
+      // Tap demasiado corto (<HOLD_MS) = el usuario no quería grabar → cancelar
+      const tooShort = heldMs < HOLD_MS;
+      stopRecording(wasArmed || tooShort);
     }
   };
 
@@ -224,13 +233,16 @@ export default function PTTOverlay({ context }: Props) {
     <>
       {/* FAB siempre visible mientras hay contexto */}
       <button
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
+        onClick={() => {
+          // TAP-TOGGLE simple (v4 fix-mobile): tap arranca, los botones del sheet paran/cancelan.
+          // Los gestos hold-to-talk y slide-up se descartan: en touch real no funcionan bien
+          // porque el bottom sheet ocupa la zona del FAB cuando empieza a grabar.
+          if (phase === 'idle') beginRecording();
+        }}
+        disabled={phase !== 'idle'}
         className={`fixed bottom-20 right-5 w-16 h-16 rounded-full shadow-lg z-40
                     flex items-center justify-center active:scale-95 transition-transform
-                    ${fabClasses(context)}`}
+                    disabled:opacity-50 ${fabClasses(context)}`}
         aria-label="Pulsa para hablar"
       >
         {phase === 'idle' ? (
@@ -264,8 +276,20 @@ export default function PTTOverlay({ context }: Props) {
                     </span>
                   </div>
                   <Waveform analyser={recRef.current?.analyser ?? null} color={accent} />
-                  <div className="text-[10px] text-neutral-600 uppercase tracking-tight text-center">
-                    {hint || 'desliza arriba para cancelar'}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <button
+                      onClick={() => stopRecording(true)}
+                      className="bg-neutral-100 active:bg-neutral-200 text-neutral-800 font-bold py-4 rounded-xl border-2 border-neutral-300 text-base uppercase tracking-wider"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => stopRecording(false)}
+                      style={{ background: accent }}
+                      className="text-white font-bold py-4 rounded-xl text-base uppercase tracking-wider active:opacity-80"
+                    >
+                      Enviar
+                    </button>
                   </div>
                 </div>
               )}

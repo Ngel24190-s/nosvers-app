@@ -43,7 +43,7 @@ PROMPT_FILE = Path(
 # Whitelist de tools que el router puede devolver.
 ALLOWED_TOOLS: set[str] = {
     # claudio identidad
-    "claudio_recordar", "claudio_contexto",
+    "claudio_recordar", "claudio_contexto", "claudio_conversar",
     # familia
     "recordatorio_crear", "recordatorios_listar", "recordatorio_completar",
     "familia_cumpleanos_listar",
@@ -88,12 +88,14 @@ TOOLS_CASA: set[str] = {
     "medicacion_recordar", "cita_medica_anotar",
     "casa_mantenimiento_anotar",
     "dia_capturar", "dia_buscar",
+    "claudio_conversar",
 }
 
 TOOLS_NOSVERS: set[str] = {
     "claudio_contexto", "claudio_recordar",
     "documentos_buscar", "documento_anotar",
     "dia_capturar", "dia_buscar",
+    "claudio_conversar",
 }
 
 TOOLS_TRABAJO: set[str] = {
@@ -103,6 +105,7 @@ TOOLS_TRABAJO: set[str] = {
     "devis_anotar", "ppsps_crear", "documento_trabajo_archivar",
     "claudio_contexto",  # consulta del propio Claudio sigue accesible
     "dia_capturar",      # fallback nota libre en vault trabajo
+    "claudio_conversar",
 }
 
 TOOLS_POR_CONTEXTO: dict[str, set[str]] = {
@@ -129,7 +132,9 @@ class IntentResult:
 _FALLBACK_PROMPT = (
     "Eres el router de intents de Claudio. Devuelve EXCLUSIVAMENTE un JSON "
     '{"tool": "<nombre>", "args": {...}, "confidence": <0..1>, "razon": "..."}. '
-    "Si el dictado es ambiguo, usa tool=dia_capturar con confidence<0.6."
+    "Si el dictado NO es un comando concreto (saludo, pregunta libre, "
+    "conversación, opinión, ayuda) → tool=claudio_conversar args={\"texto\":<dictado>}. "
+    "Si parece nota libre sin destinatario → tool=dia_capturar."
 )
 
 

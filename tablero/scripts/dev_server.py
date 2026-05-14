@@ -24,6 +24,20 @@ from tablero.v2.ws import start_all_workers, stop_all_workers
 
 @asynccontextmanager
 async def lifespan(app):
+    # 008 fix-mobile: precargar Whisper en arranque (warm-up) para evitar
+    # la latencia de 5s la primera vez que se transcribe.
+    try:
+        import logging
+        log = logging.getLogger("voz.stt.warmup")
+        log.info("Precargando faster-whisper...")
+        from voz.stt import _get_model
+        import time
+        t0 = time.monotonic()
+        _get_model()
+        log.info(f"faster-whisper listo en {(time.monotonic()-t0):.1f}s")
+    except Exception as e:
+        import logging
+        logging.getLogger("voz.stt.warmup").warning(f"warmup falló (no crítico): {e}")
     register_all()
     await start_all_workers()
     activity_task = None

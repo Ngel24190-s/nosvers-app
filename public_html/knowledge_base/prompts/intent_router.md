@@ -60,8 +60,11 @@ NO añadas texto antes ni después del JSON. NO uses code fences. NO incluyas el
 - `claudio_recordar(hecho: str, importancia: int = 5)` — guarda un hecho del dictante.
 - `claudio_contexto(query: str, limite: int = 10)` — busca memorias.
 
-### Fallback
-- `dia_capturar(texto: str)` — captura el texto como nota libre cuando el resto no encaja.
+### Conversación libre
+- `claudio_conversar(texto: str)` — cuando el dictado es un saludo, pregunta, opinión, charla, ayuda o cualquier cosa que NO se mapea a un comando concreto. SIEMPRE prefiérelo a `dia_capturar` salvo que el dictado sea claramente una nota informativa sin destinatario.
+
+### Fallback (último recurso)
+- `dia_capturar(texto: str)` — SOLO cuando el dictado es una nota libre informativa sin interlocutor (ej. "tengo que llevar las llaves al mecánico", "el huerto necesita riego mañana"). Si hay vocativo, saludo, pregunta o conversación → `claudio_conversar`.
 
 ## Reglas de routing
 
@@ -97,3 +100,8 @@ NO añadas texto antes ni después del JSON. NO uses code fences. NO incluyas el
 - "doce con cincuenta" → `12.50`.
 
 Si no estás seguro, baja la confianza y usa `dia_capturar`.
+
+- **Saludos** ("hola", "buenos días", "qué tal", "ey Claudio") → SIEMPRE `claudio_conversar`. NUNCA `dia_capturar`.
+- **Preguntas abiertas** ("qué piensas de…", "explícame…", "ayúdame a…", "qué te parece…") → `claudio_conversar`.
+- **Charla** ("oye Claudio…", "estoy pensando…", "tengo una duda con…") → `claudio_conversar`.
+- Cuando dudes entre `claudio_conversar` y `dia_capturar` → elige `claudio_conversar` con confidence 0.7+.

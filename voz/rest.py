@@ -18,6 +18,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
+from .tts import sintetizar
+from .conversar import conversar
 from .auth import validar_token, check_context, CONTEXTS_VALIDOS
 from .capturar import dia_capturar_impl
 from .contexto import dia_contexto_impl
@@ -176,6 +178,16 @@ def _execute_intent(intent: IntentResult, transcript: str, autor: str,
 
     # Mapa tool → callable
     try:
+        if tool == "claudio_conversar":
+            res = conversar(
+                texto=str(args.get("texto") or transcript),
+                autor=autor,
+                contexto=contexto,
+            )
+            if not res.get("ok"):
+                return f"❌ {res.get('error', 'error_conversar')}"
+            return f"💬 {res['texto']}"
+
         if tool == "dia_capturar":
             res = dia_capturar_impl(
                 texto=args.get("texto") or transcript,
@@ -428,9 +440,12 @@ async def dictado_procesar_handler(request: Request) -> JSONResponse:
     )
     tool_result = _execute_intent(intent, transcript, autor_jwt, device,
                                   contexto=ctx_raw)
-    voice = compose_voice_response(
+    voice_text = compose_voice_response(
         intent.tool, intent.args, tool_result, autor_jwt
     )
+    # 008 fix-mobile: sintetizar audio Piper para que Claudio CONTESTE POR VOZ
+    audio_url = sintetizar(voice_text) if voice_text else None
+    voice = {"text": voice_text, "audio_url": audio_url}
     latency_ms = int((time.monotonic() - t0) * 1000)
     ok = not (tool_result or "").lstrip().startswith("❌")
     _log_dictado(
