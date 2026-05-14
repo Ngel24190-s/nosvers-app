@@ -211,13 +211,49 @@ def _post_haiku(
     try:
         data = r.json()
         content = data["content"][0]["text"].strip()
+        # Quita code fences si están presentes (al principio o intercalados)
         content = re.sub(
-            r"^```(?:json)?\s*|\s*```$", "", content, flags=re.DOTALL
-        ).strip()
-        return json.loads(content)
+            r"```(?:json)?\s*", "", content, flags=re.IGNORECASE
+        )
+        content = content.replace("```", "").strip()
+        # Extrae el primer objeto JSON balanceado (tolera texto antes/después)
+        obj = _extract_first_json_object(content)
+        if obj is None:
+            log.warning(f"no JSON balanceado en body={r.text[:200]}")
+            return None
+        return json.loads(obj)
     except (json.JSONDecodeError, KeyError, ValueError, TypeError) as e:
         log.warning(f"parse error: {e} body={r.text[:200] if 'r' in locals() else '?'}")
         return None
+
+
+def _extract_first_json_object(s: str) -> str | None:
+    """Devuelve la primera substring que es un JSON object balanceado."""
+    start = s.find("{")
+    if start < 0:
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    for i in range(start, len(s)):
+        ch = s[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return s[start:i + 1]
+    return None
 
 
 # ─── route_intent (public) ───────────────────────────────────────
