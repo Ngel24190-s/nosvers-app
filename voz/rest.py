@@ -8,6 +8,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import time
+from datetime import date
+from pathlib import Path
 from typing import Any
 
 from starlette.requests import Request
@@ -18,11 +22,20 @@ from .auth import validar_token
 from .capturar import dia_capturar_impl
 from .contexto import dia_contexto_impl
 from .buscar import dia_buscar_impl
+from .intent_router import IntentResult, route_intent
+from .compose_voice_response import compose_voice_response
 
 log = logging.getLogger("voz.rest")
 
 ALLOWED_ORIGIN = "https://voz.nosvers.com"
 MAX_AUDIO_BYTES = 5 * 1024 * 1024  # 5 MB
+
+_DICTADO_LOGS_DIR = Path(
+    os.getenv(
+        "CLAUDIO_DICTADO_LOGS_DIR",
+        "/home/nosvers/public_html/knowledge_base/claudio/logs",
+    )
+)
 
 
 def _cors_headers() -> dict:
@@ -146,6 +159,227 @@ async def health_handler(request: Request) -> JSONResponse:
     return _json({"ok": True, "service": "voz", "version": "1.0.0"})
 
 
+# ─── /voz/api/dictado-procesar (Fase 2) ───────────────────────────
+
+def _execute_intent(intent: IntentResult, transcript: str, autor: str,
+                    device: str) -> str:
+    """Ejecuta el tool decidido por el router. Devuelve string humano."""
+    tool = intent.tool
+    args = dict(intent.args or {})
+    args.pop("autor", None)
+    args.pop("quien", None) if tool == "claudio_recordar" else None
+
+    # Mapa tool → callable
+    try:
+        if tool == "dia_capturar":
+            res = dia_capturar_impl(
+                texto=args.get("texto") or transcript,
+                etiqueta="auto",
+                origen="dictado",
+                autor=autor,
+                device_label=device or "dictado",
+            )
+            if not res.get("ok"):
+                return f"❌ {res.get('error', 'error')}"
+            return f"✅ Apuntado en notas ({res.get('etiqueta_aplicada','otro')})."
+
+        if tool == "dia_buscar":
+            res = dia_buscar_impl(
+                query=str(args.get("query", "")),
+                desde=str(args.get("desde", "")),
+                hasta=str(args.get("hasta", "")),
+                limite=int(args.get("limite", 10)),
+            )
+            if not res.get("ok"):
+                return f"❌ {res.get('error', 'error')}"
+            n = res.get("total", 0)
+            return f"Encontré {n} resultados."
+
+        # claudio_tools: importamos lazy para no romper si claudio_tools cae
+        from claudio_tools import (
+            identidad as _id,
+            familia as _fam,
+            finanzas as _fin,
+            compras as _com,
+            menus as _men,
+            coche as _coc,
+            casa as _cas,
+            documentos as _doc,
+            salud as _sal,
+        )
+        # tools que reciben autor explícito
+        if tool == "claudio_recordar":
+            return _id.claudio_recordar(autor, args.get("hecho", ""),
+                                        int(args.get("importancia", 5)))
+        if tool == "claudio_contexto":
+            return _id.claudio_contexto(autor, args.get("query", ""),
+                                        int(args.get("limite", 10)))
+        if tool == "recordatorio_crear":
+            return _fam.recordatorio_crear(args.get("texto", ""),
+                                           args.get("fecha", "hoy"),
+                                           autor,
+                                           int(args.get("prioridad", 3)))
+        if tool == "recordatorios_listar":
+            return _fam.recordatorios_listar(
+                args.get("periodo", "proximos_7_dias"),
+                args.get("autor_filtro", ""))
+        if tool == "recordatorio_completar":
+            return _fam.recordatorio_completar(args.get("id_o_slug", ""))
+        if tool == "familia_cumpleanos_listar":
+            return _fam.familia_cumpleanos_listar(int(args.get("meses", 12)))
+        if tool == "gasto_anotar":
+            return _fin.gasto_anotar(
+                float(args.get("monto_eur", 0)),
+                args.get("concepto", ""),
+                args.get("categoria", "otros"),
+                autor)
+        if tool == "gastos_resumen":
+            return _fin.gastos_resumen(
+                args.get("periodo", "mes_actual"),
+                args.get("categoria", ""))
+        if tool == "recurrente_alertar":
+            return _fin.recurrente_alertar(int(args.get("dias", 7)))
+        if tool in ("lista_compras_añadir", "lista_compras_anadir"):
+            return _com.lista_compras_añadir(
+                args.get("item", ""), autor,
+                args.get("cantidad", ""),
+                bool(args.get("urgente", False)))
+        if tool == "lista_compras_ver":
+            return _com.lista_compras_ver()
+        if tool == "lista_compras_completar":
+            return _com.lista_compras_completar(args.get("item", ""))
+        if tool == "despensa_estado":
+            return _com.despensa_estado()
+        if tool == "menu_sugerir":
+            return _men.menu_sugerir(args.get("dia", ""),
+                                     args.get("ingredientes_disponibles", ""))
+        if tool == "receta_guardar":
+            return _men.receta_guardar(
+                args.get("nombre", ""),
+                args.get("ingredientes", ""),
+                args.get("pasos", ""),
+                args.get("fuente", ""))
+        if tool == "coche_estado":
+            return _coc.coche_estado()
+        if tool == "coche_evento":
+            return _coc.coche_evento(
+                args.get("tipo", "otros"),
+                args.get("fecha", "hoy"),
+                float(args.get("monto_eur", 0)),
+                args.get("notas", ""),
+                autor)
+        if tool == "documento_anotar":
+            return _doc.documento_anotar(
+                args.get("tipo", "otros"),
+                args.get("contenido_texto", "") or transcript,
+                args.get("fecha", "hoy"),
+                args.get("fuente", ""),
+                autor)
+        if tool == "documentos_buscar":
+            return _doc.documentos_buscar(args.get("query", ""),
+                                          int(args.get("limite", 20)))
+        if tool == "medicacion_recordar":
+            return _sal.medicacion_recordar()
+        if tool == "cita_medica_anotar":
+            return _sal.cita_medica_anotar(
+                args.get("quien", autor),
+                args.get("especialista", ""),
+                args.get("fecha", ""),
+                args.get("notas", ""),
+                autor)
+        if tool == "casa_mantenimiento_anotar":
+            return _cas.casa_mantenimiento_anotar(
+                args.get("tarea", ""),
+                args.get("fecha", ""),
+                args.get("proximo", ""),
+                autor)
+    except Exception as e:  # noqa: BLE001
+        log.warning(f"_execute_intent fallo en {tool}: {e}")
+        return f"❌ {e}"
+    return f"❌ tool desconocido: {tool}"
+
+
+def _log_dictado(*, autor: str, transcript: str, intent: IntentResult,
+                 tool_result: str, latency_ms: int, device: str,
+                 ok: bool) -> None:
+    try:
+        _DICTADO_LOGS_DIR.mkdir(parents=True, exist_ok=True)
+        log_full = os.getenv("CLAUDIO_DICTADO_LOG_FULL") == "1"
+        line: dict[str, Any] = {
+            "ts": __import__("datetime").datetime.now().astimezone()
+                  .isoformat(timespec="seconds"),
+            "autor": autor,
+            "transcript_len": len(transcript),
+            "intent": {
+                "tool": intent.tool,
+                "confidence": round(intent.confidence, 3),
+                "fallback": intent.fallback,
+                "cached": intent.cached,
+                "modelo": intent.modelo,
+            },
+            "args": intent.args,
+            "ok": ok,
+            "latency_ms": latency_ms,
+            "device": device,
+        }
+        if log_full:
+            line["transcript"] = transcript
+            line["tool_result"] = tool_result
+        path = _DICTADO_LOGS_DIR / f"dictado-{date.today().isoformat()}.jsonl"
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(line, ensure_ascii=False) + "\n")
+    except Exception as e:  # noqa: BLE001
+        log.debug(f"log_dictado fallo: {e}")
+
+
+async def dictado_procesar_handler(request: Request) -> JSONResponse:
+    payload = await _autenticar(request)
+    if not payload:
+        return _json({"ok": False, "error": "auth_invalido"}, 401)
+    autor_jwt = payload.get("sub") or payload.get("autor") or "angel"
+    device = payload.get("device", "desconocido")
+
+    try:
+        data = await request.json()
+    except json.JSONDecodeError:
+        return _json({"ok": False, "error": "parametro_invalido",
+                      "detalle": "body no JSON"}, 400)
+
+    transcript = (data.get("transcript") or "").strip()
+    if not transcript:
+        return _json({"ok": False, "error": "input_vacio"}, 400)
+    if len(transcript) > 4000:
+        return _json({"ok": False, "error": "payload_too_large"}, 413)
+
+    t0 = time.monotonic()
+    intent = await route_intent(transcript, autor_jwt)
+    tool_result = _execute_intent(intent, transcript, autor_jwt, device)
+    voice = compose_voice_response(
+        intent.tool, intent.args, tool_result, autor_jwt
+    )
+    latency_ms = int((time.monotonic() - t0) * 1000)
+    ok = not (tool_result or "").lstrip().startswith("❌")
+    _log_dictado(
+        autor=autor_jwt, transcript=transcript, intent=intent,
+        tool_result=tool_result, latency_ms=latency_ms, device=device,
+        ok=ok,
+    )
+
+    return _json({
+        "ok": True,
+        "intent": {
+            "tool": intent.tool,
+            "args": intent.args,
+            "confidence": round(intent.confidence, 3),
+            "fallback": intent.fallback,
+            "cached": intent.cached,
+        },
+        "tool_result": tool_result,
+        "voice_response": voice,
+        "latency_ms": latency_ms,
+    })
+
+
 ROUTES = [
     Route("/voz/api/capturar", capturar_handler, methods=["POST"]),
     Route("/voz/api/capturar", options_handler, methods=["OPTIONS"]),
@@ -153,6 +387,8 @@ ROUTES = [
     Route("/voz/api/contexto", options_handler, methods=["OPTIONS"]),
     Route("/voz/api/buscar", buscar_handler, methods=["GET"]),
     Route("/voz/api/buscar", options_handler, methods=["OPTIONS"]),
+    Route("/voz/api/dictado-procesar", dictado_procesar_handler, methods=["POST"]),
+    Route("/voz/api/dictado-procesar", options_handler, methods=["OPTIONS"]),
     Route("/voz/api/health", health_handler, methods=["GET"]),
 ]
 
