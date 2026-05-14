@@ -1,0 +1,46 @@
+# Alerta ITV coche — proyecto 005 Claudio Jarvis
+#
+# Cron diario 9:00 → si la ITV próxima está en los siguientes 90 días,
+# envía Telegram con la fecha y la sugerencia de reservar cita.
+#
+# Lectura de coche/INDEX.md via claude_prompt mientras el Engine no
+# soporta action `mcp_tool`. Sustituir por `coche_estado` cuando exista.
+id: claudio_2026_05_14_itv_coche_3_meses
+nombre: ITV del coche — aviso a 3 meses
+autor: angel
+creado: 2026-05-14T08:00:00Z
+modificado: 2026-05-14T08:00:00Z
+activo: false
+trigger:
+  tipo: cron
+  rrule: '0 9 * * *'
+acciones:
+  - tipo: claude_prompt
+    model: claude-haiku-4-5-20251001
+    system: |
+      Eres Claudio. Lee el archivo
+      /home/nosvers/public_html/knowledge_base/coche/INDEX.md.
+      Extrae del frontmatter el valor de `itv_proxima` (formato YYYY-MM-DD).
+      Calcula días restantes desde hoy ({{ts.iso_date}}).
+      Si la ITV está en menos de 90 días, devuelve UNA línea:
+        "ITV del coche el <fecha>. Quedan <N> días. Reserva cita."
+      Si quedan más de 90 días o el campo está vacío, devuelve EXACTAMENTE
+      la string: "(skip)"
+    prompt: 'Calcula y devuelve la línea o "(skip)".'
+    max_tokens: 200
+  - tipo: condicional
+    expresion: '{{previo.resultado}} != "(skip)"'
+    acciones_si:
+      - tipo: telegram
+        mensaje: |
+          🚗 {{previo.resultado}}
+      - tipo: cockpit_toast
+        level: warn
+        text: 'ITV coche próxima'
+    acciones_no: []
+metadatos:
+  descripcion: |
+    Aviso diario si la ITV está a < 90 días. Lectura por claude_prompt;
+    cuando Engine soporte mcp_tool, sustituir por coche_estado() y un
+    parser determinista.
+  tags: [claudio, coche, alerta, itv]

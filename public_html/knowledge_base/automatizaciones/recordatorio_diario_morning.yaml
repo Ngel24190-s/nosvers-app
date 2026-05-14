@@ -1,0 +1,45 @@
+# Recordatorio diario matinal (proyecto 005 — Claudio Jarvis)
+#
+# Cada día 7:30 → resumen de recordatorios del día → Telegram a Angel.
+#
+# Cuando se active, el Automation Engine v2 deberá soportar action
+# `mcp_tool` para sustituir el `claude_prompt` actual por una llamada
+# directa a `recordatorios_listar(periodo='hoy')`. Mientras, dejamos
+# claude_prompt para que componga el mensaje a partir del contexto vault.
+id: claudio_2026_05_14_recordatorio_diario_morning
+nombre: Recordatorios del día — 7:30
+autor: angel
+creado: 2026-05-14T08:00:00Z
+modificado: 2026-05-14T08:00:00Z
+activo: false
+trigger:
+  tipo: cron
+  rrule: '30 7 * * *'
+acciones:
+  - tipo: claude_prompt
+    model: claude-haiku-4-5-20251001
+    system: |
+      Eres Claudio, mayordomo digital de la familia Angel+África.
+      Tienes que componer un saludo matinal breve (max 6 líneas) listando
+      los recordatorios de hoy. Si no hay ninguno, di simplemente "Hoy no
+      hay recordatorios — buen día". Sin emojis innecesarios.
+    prompt: |
+      Lista los recordatorios activos para hoy
+      ({{ts.iso_date}}) en la familia. Lee
+      /home/nosvers/public_html/knowledge_base/familia/recordatorios/
+      (cada archivo .md tiene frontmatter con `fecha` y `hecho`).
+      Solo lista los que tienen `fecha: {{ts.iso_date}}` y `hecho: false`.
+    max_tokens: 600
+  - tipo: telegram
+    mensaje: |
+      🌅 Buenos días.
+      {{previo.resultado}}
+  - tipo: cockpit_toast
+    level: ok
+    text: 'Recordatorio matinal enviado'
+metadatos:
+  descripcion: |
+    Resumen matinal automático de recordatorios. Lectura via claude_prompt
+    en Fase 1; cuando el Engine soporte mcp_tool, sustituir por llamada
+    directa a recordatorios_listar.
+  tags: [claudio, familia, daily, recordatorios]

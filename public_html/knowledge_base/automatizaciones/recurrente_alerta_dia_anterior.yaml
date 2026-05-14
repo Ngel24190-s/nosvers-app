@@ -1,0 +1,46 @@
+# Alerta cargos recurrentes — proyecto 005 Claudio Jarvis
+#
+# Cron diario 20:00 → consulta finanzas/recurrentes.yaml y avisa
+# de los cargos previstos en las próximas 24h.
+#
+# Lectura via claude_prompt mientras Engine no soporta mcp_tool;
+# sustituir por `recurrente_alertar(dias=1)` cuando exista.
+id: claudio_2026_05_14_recurrente_alerta_dia_anterior
+nombre: Cargos recurrentes — aviso el día anterior
+autor: angel
+creado: 2026-05-14T08:00:00Z
+modificado: 2026-05-14T08:00:00Z
+activo: false
+trigger:
+  tipo: cron
+  rrule: '0 20 * * *'
+acciones:
+  - tipo: claude_prompt
+    model: claude-haiku-4-5-20251001
+    system: |
+      Eres Claudio. Lee
+      /home/nosvers/public_html/knowledge_base/finanzas/recurrentes.yaml.
+      Para cada item activo, calcula la próxima ocurrencia (considera
+      dia_mes y cada_n_meses). Si alguna cae mañana ({{ts.iso_date+1}}),
+      lista cada uno como:
+        "<nombre>: <monto>€ mañana"
+      Si no hay ninguno, devuelve EXACTAMENTE: "(skip)"
+    prompt: 'Lista los cargos previstos mañana o "(skip)".'
+    max_tokens: 400
+  - tipo: condicional
+    expresion: '{{previo.resultado}} != "(skip)"'
+    acciones_si:
+      - tipo: telegram
+        mensaje: |
+          📅 Cargos previstos mañana:
+          {{previo.resultado}}
+      - tipo: cockpit_toast
+        level: warn
+        text: 'Cargos recurrentes mañana'
+    acciones_no: []
+metadatos:
+  descripcion: |
+    Alerta a 24h vista para revisar saldo antes de que pasen los cargos.
+    Cuando Engine v2 soporte mcp_tool, simplificar a
+    recurrente_alertar(dias=1).
+  tags: [claudio, finanzas, alerta, recurrentes]
