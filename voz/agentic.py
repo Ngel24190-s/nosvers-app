@@ -189,13 +189,25 @@ TOOLS_SCHEMA = [
             "required": ["query"],
         },
     },
+    {
+        "name": "claude_code_lanzar",
+        "description": "Lanza Claude Code (claude-code CLI) en una sesión tmux para que programe un proyecto complejo, escriba código, refactorice o implemente features. SOLO Angel puede invocarla. ÚSALA cuando el usuario pida 'lanza code', 'que code haga X', 'arranca un proyecto', 'programa Y', 'desarrolla Z'. Especifica un brief detallado con qué debe hacer Claude Code (Spec Kit completo: specify, plan, tasks, implement).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "brief": {"type": "string", "description": "Brief detallado del proyecto. Incluye objetivo, archivos a tocar, constraints, definition of done. Mínimo 200 caracteres."},
+                "nombre_proyecto": {"type": "string", "description": "Slug del proyecto (solo a-z 0-9 guiones, max 40 chars). Ej: 'widget-stripe', 'fix-bot-telegram', 'agente-noticias'"},
+            },
+            "required": ["brief", "nombre_proyecto"],
+        },
+    },
 ]
 
 # Clasificación de tools por nivel de acceso
 TOOLS_READ_ONLY = {"sistema_estado", "agentes_estado", "agente_logs",
                    "vault_leer", "vault_listar", "dia_buscar"}
 TOOLS_WRITE = {"vault_escribir"}  # acepta África pero registrada
-TOOLS_DESTRUCTIVE_ANGEL_ONLY = {"agente_ejecutar", "ejecutar_comando", "git_pull_vps"}
+TOOLS_DESTRUCTIVE_ANGEL_ONLY = {"agente_ejecutar", "ejecutar_comando", "git_pull_vps", "claude_code_lanzar"}
 
 
 def _tools_para(autor: str) -> list[dict]:
@@ -251,6 +263,9 @@ def _ejecutar_tool(name: str, tool_input: dict, autor: str) -> dict:
             return {"ok": True, "result": _call_mcp_tool("git_pull_vps")}
         elif name == "dia_buscar":
             return {"ok": True, "result": _call_mcp_tool("dia_buscar", **tool_input)}
+        elif name == "claude_code_lanzar":
+            return _ejecutar_claude_code(tool_input.get("brief", ""),
+                                         tool_input.get("nombre_proyecto", ""))
         else:
             return {"ok": False, "error": f"Tool desconocida: {name}"}
     except Exception as e:
@@ -269,22 +284,80 @@ def _call_mcp_tool(name: str, **kwargs) -> str:
     return fn(**kwargs)
 
 
+
+
+# ─── HELPER: Lanzar Claude Code en tmux ────────────────────────────
+
+def _ejecutar_claude_code(brief: str, nombre_proyecto: str) -> dict:
+    """Crea spec dir + BRIEF.md + lanza tmux con claude-code en modo remote-control."""
+    import subprocess, re
+    from pathlib import Path
+
+    if len(brief) < 100:
+        return {"ok": False, "error": "brief demasiado corto (min 100 chars)"}
+
+    nombre = re.sub(r"[^a-z0-9-]+", "-", nombre_proyecto.lower()).strip("-")[:40]
+    if not nombre:
+        return {"ok": False, "error": "nombre_proyecto invalido"}
+
+    spec_dir = Path(f"/home/nosvers/specs/claudio-{nombre}")
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    (spec_dir / "BRIEF.md").write_text(brief, encoding="utf-8")
+
+    session = f"spec-claudio-{nombre}"
+    subprocess.run(["tmux", "kill-session", "-t", session], capture_output=True)
+    subprocess.run(["setsid", "tmux", "new-session", "-d",
+                    "-s", session, "-c", str(spec_dir)], check=True)
+
+    subprocess.run(["tmux", "send-keys", "-t", session,
+                    "unset ANTHROPIC_API_KEY && claude", "Enter"])
+    time.sleep(9)
+    subprocess.run(["tmux", "send-keys", "-t", session,
+                    "/remote-control", "Enter"])
+    time.sleep(4)
+    subprocess.run(["tmux", "send-keys", "-t", session, "", "Enter"])
+    time.sleep(5)
+
+    prompt = ("Lee BRIEF.md entero. Arranca el proyecto sin parar (Spec Kit: "
+              "specify, plan, tasks, implement). Bug telegram conocido: NO "
+              "uses telegram_enviar intermedio. Commit + push al terminar.")
+    subprocess.run(["tmux", "send-keys", "-t", session, prompt])
+    time.sleep(2)
+    subprocess.run(["tmux", "send-keys", "-t", session, "Enter"])
+    time.sleep(8)
+
+    cap = subprocess.run(["tmux", "capture-pane", "-t", session, "-p"],
+                          capture_output=True, text=True)
+    m = re.search(r"session_[a-zA-Z0-9]+", cap.stdout)
+    session_id = m.group(0) if m else "?"
+
+    return {
+        "ok": True,
+        "result": (f"Claude Code lanzado proyecto {nombre} session {session_id} "
+                   f"tmux {session} URL https://claude.ai/code/{session_id}")
+    }
+
+
 # ─── AGENTIC LOOP ─────────────────────────────────────────────────
 
 SYSTEM_AGENTIC = (
-    "Eres Claudio, asistente con manos de Angel y África. Hablas español castellano "
-    "peninsular SIEMPRE, breve y directo. Tienes herramientas para actuar en el VPS "
-    "y vault NosVers.\n\n"
+    "Eres Claudio, asistente AGÉNTICO de Angel y África. Hablas español castellano "
+    "peninsular SIEMPRE, breve y directo. Tienes manos en el VPS NosVers: puedes "
+    "ejecutar agentes, comandos bash, leer/escribir vault, hacer git pull, "
+    "lanzar Claude Code para proyectos complejos.\n\n"
     "REGLAS IMPORTANTES:\n"
-    "- Si el usuario pide algo concreto que requiere actuar (ejecutar agente, leer "
-    "log, hacer git pull, mirar estado, leer archivo del vault, etc.), USA las "
-    "tools que tienes disponibles. NO digas 'tendrías que ir a...' — HAZLO.\n"
-    "- Después de ejecutar una tool, da una respuesta BREVE en lenguaje natural "
-    "(máximo 2-3 frases). NO copies la salida cruda del comando — RESUME.\n"
-    "- Si no necesitas tools (saludo, conversación, pregunta general), responde "
-    "directamente sin invocarlas.\n"
-    "- Si el usuario es África y pide una acción que solo puede hacer Angel, "
-    "explícale brevemente y sugiérele pedírselo a él.\n"
+    "- ACTÚA, no expliques teoría. Si el usuario pide algo concreto → USA tools. "
+    "Nunca digas 'tendrías que ir a...' o 'puedes hacer...' — HAZLO TÚ.\n"
+    "- Si pide programar / desarrollar / refactorizar / crear un agente nuevo / "
+    "implementar feature → usa claude_code_lanzar con brief detallado.\n"
+    "- Si pide algo simple (ver estado, ejecutar agente, leer archivo) → usa la "
+    "tool directa, no Code.\n"
+    "- Después de ejecutar, responde BREVE (2-3 frases máx). RESUME el resultado, "
+    "NO copies la salida cruda. Si fue un comando bash con muchas líneas, "
+    "interpreta y di 'todo OK' o señala lo importante.\n"
+    "- Si no necesitas tools (saludo, charla, opinión), responde directo.\n"
+    "- Si África pide algo destructive (lanzar agente, ejecutar comando, lanzar "
+    "Code), recházalo amablemente y sugiérele pedírselo a Angel.\n"
 )
 
 
