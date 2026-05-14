@@ -41,6 +41,15 @@ VALID_CHANNELS = {
     # 006-claudio-voz-cockpit: familia/admin
     "recordatorios", "gastos", "compras", "medicacion", "coche", "menu_dia",
     "bris",
+    # 007-claudio-pwa-contextos: contexto trabajo
+    "trabajo",
+}
+
+# Canales que requieren scope JWT específico (007 §FR-E-6).
+# Si un cliente intenta suscribirse sin tener `available_contexts` que
+# incluya el contexto, devolvemos error y NO entregamos snapshot.
+CHANNEL_SCOPE = {
+    "trabajo": "trabajo",
 }
 
 
@@ -50,6 +59,7 @@ class Connection:
     sub: str
     subscribed: set[str] = field(default_factory=set)
     connected_at: float = field(default_factory=time.time)
+    available_contexts: list[str] = field(default_factory=list)
 
     def __hash__(self) -> int:
         return id(self)
@@ -97,6 +107,10 @@ class Broker:
 
     async def subscribe(self, conn: Connection, channel: str) -> bool:
         if channel not in VALID_CHANNELS:
+            return False
+        # 007 §FR-E-6: gate por contexto si aplica
+        scope = CHANNEL_SCOPE.get(channel)
+        if scope is not None and scope not in (conn.available_contexts or []):
             return False
         async with self._lock:
             self._channels[channel].add(conn)
@@ -214,11 +228,15 @@ async def ws_main_handler(websocket: WebSocket) -> None:
     """Cockpit WebSocket: `wss://.../tablero/api/v2/ws?token=<JWT>`."""
     token = websocket.query_params.get("token", "")
     sub: str | None = None
+    available_contexts: list[str] = []
     if token:
         try:
             payload = validar_token(token)
             if payload:
                 sub = payload.get("sub")
+                available_contexts = list(
+                    payload.get("available_contexts") or ["casa", "nosvers"]
+                )
         except Exception:
             sub = None
     if not sub:
@@ -226,7 +244,10 @@ async def ws_main_handler(websocket: WebSocket) -> None:
         return
 
     await websocket.accept()
-    conn = Connection(websocket=websocket, sub=sub)
+    conn = Connection(
+        websocket=websocket, sub=sub,
+        available_contexts=available_contexts,
+    )
     await broker.register(conn)
     log.info(f"WS open sub={sub} stats={broker.stats}")
 

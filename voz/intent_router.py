@@ -62,8 +62,53 @@ ALLOWED_TOOLS: set[str] = {
     "medicacion_recordar", "cita_medica_anotar",
     # casa
     "casa_mantenimiento_anotar",
+    # trabajo (007 — DI Environnement)
+    "chantier_listar", "chantier_crear", "chantier_evento",
+    "chantier_estado", "chantier_documento_listar",
+    "equipe_listar", "equipe_anotar",
+    "devis_anotar", "ppsps_crear", "documento_trabajo_archivar",
     # fallback / capturas libres
     "dia_capturar", "dia_buscar",
+}
+
+
+# Mapping contexto → subset de tools accesibles (007 §FR-G-2).
+# Si contexts_permitidos no se pasa al router, asume ALLOWED_TOOLS completo
+# (retro-compat con clientes pre-007 que no envían X-Claudio-Context).
+TOOLS_CASA: set[str] = {
+    "claudio_recordar", "claudio_contexto",
+    "recordatorio_crear", "recordatorios_listar", "recordatorio_completar",
+    "familia_cumpleanos_listar",
+    "gasto_anotar", "gastos_resumen", "recurrente_alertar",
+    "lista_compras_añadir", "lista_compras_anadir",
+    "lista_compras_ver", "lista_compras_completar", "despensa_estado",
+    "menu_sugerir", "receta_guardar",
+    "coche_estado", "coche_evento",
+    "documento_anotar", "documentos_buscar",
+    "medicacion_recordar", "cita_medica_anotar",
+    "casa_mantenimiento_anotar",
+    "dia_capturar", "dia_buscar",
+}
+
+TOOLS_NOSVERS: set[str] = {
+    "claudio_contexto", "claudio_recordar",
+    "documentos_buscar", "documento_anotar",
+    "dia_capturar", "dia_buscar",
+}
+
+TOOLS_TRABAJO: set[str] = {
+    "chantier_listar", "chantier_crear", "chantier_evento",
+    "chantier_estado", "chantier_documento_listar",
+    "equipe_listar", "equipe_anotar",
+    "devis_anotar", "ppsps_crear", "documento_trabajo_archivar",
+    "claudio_contexto",  # consulta del propio Claudio sigue accesible
+    "dia_capturar",      # fallback nota libre en vault trabajo
+}
+
+TOOLS_POR_CONTEXTO: dict[str, set[str]] = {
+    "casa": TOOLS_CASA,
+    "nosvers": TOOLS_NOSVERS,
+    "trabajo": TOOLS_TRABAJO,
 }
 
 
@@ -265,6 +310,7 @@ async def route_intent(
     threshold: float = DEFAULT_THRESHOLD,
     timeout: float = DEFAULT_TIMEOUT_S,
     modelo: str = DEFAULT_MODEL,
+    contexts_permitidos: set[str] | None = None,
 ) -> IntentResult:
     """Decide qué tool ejecutar para un texto dictado.
 
@@ -274,10 +320,17 @@ async def route_intent(
         threshold: confidence mínima para no caer al fallback.
         timeout: segundos antes de fallback por red.
         modelo: model id de Anthropic.
+        contexts_permitidos: subset de ALLOWED_TOOLS al que el router puede
+            mapear. Si None, todo ALLOWED_TOOLS (retro-compat). Tools fuera
+            del set caen al fallback (007 §FR-G-2).
     """
     text = (text or "").strip()
     if not text:
         return _fallback("", "texto vacío")
+    if contexts_permitidos is None:
+        contexts_permitidos = ALLOWED_TOOLS
+    # Garantiza dia_capturar siempre disponible como red de seguridad
+    contexts_permitidos = set(contexts_permitidos) | {"dia_capturar"}
 
     cached = _cache_get(text, autor)
     if cached is not None:
@@ -314,6 +367,14 @@ async def route_intent(
 
     if tool not in ALLOWED_TOOLS:
         result = _fallback(text, f"tool fuera de whitelist: {tool!r}", modelo)
+        result.raw = parsed
+        _cache_set(text, autor, result)
+        return result
+
+    if tool not in contexts_permitidos:
+        # Tool válido pero fuera del contexto activo → fallback a captura
+        # (siempre disponible). El nombre tool original queda en `raw`.
+        result = _fallback(text, f"tool fuera de contexto: {tool!r}", modelo)
         result.raw = parsed
         _cache_set(text, autor, result)
         return result

@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './themes.css';
+
+:root {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* Utilidades específicas DI Environnement */
+.di-card {
+  border: 2px solid #000;
+  background: #fff;
+  border-radius: 0;
+}
+
+.di-header-stripe {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  border: 2px solid #000;
+}
+
+.di-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: #000;
+  color: #fff;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  border: 2px solid #000;
+}
+
+.di-title {
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

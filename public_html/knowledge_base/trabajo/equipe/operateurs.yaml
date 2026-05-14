@@ -1,0 +1,25 @@
+# Operadores DI Environnement — registro central
+#
+# Editado por equipe_anotar / equipe_listar tools.
+# Cada entry mínima: id, nombre, activo, cualificaciones, formaciones_validas_hasta.
+#
+# Ejemplo (uno por defecto: Angel como referencia, real solo lo añade Angel):
+
+operateurs:
+  - id: angel
+    nombre: Angel
+    rol: chef-d-equipe
+    activo: true
+    cualificaciones:
+      - sous-section-3-encadrement
+      - SS3-operateur
+      - SS4-encadrement
+    formaciones:
+      sous-section-3:
+        valida_hasta: 2027-06-30
+        organisme: INRS
+      port-equipement-isolant:
+        valida_hasta: 2026-12-31
+        organisme: AC-Environnement
+    notas: |
+      Jefe de obra. Habilitado SS3 y SS4. Encadrement total y trabajo en hauteur.

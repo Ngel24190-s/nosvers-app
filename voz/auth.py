@@ -49,23 +49,43 @@ def _conn() -> sqlite3.Connection:
 
 
 AUTORES_VALIDOS = {"angel", "africa"}
+CONTEXTS_VALIDOS = {"casa", "nosvers", "trabajo"}
+CONTEXTS_DEFAULT = ["casa", "nosvers"]
+CONTEXTS_ANGEL = ["casa", "nosvers", "trabajo"]
 
 
 def emitir_token(
     device_label: str,
     ttl_days: int = DEFAULT_TTL_DAYS,
     autor: str = "angel",
+    contexts: list[str] | None = None,
 ) -> dict:
     """Emite un nuevo token JWT y lo registra. Devuelve dict con jwt + metadatos.
 
     `autor` (BRIEF §14): "angel" o "africa". Persiste en JWT como `sub` y se
     usa en /voz/api/capturar como identidad del usuario asociado al device.
+
+    `contexts` (007 §FR-B): lista de contextos disponibles para el portador.
+    Si se omite: ["casa","nosvers","trabajo"] para angel, ["casa","nosvers"]
+    para africa. El contexto "trabajo" SOLO se concede a angel; intento con
+    africa lanza ValueError (defense-in-depth contra mis-issuance).
     """
     if not device_label:
         raise ValueError("device_label requerido")
     autor = autor.strip().lower()
     if autor not in AUTORES_VALIDOS:
         raise ValueError(f"autor inválido: {autor!r}. Esperado: {sorted(AUTORES_VALIDOS)}")
+    if contexts is None:
+        contexts = CONTEXTS_ANGEL if autor == "angel" else CONTEXTS_DEFAULT
+    contexts = [str(c).strip().lower() for c in contexts]
+    for c in contexts:
+        if c not in CONTEXTS_VALIDOS:
+            raise ValueError(f"contexto inválido: {c!r}. Esperado: {sorted(CONTEXTS_VALIDOS)}")
+    if "trabajo" in contexts and autor != "angel":
+        raise ValueError("contexto 'trabajo' solo permitido para autor=angel")
+    # dedupe preservando orden
+    seen: set[str] = set()
+    contexts = [c for c in contexts if not (c in seen or seen.add(c))]
     jti = str(uuid.uuid4())
     now = datetime.now(timezone.utc)
     exp = now + timedelta(days=ttl_days)
@@ -75,6 +95,7 @@ def emitir_token(
         "iat": int(now.timestamp()),
         "exp": int(exp.timestamp()),
         "sub": autor,
+        "available_contexts": contexts,
     }
     token = jwt.encode(payload, _secret(), algorithm=ALGORITHM)
     with _conn() as c:
@@ -85,7 +106,31 @@ def emitir_token(
     return {
         "jwt": token, "jti": jti, "device": device_label,
         "autor": autor, "expires_at": exp.isoformat(),
+        "available_contexts": contexts,
     }
+
+
+def check_context(payload: dict | None, requested: str | None) -> bool:
+    """True si el JWT autoriza el contexto solicitado (007 §FR-B-5).
+
+    Reglas:
+    - payload None → False.
+    - requested fuera de {casa,nosvers,trabajo} → False.
+    - requested == "trabajo" pero sub != "angel" → False (defensa adicional
+      aunque available_contexts lo incluya por error).
+    - Si payload no trae available_contexts (token viejo), default
+      CONTEXTS_DEFAULT (NUNCA trabajo).
+    - True si requested ∈ available_contexts.
+    """
+    if not payload:
+        return False
+    requested = (requested or "").strip().lower()
+    if requested not in CONTEXTS_VALIDOS:
+        return False
+    if requested == "trabajo" and (payload.get("sub") or "").strip().lower() != "angel":
+        return False
+    available = payload.get("available_contexts") or CONTEXTS_DEFAULT
+    return requested in available
 
 
 def validar_token(token: str) -> dict | None:

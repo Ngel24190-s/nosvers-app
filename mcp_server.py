@@ -989,6 +989,163 @@ try:
 
     log.info("claudio_tools: 22 tools nuevos registrados (familia/finanzas/compras/menus/coche/casa/documentos/salud/identidad)")
 
+    # ── trabajo (007 — DI Environnement) ──────────────────────
+    # 10 tools del contexto trabajo. El scope se valida en
+    # voz/rest.py vía X-Claudio-Context; aquí los registramos planos
+    # para que estén disponibles vía MCP RPC también (Angel desde
+    # claude.ai/desktop puede llamarlos directamente).
+    try:
+        from claudio_tools import trabajo as _cl_trabajo
+
+        @mcp.tool()
+        def chantier_listar(estado: str = "activos") -> str:
+            """Lista chantiers DI Environnement.
+
+            Args:
+                estado: activos | archivados | urgentes | todos
+            """
+            return _cl_trabajo.chantier_listar(estado)
+
+        @mcp.tool()
+        def chantier_crear(
+            nombre: str,
+            direccion: str,
+            cliente: str,
+            devis_eur: float,
+            equipe_ids: str,
+            fecha_inicio: str,
+            fecha_fin_prev: str,
+            autor: str = "angel",
+        ) -> str:
+            """Crea un chantier nuevo en vault/trabajo/chantiers/{slug}/.
+
+            Args:
+                nombre: nombre humano del chantier
+                direccion: dirección de la obra
+                cliente: cliente / commanditaire
+                devis_eur: monto del devis en €
+                equipe_ids: CSV de operadores asignados (ej "angel,jose")
+                fecha_inicio: 'YYYY-MM-DD'
+                fecha_fin_prev: 'YYYY-MM-DD' o vacío
+                autor: por defecto angel (jefe de obra)
+            """
+            return _cl_trabajo.chantier_crear(
+                nombre, direccion, cliente, float(devis_eur),
+                equipe_ids, fecha_inicio, fecha_fin_prev, autor,
+            )
+
+        @mcp.tool()
+        def chantier_evento(
+            chantier_id: str,
+            tipo: str,
+            descripcion: str,
+            autor: str = "angel",
+        ) -> str:
+            """Append a journal del chantier (avance, incidente, seguridad).
+
+            Args:
+                chantier_id: slug del chantier (acepta keyword/prefijo)
+                tipo: avance | incidente | seguridad | journal | otro
+                descripcion: texto del evento
+                autor: angel | jose | ...
+            """
+            return _cl_trabajo.chantier_evento(chantier_id, tipo,
+                                               descripcion, autor)
+
+        @mcp.tool()
+        def chantier_estado(chantier_id: str) -> str:
+            """Snapshot del chantier (cliente, devis, equipo, último journal).
+
+            Args:
+                chantier_id: slug (acepta keyword/prefijo)
+            """
+            return _cl_trabajo.chantier_estado(chantier_id)
+
+        @mcp.tool()
+        def chantier_documento_listar(
+            chantier_id: str,
+            tipo: str = "todos",
+        ) -> str:
+            """Lista documentos asociados al chantier.
+
+            Args:
+                chantier_id: slug
+                tipo: todos | ppsps | plans-retrait | devis | certificats | diag-amiante
+            """
+            return _cl_trabajo.chantier_documento_listar(chantier_id, tipo)
+
+        @mcp.tool()
+        def equipe_listar() -> str:
+            """Lista operadores activos (lee equipe/operateurs.yaml)."""
+            return _cl_trabajo.equipe_listar()
+
+        @mcp.tool()
+        def equipe_anotar(
+            operario: str,
+            evento: str,
+            fecha: str = "hoy",
+        ) -> str:
+            """Anota un evento de formación/ausencia/incidente del operario.
+
+            Args:
+                operario: id del operario (slug)
+                evento: descripción libre
+                fecha: 'YYYY-MM-DD' o 'hoy'
+            """
+            return _cl_trabajo.equipe_anotar(operario, evento, fecha)
+
+        @mcp.tool()
+        def devis_anotar(
+            cliente: str,
+            monto_eur: float,
+            chantier_ref: str = "",
+        ) -> str:
+            """Anota un devis emitido en documents/devis/{cliente}.md.
+
+            Args:
+                cliente: nombre del cliente
+                monto_eur: monto en €
+                chantier_ref: slug del chantier asociado (opcional)
+            """
+            return _cl_trabajo.devis_anotar(cliente, float(monto_eur),
+                                            chantier_ref)
+
+        @mcp.tool()
+        def ppsps_crear(
+            chantier_id: str,
+            version: str = "v1",
+            observaciones: str = "",
+        ) -> str:
+            """Crea PPSPS plantilla para el chantier.
+
+            Args:
+                chantier_id: slug del chantier
+                version: 'v1', 'v2', ... (default v1)
+                observaciones: texto libre añadido al final
+            """
+            return _cl_trabajo.ppsps_crear(chantier_id, version, observaciones)
+
+        @mcp.tool()
+        def documento_trabajo_archivar(
+            tipo: str,
+            contenido: str,
+            chantier_ref: str = "",
+        ) -> str:
+            """Archiva contenido en documents/{tipo}/{slug}-{stamp}.md.
+
+            Args:
+                tipo: certificat | diag-amiante | plan-retrait | otro
+                contenido: texto del documento (markdown OK)
+                chantier_ref: slug del chantier asociado (opcional)
+            """
+            return _cl_trabajo.documento_trabajo_archivar(
+                tipo, contenido, chantier_ref,
+            )
+
+        log.info("claudio_tools.trabajo: 10 tools registrados (chantier/equipe/devis/ppsps/documento)")
+    except Exception as _tra_err:  # pragma: no cover
+        log.warning(f"claudio_tools.trabajo no cargado: {_tra_err}")
+
 except Exception as _cl_err:  # pragma: no cover
     log.warning(f"claudio_tools no cargado: {_cl_err}")
 

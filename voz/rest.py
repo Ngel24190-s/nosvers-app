@@ -18,11 +18,11 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
-from .auth import validar_token
+from .auth import validar_token, check_context, CONTEXTS_VALIDOS
 from .capturar import dia_capturar_impl
 from .contexto import dia_contexto_impl
 from .buscar import dia_buscar_impl
-from .intent_router import IntentResult, route_intent
+from .intent_router import IntentResult, route_intent, TOOLS_POR_CONTEXTO
 from .compose_voice_response import compose_voice_response
 
 log = logging.getLogger("voz.rest")
@@ -42,7 +42,7 @@ def _cors_headers() -> dict:
     return {
         "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id, X-Claudio-Context",
         "Access-Control-Max-Age": "86400",
     }
 
@@ -162,8 +162,13 @@ async def health_handler(request: Request) -> JSONResponse:
 # ─── /voz/api/dictado-procesar (Fase 2) ───────────────────────────
 
 def _execute_intent(intent: IntentResult, transcript: str, autor: str,
-                    device: str) -> str:
-    """Ejecuta el tool decidido por el router. Devuelve string humano."""
+                    device: str, contexto: str = "casa") -> str:
+    """Ejecuta el tool decidido por el router. Devuelve string humano.
+
+    `contexto` (007 §FR-G-3): Si == "trabajo" y tool == dia_capturar, la
+    nota cae en el vault trabajo/. Para tools del dominio trabajo, el
+    autor se inyecta server-side igual que en otros dominios.
+    """
     tool = intent.tool
     args = dict(intent.args or {})
     args.pop("autor", None)
@@ -174,14 +179,15 @@ def _execute_intent(intent: IntentResult, transcript: str, autor: str,
         if tool == "dia_capturar":
             res = dia_capturar_impl(
                 texto=args.get("texto") or transcript,
-                etiqueta="auto",
-                origen="dictado",
+                etiqueta=("trabajo" if contexto == "trabajo" else "auto"),
+                origen=f"dictado:{contexto}",
                 autor=autor,
                 device_label=device or "dictado",
             )
             if not res.get("ok"):
                 return f"❌ {res.get('error', 'error')}"
-            return f"✅ Apuntado en notas ({res.get('etiqueta_aplicada','otro')})."
+            etiq = res.get("etiqueta_aplicada", "otro")
+            return f"✅ Apuntado en notas ({etiq})."
 
         if tool == "dia_buscar":
             res = dia_buscar_impl(
@@ -293,6 +299,58 @@ def _execute_intent(intent: IntentResult, transcript: str, autor: str,
                 args.get("fecha", ""),
                 args.get("proximo", ""),
                 autor)
+
+        # ─── Trabajo (007) ─────────────────────────────────────────
+        if tool.startswith("chantier_") or tool.startswith("equipe_") \
+           or tool in {"devis_anotar", "ppsps_crear",
+                       "documento_trabajo_archivar"}:
+            from claudio_tools import trabajo as _tra
+            if tool == "chantier_listar":
+                return _tra.chantier_listar(args.get("estado", "activos"))
+            if tool == "chantier_crear":
+                return _tra.chantier_crear(
+                    args.get("nombre", ""),
+                    args.get("direccion", ""),
+                    args.get("cliente", ""),
+                    float(args.get("devis_eur", 0)),
+                    args.get("equipe_ids", ""),
+                    args.get("fecha_inicio", "hoy"),
+                    args.get("fecha_fin_prev", ""),
+                    autor)
+            if tool == "chantier_evento":
+                return _tra.chantier_evento(
+                    args.get("chantier_id", ""),
+                    args.get("tipo", "journal"),
+                    args.get("descripcion", "") or transcript,
+                    autor)
+            if tool == "chantier_estado":
+                return _tra.chantier_estado(args.get("chantier_id", ""))
+            if tool == "chantier_documento_listar":
+                return _tra.chantier_documento_listar(
+                    args.get("chantier_id", ""),
+                    args.get("tipo", "todos"))
+            if tool == "equipe_listar":
+                return _tra.equipe_listar()
+            if tool == "equipe_anotar":
+                return _tra.equipe_anotar(
+                    args.get("operario", ""),
+                    args.get("evento", ""),
+                    args.get("fecha", "hoy"))
+            if tool == "devis_anotar":
+                return _tra.devis_anotar(
+                    args.get("cliente", ""),
+                    float(args.get("monto_eur", 0)),
+                    args.get("chantier_ref", ""))
+            if tool == "ppsps_crear":
+                return _tra.ppsps_crear(
+                    args.get("chantier_id", ""),
+                    args.get("version", "v1"),
+                    args.get("observaciones", ""))
+            if tool == "documento_trabajo_archivar":
+                return _tra.documento_trabajo_archivar(
+                    args.get("tipo", "otro"),
+                    args.get("contenido", "") or transcript,
+                    args.get("chantier_ref", ""))
     except Exception as e:  # noqa: BLE001
         log.warning(f"_execute_intent fallo en {tool}: {e}")
         return f"❌ {e}"
@@ -339,6 +397,19 @@ async def dictado_procesar_handler(request: Request) -> JSONResponse:
     autor_jwt = payload.get("sub") or payload.get("autor") or "angel"
     device = payload.get("device", "desconocido")
 
+    # Contexto activo (007 §FR-G-1): viene del header `X-Claudio-Context`,
+    # NUNCA del body. Default "casa" si ausente (retro-compat con clientes
+    # pre-007 que solo veían el contexto familiar).
+    ctx_raw = (request.headers.get("x-claudio-context")
+               or "casa").strip().lower()
+    if ctx_raw not in CONTEXTS_VALIDOS:
+        return _json({"ok": False, "error": "context_invalido",
+                      "detalle": f"contexto desconocido: {ctx_raw}"}, 400)
+    if not check_context(payload, ctx_raw):
+        return _json({"ok": False, "error": "context_no_autorizado",
+                      "detalle": f"sin acceso a {ctx_raw}"}, 403)
+    contexts_permitidos = TOOLS_POR_CONTEXTO.get(ctx_raw, set()) | {"dia_capturar"}
+
     try:
         data = await request.json()
     except json.JSONDecodeError:
@@ -352,8 +423,11 @@ async def dictado_procesar_handler(request: Request) -> JSONResponse:
         return _json({"ok": False, "error": "payload_too_large"}, 413)
 
     t0 = time.monotonic()
-    intent = await route_intent(transcript, autor_jwt)
-    tool_result = _execute_intent(intent, transcript, autor_jwt, device)
+    intent = await route_intent(
+        transcript, autor_jwt, contexts_permitidos=contexts_permitidos,
+    )
+    tool_result = _execute_intent(intent, transcript, autor_jwt, device,
+                                  contexto=ctx_raw)
     voice = compose_voice_response(
         intent.tool, intent.args, tool_result, autor_jwt
     )

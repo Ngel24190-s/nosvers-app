@@ -58,6 +58,15 @@ from tablero.v2.agentes import (  # noqa: E402
 from tablero.v2.health import health_handler as _v2_health  # noqa: E402
 from tablero.v2.ws import ws_main_handler as _v2_ws_main  # noqa: E402
 
+# 007 — contexto trabajo (DI Environnement)
+from tablero.v2.api_trabajo import (  # noqa: E402
+    chantiers_handler as _v3_tra_chantiers,
+    chantier_detail_handler as _v3_tra_chantier_detail,
+    equipe_handler as _v3_tra_equipe,
+    documents_handler as _v3_tra_documents,
+    options_handler as _v3_tra_options,
+)
+
 log = get_logger("tablero.rest")
 
 VERSION = "0.2.0"
@@ -445,6 +454,15 @@ ROUTES = [
     Route("/tablero/api/v2/automatizaciones/{id}/test", options_handler, methods=["OPTIONS"]),
     Route("/tablero/api/v2/automatizaciones/{id}/logs", v2_auto_logs, methods=["GET"]),
     Route("/tablero/api/v2/automatizaciones/{id}/logs", options_handler, methods=["OPTIONS"]),
+    # ── 007 Trabajo (DI Environnement) ─────────────────────────────────────
+    Route("/tablero/api/v3/trabajo/chantiers", _v3_tra_chantiers, methods=["GET"]),
+    Route("/tablero/api/v3/trabajo/chantiers", _v3_tra_options, methods=["OPTIONS"]),
+    Route("/tablero/api/v3/trabajo/chantier/{slug}", _v3_tra_chantier_detail, methods=["GET"]),
+    Route("/tablero/api/v3/trabajo/chantier/{slug}", _v3_tra_options, methods=["OPTIONS"]),
+    Route("/tablero/api/v3/trabajo/equipe", _v3_tra_equipe, methods=["GET"]),
+    Route("/tablero/api/v3/trabajo/equipe", _v3_tra_options, methods=["OPTIONS"]),
+    Route("/tablero/api/v3/trabajo/documents", _v3_tra_documents, methods=["GET"]),
+    Route("/tablero/api/v3/trabajo/documents", _v3_tra_options, methods=["OPTIONS"]),
 ]
 
 

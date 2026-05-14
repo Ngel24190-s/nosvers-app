@@ -1,0 +1,41 @@
+/* Themes Claudio (007) — variables CSS por contexto, conmutadas via
+   data-context en <html>. */
+
+[data-context='casa'] {
+  --bg: #FEFAF4;
+  --fg: #1c1510;
+  --primary: #5A7A2E;
+  --primary-dark: #3D6B20;
+  --accent: #D97706;
+  --muted: #6b6357;
+  --border: #e0d6c7;
+  --on-primary: #FEFAF4;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+[data-context='nosvers'] {
+  --bg: #FEFAF4;
+  --fg: #1c1510;
+  --primary: #5A7A2E;
+  --primary-dark: #3D6B20;
+  --accent: #10b981;
+  --muted: #6b6357;
+  --border: #c8c2b4;
+  --on-primary: #FEFAF4;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+[data-context='trabajo'] {
+  --bg: #FFFFFF;
+  --fg: #000000;
+  --primary: #D62828;
+  --primary-dark: #A91D1D;
+  --accent: #000000;
+  --muted: #1A1A1A;
+  --border: #000000;
+  --on-primary: #FFFFFF;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}

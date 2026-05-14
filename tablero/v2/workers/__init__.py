@@ -23,6 +23,8 @@ from tablero.v2.workers.medicacion import medicacion_tick
 from tablero.v2.workers.coche import coche_tick
 from tablero.v2.workers.menu_dia import menu_dia_tick
 from tablero.v2.workers.bris import bris_tick
+# 007: contexto trabajo (DI Environnement)
+from tablero.v2.workers.trabajo import trabajo_tick
 
 log = logging.getLogger("tablero.v2.workers")
 
@@ -46,10 +48,12 @@ def register_all() -> None:
     register_worker(Worker(name="menu_dia", interval_s=600.0,
                            tick=menu_dia_tick))
     register_worker(Worker(name="bris", interval_s=300.0, tick=bris_tick))
+    # 007 — contexto trabajo
+    register_worker(Worker(name="trabajo", interval_s=60.0, tick=trabajo_tick))
     log.info(
         "workers registrados: health, claude, agentes, revenue, aegis, wake, "
-        "recordatorios, gastos, compras, medicacion, coche, menu_dia, bris "
-        "(+activity bg)"
+        "recordatorios, gastos, compras, medicacion, coche, menu_dia, bris, "
+        "trabajo (+activity bg)"
     )
 
 

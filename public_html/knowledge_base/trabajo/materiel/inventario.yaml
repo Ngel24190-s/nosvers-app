@@ -1,0 +1,27 @@
+# Inventario material DI Environnement
+# Editado a mano (rara vez vía tool — categoría futura).
+
+equipement_protection_individuelle:
+  combinaisons_jetables:
+    stock: 0
+    talla_estandar: XL
+  masques_p3:
+    stock: 0
+  filtres_p3:
+    stock: 0
+
+machines:
+  aspirateurs_h:
+    cantidad: 0
+    modelo: ""
+    estado: ""
+  ventilateurs_extraction:
+    cantidad: 0
+
+vehiculos:
+  furgon_principal:
+    matricula: ""
+    modelo: ""
+    km: 0
+    itv_proxima: ""
+    notas: "Bicromático blanco/rojo DI"
