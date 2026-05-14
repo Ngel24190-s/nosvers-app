@@ -353,6 +353,108 @@ def telegram_enviar(mensaje: str) -> str:
     ok = notify(mensaje)
     return "✅ Enviado por Telegram" if ok else "❌ Error — verificar TELEGRAM_TOKEN"
 
+# ── HERRAMIENTAS VOZ (asistente personal Angel) ───────────
+# feature/001-voice-assistant — añade dia_capturar / dia_contexto / dia_buscar
+# Implementación en /home/nosvers/voz/
+
+import json as _voz_json
+from voz.capturar import dia_capturar_impl as _voz_capturar_impl
+from voz.contexto import dia_contexto_impl as _voz_contexto_impl
+from voz.buscar import dia_buscar_impl as _voz_buscar_impl
+
+
+@mcp.tool()
+def dia_capturar(
+    texto: str = "",
+    audio_b64: str = "",
+    ts_iso: str = "",
+    etiqueta: str = "auto",
+    origen: str = "otro",
+    autor: str = "angel",
+    device_label: str = "mcp_directo",
+    client_uuid: str = "",
+) -> str:
+    """Captura una nota del día en el vault común (Angel + África) con
+    clasificación automática.
+
+    Args:
+        texto: texto ya transcrito. Si vacío y audio_b64 viene, se transcribe.
+        audio_b64: audio Opus en base64 (alternativa a texto).
+        ts_iso: timestamp ISO 8601 del momento de dictado. Vacío = ahora().
+        etiqueta: 'auto' (Haiku decide) o una de
+                  trabajo|nosvers|familia|mental|idea|otro.
+        origen: voz_movil | voz_linux | texto_directo | otro.
+        autor: angel | africa (BRIEF §14). Default angel.
+        device_label: identificador del dispositivo origen.
+        client_uuid: UUID del cliente para idempotencia (opcional).
+
+    Returns:
+        JSON string con archivo, ts, autor, etiqueta_aplicada, confianza, etc.
+    """
+    res = _voz_capturar_impl(
+        texto=texto, audio_b64=audio_b64, ts_iso=ts_iso, etiqueta=etiqueta,
+        origen=origen, autor=autor, device_label=device_label, client_uuid=client_uuid,
+    )
+    return _voz_json.dumps(res, ensure_ascii=False)
+
+
+@mcp.tool()
+def dia_contexto(
+    rango_dias: int = 7,
+    incluir_calendario: bool = True,
+    incluir_estado_agentes: bool = True,
+    etiquetas_filtro: str = "",
+    autor: str = "",
+) -> str:
+    """Devuelve síntesis del contexto reciente desde el vault común.
+
+    Args:
+        rango_dias: 1..30 días hacia atrás (default 7).
+        incluir_calendario: si True, intenta leer eventos próximos.
+        incluir_estado_agentes: si True, incluye resumen de agentes activos.
+        etiquetas_filtro: CSV de etiquetas para filtrar (vacío = todas).
+        autor: filtra por autor ("angel"|"africa"). Vacío = ambos (BRIEF §14).
+
+    Returns:
+        JSON string con sintesis (markdown), calendario, agentes.
+    """
+    res = _voz_contexto_impl(
+        rango_dias=rango_dias, incluir_calendario=incluir_calendario,
+        incluir_estado_agentes=incluir_estado_agentes,
+        etiquetas_filtro=etiquetas_filtro, autor=autor,
+    )
+    return _voz_json.dumps(res, ensure_ascii=False)
+
+
+@mcp.tool()
+def dia_buscar(
+    query: str,
+    desde: str = "",
+    hasta: str = "",
+    limite: int = 20,
+    etiqueta: str = "",
+    autor: str = "",
+) -> str:
+    """Busca un término en las notas del diario común.
+
+    Args:
+        query: término o frase (case-insensitive, ignora diacríticos).
+        desde: fecha ISO YYYY-MM-DD inclusive (vacío = sin límite).
+        hasta: fecha ISO YYYY-MM-DD inclusive (vacío = hoy).
+        limite: máximo de resultados (1-100, default 20).
+        etiqueta: filtrar por una etiqueta concreta.
+        autor: filtra por autor ("angel"|"africa"). Vacío = ambos (BRIEF §14).
+
+    Returns:
+        JSON string con resultados ordenados por ts descendente.
+    """
+    res = _voz_buscar_impl(
+        query=query, desde=desde, hasta=hasta, limite=limite,
+        etiqueta=etiqueta, autor=autor,
+    )
+    return _voz_json.dumps(res, ensure_ascii=False)
+
+
 # ── SYSTEMD SERVICE ───────────────────────────────────────
 SERVICE = """[Unit]
 Description=NosVers MCP Server
@@ -427,6 +529,22 @@ Herramientas disponibles:
     log.info("   Instrucciones: /home/nosvers/MCP_INSTRUCCIONES.txt")
 
     app = mcp.http_app()
+    # Monta endpoints REST de la PWA de voz (mismo binario, comparte auth)
+    try:
+        from voz.rest import ROUTES as _voz_routes
+        for _r in _voz_routes:
+            app.router.routes.append(_r)
+        log.info(f"voz/REST: {len(_voz_routes)} rutas montadas bajo /voz/api/")
+    except Exception as _e:
+        log.warning(f"voz/REST no montado: {_e}")
+    # Monta endpoints REST del Second Brain Dashboard (proyecto 002, Fase A read-only)
+    try:
+        from tablero.rest import ROUTES as _tablero_routes
+        for _r in _tablero_routes:
+            app.router.routes.append(_r)
+        log.info(f"tablero/REST: {len(_tablero_routes)} rutas montadas bajo /tablero/api/")
+    except Exception as _e:
+        log.warning(f"tablero/REST no montado: {_e}")
     uvicorn.run(app, host="0.0.0.0", port=8765, log_level="warning")
 
 # ── NUEVAS HERRAMIENTAS — EVOLVE 2026-03-15 ──────────────
@@ -572,4 +690,305 @@ def fotos_inventario() -> str:
     
     result += f"\n\n**Total:** {total + local_count} images disponibles"
     return result
+
+
+# ══════════════════════════════════════════════════════════
+#  CLAUDIO JARVIS — Fase 1 (Proyecto 005)
+#  Familia · finanzas · compras · menús · coche · documentos · salud · casa
+# ══════════════════════════════════════════════════════════
+#
+# Bloque protegido: si claudio_tools falla al importar, MCP arranca igual
+# con los tools NosVers intactos y solo se loguea un warning.
+
+try:
+    from claudio_tools import (
+        identidad as _cl_identidad,
+        familia as _cl_familia,
+        finanzas as _cl_finanzas,
+        compras as _cl_compras,
+        menus as _cl_menus,
+        coche as _cl_coche,
+        casa as _cl_casa,
+        documentos as _cl_documentos,
+        salud as _cl_salud,
+    )
+
+    # ── claudio identidad ──────────────────────────────────────
+    @mcp.tool()
+    def claudio_recordar(autor: str, hecho: str, importancia: int = 5) -> str:
+        """Guarda un hecho personal en claudio/memorias/{autor}/YYYY-MM.md.
+
+        Args:
+            autor: angel | africa | compartido | bris
+            hecho: texto a recordar (1 línea preferida)
+            importancia: 1-10 (default 5)
+        """
+        return _cl_identidad.claudio_recordar(autor, hecho, importancia)
+
+    @mcp.tool()
+    def claudio_contexto(autor: str, query: str, limite: int = 10) -> str:
+        """Busca memorias relevantes del autor que matchean la query.
+
+        Args:
+            autor: angel | africa | compartido | bris
+            query: término o frase (case-insensitive, ignora acentos)
+            limite: máx resultados (default 10)
+        """
+        return _cl_identidad.claudio_contexto(autor, query, limite)
+
+    # ── familia ───────────────────────────────────────────────
+    @mcp.tool()
+    def recordatorio_crear(
+        texto: str,
+        fecha: str,
+        autor: str,
+        prioridad: int = 3,
+    ) -> str:
+        """Crea un recordatorio fechado en familia/recordatorios/.
+
+        Args:
+            texto: descripción del recordatorio
+            fecha: 'YYYY-MM-DD', 'hoy' o 'mañana'
+            autor: angel | africa | compartido
+            prioridad: 1 (bajo) a 10 (urgente), default 3
+        """
+        return _cl_familia.recordatorio_crear(texto, fecha, autor, prioridad)
+
+    @mcp.tool()
+    def recordatorios_listar(
+        periodo: str = "proximos_7_dias",
+        autor: str = "",
+    ) -> str:
+        """Lista recordatorios activos.
+
+        Args:
+            periodo: hoy | mañana | proximos_7_dias | proximos_30_dias | todos
+            autor: filtrar por autor (vacío = todos)
+        """
+        return _cl_familia.recordatorios_listar(periodo, autor)
+
+    @mcp.tool()
+    def recordatorio_completar(id_o_slug: str) -> str:
+        """Marca un recordatorio como hecho y lo mueve a completados/.
+
+        Args:
+            id_o_slug: nombre del archivo sin .md (ej '2026-06-12-cumpleanos-lucia')
+        """
+        return _cl_familia.recordatorio_completar(id_o_slug)
+
+    @mcp.tool()
+    def familia_cumpleanos_listar(meses: int = 12) -> str:
+        """Lista cumpleaños de los próximos N meses (lee familia/cumpleanos.md).
+
+        Args:
+            meses: 1-12 (default 12)
+        """
+        return _cl_familia.familia_cumpleanos_listar(meses)
+
+    # ── finanzas ──────────────────────────────────────────────
+    @mcp.tool()
+    def gasto_anotar(
+        monto_eur: float,
+        concepto: str,
+        categoria: str,
+        autor: str,
+    ) -> str:
+        """Apunta un gasto en finanzas/gastos/YYYY-MM.md.
+
+        Args:
+            monto_eur: cantidad en euros
+            concepto: descripción corta (ej "gasolina coche")
+            categoria: alimentacion|transporte|coche|hogar|ocio|salud|nosvers|ropa|regalos|viajes|otros
+            autor: angel | africa (obligatorio)
+        """
+        return _cl_finanzas.gasto_anotar(monto_eur, concepto, categoria, autor)
+
+    @mcp.tool()
+    def gastos_resumen(periodo: str = "mes_actual", categoria: str = "") -> str:
+        """Agrega gastos del periodo, por categoría.
+
+        Args:
+            periodo: mes_actual | mes_anterior | YYYY-MM | ultimos_30_dias
+            categoria: vacío (todas) o una de las categorías válidas
+        """
+        return _cl_finanzas.gastos_resumen(periodo, categoria)
+
+    @mcp.tool()
+    def recurrente_alertar(dias: int = 7) -> str:
+        """Lee finanzas/recurrentes.yaml y devuelve cargos próximos en N días.
+
+        Args:
+            dias: ventana de alerta (default 7)
+        """
+        return _cl_finanzas.recurrente_alertar(dias)
+
+    # ── compras ───────────────────────────────────────────────
+    @mcp.tool()
+    def lista_compras_anadir(
+        item: str,
+        autor: str,
+        cantidad: str = "",
+        urgente: bool = False,
+    ) -> str:
+        """Añade un item a compras/lista_actual.md.
+
+        Args:
+            item: producto a comprar
+            autor: angel | africa
+            cantidad: opcional (ej "1kg", "2 botes")
+            urgente: si True prefija ⚠️
+        """
+        return _cl_compras.lista_compras_añadir(item, autor, cantidad, urgente)
+
+    @mcp.tool()
+    def lista_compras_ver() -> str:
+        """Devuelve la lista de la compra vigente."""
+        return _cl_compras.lista_compras_ver()
+
+    @mcp.tool()
+    def lista_compras_completar(item: str) -> str:
+        """Marca un item como comprado (lo quita de la lista y lo archiva).
+
+        Args:
+            item: nombre completo o parte (case-insensitive)
+        """
+        return _cl_compras.lista_compras_completar(item)
+
+    @mcp.tool()
+    def despensa_estado() -> str:
+        """Devuelve el contenido de compras/despensa.yaml por categoría."""
+        return _cl_compras.despensa_estado()
+
+    # ── menús ─────────────────────────────────────────────────
+    @mcp.tool()
+    def menu_sugerir(dia: str = "", ingredientes_disponibles: str = "") -> str:
+        """Sugiere recetas filtrando por ingredientes disponibles.
+
+        Args:
+            dia: 'YYYY-MM-DD' o vacío (hoy)
+            ingredientes_disponibles: CSV (ej "tomate, cebolla, huevo")
+        """
+        return _cl_menus.menu_sugerir(dia, ingredientes_disponibles)
+
+    @mcp.tool()
+    def receta_guardar(
+        nombre: str,
+        ingredientes: str,
+        pasos: str,
+        fuente: str = "",
+    ) -> str:
+        """Guarda una receta en menus/recetas/.
+
+        Args:
+            nombre: nombre de la receta
+            ingredientes: CSV
+            pasos: texto con los pasos
+            fuente: origen (ej "abuela", "internet")
+        """
+        return _cl_menus.receta_guardar(nombre, ingredientes, pasos, fuente)
+
+    # ── coche ─────────────────────────────────────────────────
+    @mcp.tool()
+    def coche_estado() -> str:
+        """Resumen del coche (ITV, seguro, kilómetros) leído de coche/INDEX.md."""
+        return _cl_coche.coche_estado()
+
+    @mcp.tool()
+    def coche_evento(
+        tipo: str,
+        fecha: str,
+        monto_eur: float = 0.0,
+        notas: str = "",
+        autor: str = "angel",
+    ) -> str:
+        """Registra un evento del coche y actualiza INDEX.md si procede.
+
+        Args:
+            tipo: gasolina | mantenimiento | itv | seguro | multa | reparacion | lavado | neumaticos | otros
+            fecha: 'YYYY-MM-DD' o 'hoy'
+            monto_eur: gasto en euros (0 si no aplica)
+            notas: detalles libres
+            autor: angel | africa
+        """
+        return _cl_coche.coche_evento(tipo, fecha, monto_eur, notas, autor)
+
+    # ── casa ──────────────────────────────────────────────────
+    @mcp.tool()
+    def casa_mantenimiento_anotar(
+        tarea: str,
+        fecha: str = "",
+        proximo: str = "",
+        autor: str = "angel",
+    ) -> str:
+        """Apunta una tarea de mantenimiento en casa/mantenimiento.md.
+
+        Args:
+            tarea: qué se hizo / se hará
+            fecha: 'YYYY-MM-DD' o 'hoy' (default hoy)
+            proximo: fecha estimada de la próxima vez (opcional)
+            autor: angel | africa
+        """
+        return _cl_casa.casa_mantenimiento_anotar(tarea, fecha, proximo, autor)
+
+    # ── documentos ────────────────────────────────────────────
+    @mcp.tool()
+    def documento_anotar(
+        tipo: str,
+        contenido_texto: str,
+        fecha: str,
+        fuente: str,
+        autor: str,
+    ) -> str:
+        """Guarda un documento en documentos/<tipo>/.
+
+        Args:
+            tipo: factura | contrato | seguro | impuesto
+            contenido_texto: cuerpo del documento (texto plano)
+            fecha: 'YYYY-MM-DD' del documento
+            fuente: emisor (ej "EDF", "AXA")
+            autor: angel | africa
+        """
+        return _cl_documentos.documento_anotar(
+            tipo, contenido_texto, fecha, fuente, autor
+        )
+
+    @mcp.tool()
+    def documentos_buscar(query: str, limite: int = 20) -> str:
+        """Búsqueda en documentos/ (grep recursivo, case-insensitive).
+
+        Args:
+            query: término o frase
+            limite: máx resultados (default 20)
+        """
+        return _cl_documentos.documentos_buscar(query, limite)
+
+    # ── salud ─────────────────────────────────────────────────
+    @mcp.tool()
+    def medicacion_recordar() -> str:
+        """Devuelve qué medicación toca hoy (lee salud/medicacion.yaml)."""
+        return _cl_salud.medicacion_recordar()
+
+    @mcp.tool()
+    def cita_medica_anotar(
+        quien: str,
+        especialista: str,
+        fecha: str,
+        notas: str = "",
+        autor: str = "",
+    ) -> str:
+        """Apunta una cita médica en salud/citas/.
+
+        Args:
+            quien: angel | africa | bris
+            especialista: ej "veterinario", "ginecóloga"
+            fecha: 'YYYY-MM-DD' o 'YYYY-MM-DD HH:MM'
+            notas: detalles libres
+            autor: angel | africa (OBLIGATORIO en salud)
+        """
+        return _cl_salud.cita_medica_anotar(quien, especialista, fecha, notas, autor)
+
+    log.info("claudio_tools: 22 tools nuevos registrados (familia/finanzas/compras/menus/coche/casa/documentos/salud/identidad)")
+
+except Exception as _cl_err:  # pragma: no cover
+    log.warning(f"claudio_tools no cargado: {_cl_err}")
 
