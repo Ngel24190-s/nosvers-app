@@ -15,6 +15,14 @@ from tablero.v2.workers.activity import start_activity_worker
 from tablero.v2.workers.revenue import revenue_tick
 from tablero.v2.workers.aegis import aegis_tick
 from tablero.v2.workers.wake import wake_tick
+# 006: familia/admin
+from tablero.v2.workers.recordatorios import recordatorios_tick
+from tablero.v2.workers.gastos import gastos_tick
+from tablero.v2.workers.compras import compras_tick
+from tablero.v2.workers.medicacion import medicacion_tick
+from tablero.v2.workers.coche import coche_tick
+from tablero.v2.workers.menu_dia import menu_dia_tick
+from tablero.v2.workers.bris import bris_tick
 
 log = logging.getLogger("tablero.v2.workers")
 
@@ -27,7 +35,22 @@ def register_all() -> None:
     register_worker(Worker(name="revenue", interval_s=30.0, tick=revenue_tick))
     register_worker(Worker(name="aegis", interval_s=60.0, tick=aegis_tick))
     register_worker(Worker(name="wake", interval_s=2.0, tick=wake_tick))
-    log.info("workers registrados: health, claude, agentes, revenue, aegis, wake (+activity bg)")
+    # 006 — familia/admin
+    register_worker(Worker(name="recordatorios", interval_s=30.0,
+                           tick=recordatorios_tick))
+    register_worker(Worker(name="gastos", interval_s=60.0, tick=gastos_tick))
+    register_worker(Worker(name="compras", interval_s=30.0, tick=compras_tick))
+    register_worker(Worker(name="medicacion", interval_s=60.0,
+                           tick=medicacion_tick))
+    register_worker(Worker(name="coche", interval_s=300.0, tick=coche_tick))
+    register_worker(Worker(name="menu_dia", interval_s=600.0,
+                           tick=menu_dia_tick))
+    register_worker(Worker(name="bris", interval_s=300.0, tick=bris_tick))
+    log.info(
+        "workers registrados: health, claude, agentes, revenue, aegis, wake, "
+        "recordatorios, gastos, compras, medicacion, coche, menu_dia, bris "
+        "(+activity bg)"
+    )
 
 
 __all__ = ["register_all", "start_activity_worker"]

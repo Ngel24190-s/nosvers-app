@@ -35,7 +35,13 @@ from voz.auth import validar_token  # noqa: E402
 log = logging.getLogger("tablero.v2.ws")
 
 # Canales válidos
-VALID_CHANNELS = {"health", "claude", "activity", "agentes", "revenue", "aegis", "wake", "automation"}
+VALID_CHANNELS = {
+    "health", "claude", "activity", "agentes", "revenue", "aegis", "wake",
+    "automation",
+    # 006-claudio-voz-cockpit: familia/admin
+    "recordatorios", "gastos", "compras", "medicacion", "coche", "menu_dia",
+    "bris",
+}
 
 
 @dataclass(eq=False)
