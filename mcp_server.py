@@ -693,7 +693,7 @@ def fotos_inventario() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-#  CLAUDIO JARVIS — Fase 1 (Proyecto 005)
+#  CLAUDIO — Fase 1 (Proyecto 005)
 #  Familia · finanzas · compras · menús · coche · documentos · salud · casa
 # ══════════════════════════════════════════════════════════
 #

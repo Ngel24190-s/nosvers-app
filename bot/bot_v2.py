@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Claudio Jarvis tools (proyecto 005)
+# Claudio tools (proyecto 005 — Claudio Evolution Fase 1)
 sys.path.insert(0, '/home/nosvers')
 try:
     from claudio_tools.finanzas import gasto_anotar as _claudio_gasto_anotar
@@ -614,7 +614,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Error: {str(e)[:200]}")
 
 
-# ── CLAUDIO JARVIS HOOKS (proyecto 005) ───────────────────
+# ── CLAUDIO HOOKS (proyecto 005) ───────────────────
 
 _GASTO_CATS = {
     'alimentacion', 'transporte', 'coche', 'hogar', 'ocio', 'salud',
@@ -747,7 +747,7 @@ def main():
     app.add_handler(CommandHandler("notificaciones", notificaciones))
     app.add_handler(CommandHandler("run", run_agent_cmd))
     app.add_handler(CommandHandler("logs", logs_agent))
-    # Claudio Jarvis hooks (proyecto 005)
+    # Claudio hooks (proyecto 005 — mayordomo familiar)
     app.add_handler(CommandHandler("gasto", gasto_cmd))
     app.add_handler(CommandHandler("compra", compra_cmd))
     app.add_handler(CommandHandler("recordar", recordar_cmd))
