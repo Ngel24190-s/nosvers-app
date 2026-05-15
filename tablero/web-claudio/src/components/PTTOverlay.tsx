@@ -114,19 +114,15 @@ export default function PTTOverlay({ context }: Props) {
         const data = (await res.json()) as DictadoResponse;
         setResponse(data);
         setPhase('speaking');
-        // audio_url opcional — si viene, reproducir
-        const url = data.voice_response?.audio_url;
-        if (url) {
-          try {
-            const a = new Audio(url);
-            a.play().catch(() => {});
-            a.onended = () => setPhase('idle');
-          } catch {
-            window.setTimeout(() => setPhase('idle'), 2500);
-          }
-        } else {
-          window.setTimeout(() => setPhase('idle'), 2500);
-        }
+        // El <audio> element en el JSX se encarga del autoplay con fallback a botón visible.
+        // Si autoplay funciona → audio.onended pasa a idle. Si no → el usuario toca ▶ y suena.
+        // Timer de seguridad: si autoplay funciona y el audio termina, onended del JSX llama setPhase.
+        // Si no funciona, esperamos 30s antes de pasar a idle (suficiente para audios largos).
+        const respTextLen = (data.voice_response?.text || '').length;
+        const estimatedSecs = Math.max(3, Math.ceil(respTextLen / 12));
+        window.setTimeout(() => {
+          setPhase(prev => (prev === 'speaking' ? 'idle' : prev));
+        }, Math.min(30000, estimatedSecs * 1000 + 2000));
       } catch (e) {
         setResponse({ ok: false, voice_response: { text: 'Error de red.' } });
         setPhase('speaking');
@@ -315,6 +311,19 @@ export default function PTTOverlay({ context }: Props) {
                     <p className="text-sm">{response.tool_result}</p>
                   ) : (
                     <p className="text-sm text-neutral-700">Hecho.</p>
+                  )}
+                  {/* FIX-AUDIO 2026-05-15: <audio controls> visible para que Angel pueda
+                      tocar ▶ si Chrome móvil bloquea el autoplay tras latencia larga (12s) */}
+                  {response.voice_response?.audio_url && (
+                    <audio
+                      controls
+                      autoPlay
+                      src={response.voice_response.audio_url}
+                      onEnded={() => setPhase('idle')}
+                      onError={() => setPhase('idle')}
+                      style={{ width: '100%', height: '36px', marginTop: '8px' }}
+                      preload="auto"
+                    />
                   )}
                   {response.intent?.tool && (
                     <p className="text-[10px] text-neutral-500 di-title">

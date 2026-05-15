@@ -59,6 +59,60 @@ DANGEROUS_PATTERNS = [
 ]
 
 
+# Archivos/paths con credenciales — Claudio NUNCA debe leerlos ni siquiera para Angel
+SENSITIVE_FILE_PATTERNS = [
+    r'\.env(\.|$|\s|\b)',
+    r'\.key(\s|\b|$)',
+    r'\.pem(\s|\b|$)',
+    r'\bid_rsa\b',
+    r'\bid_ed25519\b',
+    r'\bid_ecdsa\b',
+    r'tokens\.sqlite',
+    r'sessions\.sqlite',
+    r'\.secret(s)?(\s|\b|$)',
+    r'\.aws/credentials',
+    r'\.ssh/(?!known_hosts|config\b)[^/\s]+',
+    r'mcp_credentials',
+    r'\bjwt_secret\b',
+    r'\bapi_key\b',
+    r'\bclient_secret\b',
+]
+
+# Variables de entorno con credenciales
+SENSITIVE_ENV_VARS = [
+    'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_API_KEY',
+    'STRIPE_LIVE_KEY', 'TELEGRAM_TOKEN', 'TELEGRAM_BOT_TOKEN', 'VOZ_JWT_SECRET',
+    'WP_PASS', 'WP_PASSWORD', 'HF_TOKEN', 'HUGGINGFACE_TOKEN', 'GITHUB_TOKEN',
+    'GITHUB_PAT', 'PAT', 'GOOGLE_API_KEY', 'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID', 'AHREFS_API_KEY', 'GOOGLE_CLIENT_SECRET',
+    'OAUTH_CLIENT_SECRET', 'MCP_TOKEN', 'JWT_SECRET',
+]
+
+
+def comando_lee_secretos(comando: str) -> tuple[bool, str]:
+    """Detecta intentos de leer archivos o variables sensibles. Capa 2."""
+    c = comando.lower()
+    # Comandos lectores típicos sobre archivos
+    for pattern in SENSITIVE_FILE_PATTERNS:
+        if re.search(pattern, comando, re.IGNORECASE):
+            # ¿Es comando de lectura? cat/less/more/head/tail/grep/awk/sed/cp/scp/python con read
+            if re.search(r'\b(cat|less|more|head|tail|grep|awk|sed|nano|vi|vim|cp|scp|rsync|tar|zip|base64|xxd|od|strings|hexdump)\b', c) or \
+               re.search(r'\b(open|read|read_text|read_bytes|loads?)\b\s*\(.{0,100}\.env', c) or \
+               re.search(r'\bsource\b', c) or \
+               'curl' in c and any(s in comando for s in ['file://', '/home/nosvers/.env', '/.env']):
+                return True, f"archivo sensible ({pattern})"
+    # Variables sensibles via printenv/env/echo/printf
+    for var in SENSITIVE_ENV_VARS:
+        if re.search(rf'\$\{{?{var}\b', comando) or \
+           re.search(rf'\bprintenv\b.{{0,40}}\b{var}\b', comando, re.IGNORECASE) or \
+           re.search(rf'\benv\b.{{0,40}}\b{var}\b', comando, re.IGNORECASE):
+            return True, f"variable sensible (${var})"
+    # Dump masivo de env
+    if re.search(r'\b(printenv|env|set)\b\s*($|\|\s*(grep|less|head|tail|cat))', c):
+        return True, "dump de variables de entorno"
+    return False, ""
+
+
 def comando_es_peligroso(comando: str) -> tuple[bool, str]:
     """Devuelve (True, razon) si el comando hace match con un patrón peligroso."""
     for pattern in DANGEROUS_PATTERNS:
@@ -227,12 +281,24 @@ def _ejecutar_tool(name: str, tool_input: dict, autor: str) -> dict:
     if autor != "angel" and name in TOOLS_DESTRUCTIVE_ANGEL_ONLY:
         return {"ok": False, "error": f"África no puede ejecutar {name}. Pídeselo a Angel."}
 
-    # Filter de comandos peligrosos
+    # Filter de comandos peligrosos (Capa 1) + lectura de secretos (Capa 2)
     if name == "ejecutar_comando":
         comando = tool_input.get("comando", "")
         peligroso, razon = comando_es_peligroso(comando)
         if peligroso:
             return {"ok": False, "error": f"Comando bloqueado por seguridad: {razon}"}
+        lee_secretos, razon2 = comando_lee_secretos(comando)
+        if lee_secretos:
+            log.warning(f"BLOQUEO Capa 2: {autor} intentó {razon2} con: {comando[:80]}")
+            return {"ok": False, "error": f"Lectura de secretos bloqueada (Capa 2): {razon2}. Las credenciales NO se exponen via voz."}
+
+    # vault_leer Capa 2 (por si la categoría/archivo se cuela)
+    if name == "vault_leer":
+        path_test = f"{tool_input.get('categoria','')}/{tool_input.get('archivo','')}"
+        lee_secretos, razon2 = comando_lee_secretos(path_test)
+        if lee_secretos:
+            log.warning(f"BLOQUEO Capa 2 vault_leer: {autor} intentó {razon2}")
+            return {"ok": False, "error": f"Lectura bloqueada (Capa 2): {razon2}"}
 
     try:
         # Lazy import de las funciones del mcp_server
