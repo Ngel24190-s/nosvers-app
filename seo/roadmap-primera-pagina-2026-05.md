@@ -13,19 +13,20 @@ Ver `seo/cambios-aplicados-2026-05-31.md`.
 
 ## 🔴 BLOQUE 1 — Limpiar canibalización de URLs (el mayor freno)
 
-Inventario real (REST API). Hay **páginas duplicadas publicadas** compitiendo por la misma keyword:
+Inventario **verificado por REST API** (29 páginas + 6 productos + posts). Duplicados reales confirmados (mismo título servido por varias URLs):
 
-| Tema | ✅ Canónica (mantener) | ❌ Duplicadas → 301 a la canónica |
-|------|----------------------|-----------------------------------|
-| **Home** | `490 /accueil/` | `343 /accueil-2/` |
-| **Club Sol Vivant** | `515 /club-sol-vivant/` | `763 /club-du-sol-vivant/`, `510 /club-sol-vivant-rejoignez-la-communaute/` |
-| **Contact** | `466 /contact/` | `768 /contact-2/` |
-| **Guide gratuit** | producto WooCommerce (lead magnet) | `396 /guide-gratuit/` (página duplicada) |
-| **Panel fotos** | `802 /panel-fotos/` (uso interno) | `59 /panel-fotos/` → noindex (no es para Google) |
+| Tema | ✅ Canónica (mantener) | ❌ Duplicadas → 301 a la canónica | Verificación |
+|------|----------------------|-----------------------------------|--------------|
+| **Club Sol Vivant** | `/club-sol-vivant/` | `399 /club-du-sol-vivant/`, `529 /club-sol-vivant-rejoignez-la-communaute/` (post) | ✅ las 3 sirven el mismo `<title>` |
+| **La Ferme / À propos** | `22 /a-propos/` (la mejor escrita) | `465 /la-ferme/`, `53 /notre-ferme/` | ✅ la-ferme y notre-ferme = mismo `<title>` |
+| **Guide gratuit** | `532 /produit/guide-gratuit-les-5-erreurs.../` (lead magnet Woo) | `780 /guide-gratuit/` (página duplicada) | Confirmar cuál capta el opt-in |
+| **Extrait / LombriThé** | elegir 1: `462 /extrait-vivant-de-lombric/` o `394 /lombrithe/` | la otra → 301 | ⚠️ a verificar contenido de cada una |
 
-Además: páginas/posts `/a-venir-*` ("próximamente") → **`noindex`** mientras sean placeholders sin contenido real (no deben competir ni gastar crawl budget).
+**Placeholders `/a-venir-*` → `noindex`** (8 posts: atelier, club, kit-vie-sol, lombrithé, manuel, pack-automne, pack-été, service-frais) + página `812 /a-venir/`. Son "próximamente" sin contenido real → no deben competir ni gastar crawl budget. Cuando el producto exista, se convierte en su ficha real.
 
-**Por qué importa:** 3 URLs de "club" compitiendo entre sí = Google no sabe cuál mostrar → ninguna posiciona bien. Consolidar concentra toda la autoridad en una.
+**Drafts/privados que NO indexan (OK, no tocar):** `793 /boutique-preview/`, `794 /preview-boutique-v2/` (draft), `71 /confidentialite/`, `10 /remboursements_retours/` (private).
+
+**Por qué importa:** 3 URLs de "club" y 3 de "ferme" sirviendo el mismo contenido = Google no sabe cuál mostrar → ninguna posiciona bien. Consolidar concentra toda la autoridad en una sola.
 
 **⚠️ Por qué NO lo aplico todavía:** un 301 mal puesto puede tumbar una página que ya reciba visitas. Necesito 5 min de Search Console para ver cuál variante ya tiene impresiones y elegir esa como canónica. **Acción para Angel:** activar Dashboard Sharing en Site Kit, o aplicar los 301 tú con esta tabla.
 
@@ -87,7 +88,15 @@ Cada artículo del blog debe enlazar a su producto. Sin esto, el tráfico inform
 
 ---
 
+## ⚠️ Estado del acceso a Search Console
+Site Kit está **conectado** (`connected:true`), pero el usuario `claude_nosvers` (con el que entro por Application Password) **no tiene los permisos de Google** (`authenticated:false`, faltan scopes `webmasters`). Una Application Password autentica en WordPress pero **no puede conceder OAuth de Google** — esa conexión la hizo otro admin con su cuenta Google personal.
+
+**Por eso no puedo leer las keywords/posiciones de GSC todavía.** Tres formas de desbloquearlo:
+- **(a)** En Site Kit → Settings → **Dashboard Sharing**, compartir el dashboard de Search Console con el rol del usuario `claude_nosvers`. (2 min, lo más limpio.)
+- **(b)** Que Angel entre en GSC y **exporte** el informe de Rendimiento (últimos 3 meses, por consulta y por página) y me pase el CSV.
+- **(c)** Que el usuario `claude_nosvers` conecte su propia cuenta de Google en Site Kit.
+
 ## Resumen de qué necesito de Angel
-1. **Acceso a Search Console** (Dashboard Sharing en Site Kit, 2 min) → desbloquea priorización con datos + validación segura de los 301.
-2. **OK para enlazado interno** (Bloque 3) → lo aplico ya, sin riesgo.
+1. **Desbloquear Search Console** (opción a, b o c arriba) → permite priorizar con datos reales y validar los 301 sin riesgo.
+2. **OK para enlazado interno** (Bloque 3) → lo aplico ya, sin riesgo y sin GSC.
 3. **OK para empezar drafts de artículos** (Bloque 4) → primer artículo esta semana.
