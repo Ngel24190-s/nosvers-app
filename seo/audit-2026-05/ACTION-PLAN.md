@@ -51,9 +51,22 @@ Priorizado por impacto/esfuerzo. Marcado **[OK Angel]** lo que requiere tu aprob
 | **#4 Metas largas** | ✓ Reescritas a 136-147c con keyword delante: la-ferme, club-du-sol-vivant, guide-gratuit + 3 posts de vers. Verificado en vivo tras purgar cache. |
 | **#11 llms.txt** | ✓ Ya existía (autogenerado por AIOSEO). Ver nota abajo. |
 
-## ⚠️ Pendiente (requiere panel, no accesible por API desde el VPS)
+## ✅ EJECUTADO — 2ª tanda (2026-05-31): rework páginas ferme + consolidación
 
-- **#8 WebP**: activar en *LiteSpeed Cache → Image Optimization → WebP Replacement* (1 clic en wp-admin). No hay wp-cli en el VPS.
-- **#3 Redirects confusos**: `/lombrithe/` → 301 a `/club-du-sol-vivant/` es **engañoso para SEO** (una URL "lombrithe" debería ir al artículo/producto lombrithé, no al club). Decisión tuya: ¿reapuntar `/lombrithe/` al nuevo artículo `/lombrithe-ou-extrait-vivant-lombricompost/`?
-- **llms.txt**: el autogenerado referencia URLs viejas (`/le-blog-de-la-lombriculture/`, posts antiguos borrados). Conviene regenerarlo en AIOSEO o fijarlo manual.
-- **#7 Consolidar páginas "ferme"** (notre-ferme/la-ferme/a-propos): decisión editorial tuya.
+| Acción | Resultado |
+|---|---|
+| **#7 notre-ferme (53) retrabajada a fondo** | Era un placeholder vacío (101 palabras). Ahora **605 palabras**: contenido rico de la-ferme (3 piliers, método, valores) + **intro SEO** con keywords (ferme lombricole, Neuvic, Dordogne 24190) + **2 enlaces internos a productos** + botón CTA arreglado (apuntaba a un à-venir noindex → ahora /atelier/). Title + meta (142c) optimizados. |
+| **a-propos (22) retrabajada a fondo** | **586 palabras**, 5 H2. Reescrita como página de **historia + E-E-A-T**: Angel/África, 2022, Neuvic, SIRET/MSA, ciclo real de producción. **Enlaces internos** a extrait vivant, engrais verts y los 2 artículos de vers. 2 enlaces rotos a páginas à-venir corregidos. Title + meta optimizados. |
+| **la-ferme (465) consolidada** | Duplicaba a notre-ferme → **noindex + canonical → /notre-ferme/**. Elimina la canibalización entre las 3 páginas "ferme" sin perder la URL. |
+
+**Resultado:** de 3 páginas que competían entre sí → **2 páginas fuertes y diferenciadas** (notre-ferme = la ferme/operaciones; a-propos = historia/quiénes somos) + 1 consolidada.
+
+## ⚠️ Pendiente — SOLO accesible desde wp-admin (no hay REST API ni wp-cli)
+
+WordPress está en hosting gestionado de Hostinger: solo llego por REST API, y estas 3 cosas no la exponen.
+
+- **#8 WebP**: *LiteSpeed Cache → Image Optimization → activar "WebP Replacement"* (1 clic).
+- **#3 Redirects** (addon Redirects de AIOSEO Pro, sin REST):
+  - `/lombrithe/` → 301 a `/club-du-sol-vivant/` es **engañoso**. Reapuntar a `/lombrithe-ou-extrait-vivant-lombricompost/` (el artículo nuevo).
+  - `/guides-formations/` y `/pack-engrais-vert/` → 301 a `/boutique/`: revisar si interesa conservarlos.
+- **llms.txt**: el autogenerado por AIOSEO referencia URLs viejas/borradas (`/le-blog-de-la-lombriculture/`). Regenerar en *AIOSEO → Tools → llms.txt* o fijarlo manual.
