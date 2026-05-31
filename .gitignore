@@ -34,3 +34,8 @@ agents/agt07_diario/__pycache__/
 nosvers-voz-linux/.pytest_cache/
 nosvers-voz-linux/models/*.onnx
 nosvers-voz-linux/**/__pycache__/
+
+# claude-seo skill
+.venv-seo/
+.claude/scripts/__pycache__/
+**/__pycache__/
