@@ -1,6 +1,6 @@
 # Artículo blog — "LombriThé ou Extrait Vivant" (borrador)
 
-**Fecha:** 2026-05-31 · Post ID **1271** · status **draft** (pendiente OK de Angel para publicar).
+**Fecha:** 2026-05-31 · Post ID **1279** · status **draft** (pendiente OK de Angel para publicar).
 **URL futura:** /lombrithe-ou-extrait-vivant-lombricompost/
 
 ## Objetivo SEO
@@ -12,8 +12,8 @@ el lombrithé en bouteille pierde su vida microbiana → el extracto fresco hech
 ## Contenido (verificado)
 - Title: "LombriThé ou Extrait Vivant de lombricompost : lequel choisir ?"
 - Title SEO: "LombriThé ou Extrait Vivant : lequel choisir ? · NosVers"
-- Categorías: the-de-compost (21) + lombricompostage (17)
-- **3 imágenes** (de la mediateca WP): bocal extrait (featured 757), proceso vers gants (756), aplicación riego (758)
+- Categoría: 1 (non-classé — única disponible junto a 'a-venir')
+- **3 imágenes REALES** (verificadas HTTP 200, mediateca WP): lombricompost-tamise-main (754), lombrithe-proceso-vers-gants (756, featured), produit-lombrithe-fleurs (712)
 - **Tabla comparativa** LombriThé bouteille vs Extrait Vivant (vida microbiana, additifs, coût/L, etc.)
 - **3 enlaces** + botón CTA al producto /produit/extrait-vivant-de-lombric/
 - **11 menciones** de "lombrithé" (captación de keyword) sin vender el líquido
