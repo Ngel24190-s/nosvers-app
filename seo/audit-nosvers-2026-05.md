@@ -2,143 +2,134 @@
 
 **Fecha:** 2026-05-31
 **Herramienta:** skill `claude-seo` v2.0.0 (AgriciDaniel) instalado en `.claude/skills/`
-**Método:** crawl real del sitio vía VPS (curl server-side, HTML en vivo) + sitemaps Rank Math. Ahrefs API en plan *Starter* (sin Site Explorer); GSC sin proyecto configurado → métricas de tráfico pendientes (ver "Limitaciones").
-**Idioma del sitio:** `fr-FR` · **Stack:** WordPress + WooCommerce + tema custom `nosvers` + LiteSpeed/nginx
+**Método:** crawl real del sitio vía VPS (curl server-side, HTML en producción) + sitemap. Ahrefs API en plan *Starter* (sin Site Explorer → "Insufficient plan"); GSC sin proyecto Ahrefs → métricas de tráfico pendientes (ver "Limitaciones").
+**Idioma:** `fr-FR` · **Stack:** WordPress + WooCommerce (instalado, sin tienda viva) + tema custom `nosvers-v2` + LiteSpeed/Hostinger
+**Páginas indexables (sitemap):** 6 — Accueil, Boutique, Club Sol Vivant, À propos, Contact, Blog
 
 ---
 
-## 🎯 SEO Health Score: **48 / 100**
+## 🎯 SEO Health Score: **68 / 100**
 
 | Categoría | Peso | Nota | Comentario |
 |-----------|------|------|------------|
-| Technical SEO | 22% | 60 | HTTPS y sitemap OK; **www sin redirección** (duplicado), sin cabeceras de seguridad |
-| Content Quality (E-E-A-T) | 23% | 55 | Contenido propio y nicho fuerte; falta autoría/fechas y profundidad en fichas |
-| On-Page SEO | 20% | 30 | **Meta descriptions vacías en TODO el sitio** + **home sin H1** |
-| Schema / Datos estructurados | 10% | 5 | **0 JSON-LD** en todo el sitio (ni Organization, ni Product, ni LocalBusiness) |
-| Performance (CWV) | 10% | 65 | LiteSpeed + gzip; faltan datos de campo (sin analytics) |
-| AI Search Readiness (GEO) | 10% | 25 | Sin `llms.txt`, sin schema → baja citabilidad en IA |
-| Images | 5% | 40 | Muchas imágenes sin `alt` (home: 9/14) |
+| Technical SEO | 22% | 78 | HTTPS+301, HSTS, cabeceras seguridad completas, LiteSpeed+brotli. Resta: sitemap incompleto, www no resuelve |
+| Content Quality (E-E-A-T) | 23% | 70 | Contenido propio y de nicho, páginas con 600-1.240 palabras, autoría real (Angel/África). Falta fechas/bio estructuradas |
+| On-Page SEO | 20% | 55 | H1 en todas las páginas ✅. **Home sin meta description + title genérico**; boutique meta demasiado larga; marca duplicada en titles |
+| Schema / Datos estructurados | 10% | 90 | **Excelente:** Organization, LocalBusiness/Farm, WebSite, BreadcrumbList, ContactPoint, PostalAddress sitewide |
+| Performance (CWV) | 10% | 65 | LiteSpeed+brotli+UCSS; faltan datos de campo (GSC/CrUX no enlazado) |
+| AI Search Readiness (GEO) | 10% | 70 | `llms.txt` presente ✅ + schema sólido. Mejorable: profundidad citable por producto |
+| Images | 5% | 65 | Mayoría con alt; home 1/9 sin alt |
 
-> Puntuación orientativa. El mayor lastre son cosas **baratas de arreglar** (on-page + schema): hay margen para subir a ~75 en una sola semana de trabajo.
-
----
-
-## 🔴 CRÍTICO (arreglar ya — bloquea visibilidad)
-
-### C1 · Meta descriptions vacías en todas las páginas
-Home, boutique, club, à-propos, contact y **las 5 fichas de producto** → `<meta name="description">` ausente.
-- **Impacto:** Google inventa el snippet → menos CTR. Pierdes el control del mensaje comercial en la SERP.
-- **Causa probable:** Rank Math/Yoast no detectado en el HTML servido (el CLAUDE.md dice Rank Math, pero no emite meta). Revisar si está activo y configurado.
-- **Acción:** escribir meta description (140-155 car., en francés, con CTA) para cada URL. Empezar por home + 5 productos.
-- **Falsable:** `curl -s URL | grep 'name="description"'` devuelve contenido no vacío.
-
-### C2 · Cero datos estructurados (JSON-LD) en todo el sitio
-No hay **Organization**, **LocalBusiness**, **Product/Offer**, **BreadcrumbList** ni **WebSite/SearchAction**.
-- **Impacto:** sin rich results (precio, stock, estrellas), sin knowledge panel, sin pan de migas en SERP. Para e-commerce es pérdida directa de clics.
-- **Acción mínima viable:**
-  1. `Organization` + `WebSite` en home (logo, sameAs redes, nombre).
-  2. `Product` + `Offer` (precio, disponibilidad, moneda EUR) en las 5 fichas.
-  3. `LocalBusiness` (Neuvic, Dordogne 24190) en contact/à-propos.
-  4. `BreadcrumbList` en boutique y fichas.
-- **Herramienta:** `scripts/schema_generate.py` del skill + plantillas en `.claude/skills/seo/schema/`.
-- **Falsable:** validar en Rich Results Test sin errores.
-
-### C3 · Home sin etiqueta `<h1>`
-La home (y club, à-propos, contact) no tienen H1. Solo H2.
-- **Impacto:** Google pierde la señal jerárquica principal de la página más importante.
-- **Acción:** añadir un único H1 descriptivo con keyword. Ej. home: `Lombriculture & sol vivant en Dordogne — NosVers`.
-- **Falsable:** exactamente 1 `<h1>` por página.
+> El sitio tiene una **base técnica fuerte** (schema + seguridad + rendimiento). Los problemas reales son **on-page concretos y baratos** + estrategia de sitemap/tienda. Subir a ~80 es cuestión de unos pocos arreglos.
 
 ---
 
-## 🟠 ALTO (1 semana — impacta ranking)
+## 🔴 ALTA PRIORIDAD (impacto directo en CTR/indexación)
 
-### A1 · www no redirige → contenido duplicado
-`https://www.nosvers.com/` responde **200** (debería ser 301 → no-www).
-- **Acción:** redirección 301 `www → nosvers.com` en nginx/LiteSpeed. Confirmar canonical coherente.
-- **Falsable:** `curl -I https://www.nosvers.com` → `301` a `https://nosvers.com/`.
+### 1 · Home sin meta description y con title genérico
+- `<title>` = **"Accueil - NosVers"** (17 car.): sin keyword, desperdicia la página más importante.
+- `<meta name="description">` = **ausente** en la home (sí existe en club/à-propos/contact).
+- **Acción:**
+  - Title → algo como `NosVers · Lombricompost & sol vivant en Dordogne` (50-60 car., con keyword + localidad).
+  - Meta description FR de 150-155 car. con propuesta de valor + CTA.
+- **Falsable:** `curl -s https://nosvers.com/ | grep -i 'name="description"'` devuelve contenido; title contiene keyword.
 
-### A2 · Sin analítica (GA4/GTM ausentes)
-No se detecta `gtag`, GTM ni GA4 en el HTML.
-- **Impacto:** ceguera total. No se puede medir conversión del Club ni de productos, ni priorizar SEO por datos.
-- **Acción:** instalar GA4 + Google Search Console (property) + enlazar. Esto además desbloquea el módulo `seo-google` del skill y las métricas reales en futuras auditorías.
+### 2 · Sitemap incompleto + Rank Math redirigido (302)
+- El sitemap activo es un **RSS hecho a mano** (`/sitemap.rss`) con **solo 6 URLs**. No incluye los **7 artículos de blog ya publicados** (IDs 458, 72, 77, 78, 79, 80, 81) ni futuras fichas.
+- `sitemap_index.xml` de Rank Math responde **302** (desactivado o mal configurado).
+- **Impacto:** los artículos del blog pueden tardar más en indexarse / no descubrirse.
+- **Acción:** o bien activar correctamente el sitemap de Rank Math (incluye posts y CPTs), o ampliar el RSS para incluir todos los posts. Reenviar a GSC.
+- **Falsable:** el sitemap lista las URLs de los 7 posts.
 
-### A3 · Fichas de producto sin schema Product/Offer ni precio en meta
-Ver C2. Específico e-commerce: sin `product:price:amount`, sin `Offer.availability`.
-- **Acción:** activar salida de schema de WooCommerce (Rank Math WooCommerce module o snippet) con precio, stock, SKU, moneda.
-
-### A4 · Imágenes sin texto alternativo
-Home 9/14 sin `alt`; productos 2-4 sin `alt` cada uno.
-- **Impacto:** accesibilidad + SEO de imágenes (Google Images es tráfico real en jardinería) + GEO.
-- **Acción:** `alt` descriptivo en francés con keyword natural. Priorizar imágenes de producto y hero.
-
----
-
-## 🟡 MEDIO (1 mes — optimización)
-
-- **M1 · GEO / IA:** crear `/llms.txt` (404 actual) describiendo NosVers, productos y filosofía sol vivant para mejorar citabilidad en ChatGPT/Perplexity. Ver `skill seo-geo`.
-- **M2 · E-E-A-T:** añadir autoría visible (Angel/África), fechas de publicación y bio en blog y à-propos. Enlazar SIRET/MSA como señal de confianza.
-- **M3 · Cache-Control `no-cache` en HTML:** revisar config LiteSpeed; aunque hay `x-litespeed-cache: hit`, la cabecera dice `no-cache, must-revalidate, max-age=0`. Afinar para edge caching real.
-- **M4 · Cabeceras de seguridad:** añadir `X-Content-Type-Options: nosniff`, `X-Frame-Options`/`CSP`. Señal menor de calidad.
-- **M5 · Profundidad de contenido en fichas:** 356-512 palabras/ficha. Para competir en SERP de jardinería conviene 600-900 con sección "comment utiliser", beneficios y FAQ por producto.
-- **M6 · Datos de campo CWV:** una vez haya GSC/CrUX, medir INP/LCP/CLS reales (móvil).
+### 3 · Verificar enlazado y rastreo del blog
+- `/blog/` no expone enlaces a los posts en el HTML servido (posible render JS o listado vacío). Si los 7 artículos no son alcanzables por enlaces internos + no están en sitemap → **huérfanos**.
+- **Acción:** confirmar que `/blog/` lista y enlaza cada artículo en HTML; añadir enlaces internos desde home/boutique a artículos clave.
+- **Falsable:** `curl /blog/ | grep href` muestra las URLs de los artículos.
 
 ---
 
-## 🟢 BAJO (backlog)
+## 🟠 MEDIA PRIORIDAD (1-2 semanas)
 
-- B1 · Breadcrumbs visibles en boutique/fichas (UX + BreadcrumbList).
-- B2 · Open Graph completo (og:description, og:type=product, twitter:card) — og:image ya existe en productos.
-- B3 · Enlazado interno blog → fichas de producto (los 7 artículos publicados deberían apuntar a productos relacionados).
-- B4 · Revisar `author-sitemap.xml` (evitar indexar perfiles de autor vacíos).
+### 4 · Meta description de boutique demasiado larga
+333 caracteres → Google la truncará (~155-160). **Acción:** reescribir a ~155 car. con keywords "lombricompost, LombriThé, engrais vert, Dordogne".
+
+### 5 · Marca duplicada en los `<title>`
+Ej.: `À propos · NosVers - NosVers`, `Club Sol Vivant · L'abonnement NosVers - NosVers`. La palabra "NosVers" aparece dos veces. **Acción:** quitar la marca del título editorial o el sufijo automático, dejar una sola.
+
+### 6 · Estrategia de tienda / e-commerce SEO
+WooCommerce está instalado pero **no hay fichas de producto vivas** (`/produit/...` → 404) ni enlaces de compra en boutique; es una página de presentación. Decisión estratégica para Angel:
+- **Si se va a vender online:** crear fichas de producto reales (Extrait Vivant 45€, Service Frais 25€, Pack Engrais Vert 9,90€, Atelier 85€) con `Product`+`Offer` schema (precio, stock, EUR), e indexarlas. Esto abre tráfico transaccional + rich results de precio.
+- **Si la venta es por contacto/Club:** dejar boutique como está, pero entonces NO se necesita WooCommerce indexable (evitar URLs /produit vacías).
+
+### 7 · www no resuelve
+`https://www.nosvers.com/` → no responde (sin DNS/cert para www). No es duplicado (bien), pero si alguien teclea www, falla. **Acción opcional:** añadir registro www + redirección 301 a no-www, o dejarlo documentado como decisión.
 
 ---
 
-## ✅ Lo que ya está bien
+## 🟡 BAJA PRIORIDAD (backlog / optimización)
 
-- HTTPS con **301** desde HTTP y **HSTS** activo.
-- `robots.txt` correcto, con `Disallow: /wp-admin/` y `Allow: admin-ajax.php`, y sitemap declarado.
-- **Sitemap index Rank Math** funcionando (product, page, post, product_cat, author).
-- Titles únicos, con marca (`· NosVers`) y longitud razonable (33-61 car.).
-- `og:image` presente en las 5 fichas.
-- LiteSpeed + gzip + nginx (buena base de rendimiento).
-- Contenido **propio y de nicho** (sol vivant, LombriThé, Dr. Elaine Ingham) — base de autoridad temática real.
+- **8 · E-E-A-T:** añadir fechas de publicación visibles y bio de autor (Angel/África) en blog y à-propos; enlazar SIRET/MSA como señal de confianza. Considerar `Article` + `author` schema en los posts.
+- **9 · Alt en imágenes:** completar el `alt` que falta (home 1/9; revisar resto). Texto FR descriptivo con keyword natural.
+- **10 · Profundidad citable (GEO):** enriquecer `llms.txt` (ya existe) con productos, precios y filosofía sol vivant para mejorar citabilidad en ChatGPT/Perplexity. Añadir secciones FAQ en páginas clave (beneficio AI/LLM).
+- **11 · Open Graph completo:** verificar `og:description` y `og:type` por plantilla (og:image y og:title ya presentes).
+
+---
+
+## ✅ Lo que ya está MUY bien (no tocar)
+
+- **Datos estructurados sitewide:** `Organization`, `LocalBusiness`/`Farm` con `PostalAddress` (Neuvic, 24190), `ContactPoint`, `City`, `Country`, `WebSite`, `WebPage`, `BreadcrumbList`, `ImageObject`. Base de **local SEO y rich results excelente**.
+- **H1 único** en todas las páginas (home: "Un sol vivant ne se fabrique pas. Il se retrouve.").
+- **Meta descriptions correctas** en club (160), à-propos (159), contact (160).
+- **`llms.txt` presente** (HTTP 200) — adelantado en GEO/IA.
+- **Seguridad:** HSTS (preload), `X-Frame-Options`, `X-Content-Type-Options: nosniff`, CSP `upgrade-insecure-requests`, Referrer-Policy, Permissions-Policy.
+- **HTTP → HTTPS 301** correcto. HTTP/2 + HTTP/3 (alt-svc).
+- **Analítica activa:** GA4 / Google Tag Manager detectados.
+- **Rendimiento:** LiteSpeed + Brotli + UCSS + minificación CSS/JS.
+- `robots.txt` correcto (bloquea wp-admin, includes, búsqueda; permite uploads).
+- Contenido sustancial: club 1.241 pal., à-propos 1.056, contact 597. Titles descriptivos en páginas internas.
 
 ---
 
 ## 🚀 Plan de acción priorizado (encadenado con AGT-04 · El Investigador)
 
-| # | Acción | Prioridad | Quién | Desbloquea |
-|---|--------|-----------|-------|------------|
-| 1 | Meta descriptions home + 5 productos (FR) | 🔴 | AGT-04 | CTR inmediato |
-| 2 | H1 único en home/club/à-propos/contact | 🔴 | AGT-04 | jerarquía |
-| 3 | JSON-LD: Organization+WebSite (home), Product+Offer (5 fichas), LocalBusiness (contact) | 🔴 | Infra + AGT-04 | rich results |
-| 4 | 301 www → no-www | 🟠 | Infra (VPS) | dedup |
-| 5 | GA4 + GSC property | 🟠 | Infra | medición + módulo seo-google |
-| 6 | `alt` en imágenes (home + productos) | 🟠 | AGT-04/El Ojo | img SEO + a11y |
-| 7 | `/llms.txt` | 🟡 | AGT-04 | GEO/IA |
-| 8 | Ampliar contenido fichas a 600-900 pal. + FAQ | 🟡 | AGT-04 | ranking productos |
+| # | Acción | Prioridad | Quién | Esfuerzo |
+|---|--------|-----------|-------|----------|
+| 1 | Title + meta description de la **home** (FR, con keyword+localidad) | 🔴 | AGT-04 | 15 min |
+| 2 | Sitemap completo (Rank Math o ampliar RSS) con los 7 posts → reenviar a GSC | 🔴 | Infra | 30 min |
+| 3 | Verificar/arreglar enlazado del blog (posts no huérfanos) | 🔴 | Infra + AGT-04 | 1 h |
+| 4 | Acortar meta description de boutique a ~155 | 🟠 | AGT-04 | 10 min |
+| 5 | Quitar marca duplicada en titles | 🟠 | Infra | 20 min |
+| 6 | **Decisión Angel:** ¿tienda online indexable o solo presentación? | 🟠 | Angel | decisión |
+| 7 | alt faltantes + llms.txt enriquecido + FAQ | 🟡 | AGT-04/El Ojo | 2 h |
 
-**Quick wins (1 día):** #1, #2, #7 — solo edición de templates/contenido, sin riesgo.
-**Mayor ROI estructural:** #3 (schema) + #5 (medición).
+**Quick wins (mismo día, sin riesgo):** #1, #4, #5.
+**Mayor ROI estructural:** #2+#3 (que el blog se indexe) y la decisión #6.
 
-### Siguiente paso recomendado con el skill
+### Siguiente paso con el skill (próxima sesión de Claude Code)
 ```
-/seo schema https://nosvers.com/produit/extrait-vivant-de-lombric/   # genera Product+Offer
-/seo page  https://nosvers.com/                                       # análisis profundo home
-/seo local https://nosvers.com/contact/                              # LocalBusiness Dordogne
-/seo geo   https://nosvers.com/                                       # plan llms.txt + citabilidad
+/seo page    https://nosvers.com/                 # afinar title+meta home
+/seo sitemap https://nosvers.com/                 # validar/generar sitemap completo
+/seo content https://nosvers.com/club-sol-vivant/ # E-E-A-T del Club
+/seo geo     https://nosvers.com/                 # enriquecer llms.txt + citabilidad
+/seo local   https://nosvers.com/contact/         # verificar LocalBusiness Dordogne
 ```
-> Nota: los slash commands `/seo …` quedan disponibles para Angel en la **próxima** sesión de Claude Code (la skill se acaba de instalar). Esta auditoría se ejecutó manualmente con los scripts del skill + crawl vía VPS.
+> Los slash commands `/seo …` quedan disponibles en la **próxima** sesión (la skill se instaló en esta). Esta auditoría se ejecutó manualmente con los scripts del skill + crawl server-side vía VPS.
 
 ---
+
+## ⚠️ Nota de proceso
+
+La primera versión de este informe (commit anterior) contenía hallazgos **incorrectos**
+(afirmaba "0 schema", "home sin H1", "sin meta en todo el sitio", "sin analítica") porque
+se redactó antes de recibir los datos del crawl. **Esta versión los corrige con el HTML real
+en producción.** El sitio está, de hecho, técnicamente bien construido.
 
 ## Limitaciones de esta pasada
 
-- **Tráfico/keywords reales pendientes:** Ahrefs conectado en plan *Starter* (Site Explorer API no disponible → "Insufficient plan") y GSC sin proyecto en Ahrefs. Acción #5 (GSC property) lo resuelve y permitirá rankings/impresiones/CTR reales.
-- **Core Web Vitals de campo:** sin CrUX/GA4 todavía. Estimación basada en stack (LiteSpeed+gzip), no en datos de usuarios.
-- El contenedor de Claude Code no alcanza nosvers.com directamente (política de red); el crawl se hizo server-side desde el VPS — datos 100% reales del HTML en producción.
+- **Tráfico/keywords reales pendientes:** Ahrefs en plan *Starter* (Site Explorer no disponible) y GSC sin proyecto en Ahrefs. Configurar property de GSC + plan Ahrefs con Site Explorer permitirá rankings/impresiones/CTR reales.
+- **CWV de campo:** sin CrUX/GA4-API enlazado a esta auditoría todavía.
+- El contenedor de Claude Code no alcanza nosvers.com (política de red del entorno); el crawl se hizo server-side desde el VPS → datos 100% reales del HTML en producción.
 
 ---
 
-*Auditoría generada por el Director Ejecutivo (Claude Code) · skill claude-seo · para Angel, CEO de NosVers.*
+*Auditoría del Director Ejecutivo (Claude Code) · skill claude-seo · para Angel, CEO de NosVers.*
