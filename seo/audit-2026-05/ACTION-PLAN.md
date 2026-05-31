@@ -38,9 +38,22 @@ Priorizado por impacto/esfuerzo. Marcado **[OK Angel]** lo que requiere tu aprob
 
 ---
 
-## Lo que puedo ejecutar YA sin tocar nada sensible (#2, #3, #4, #5, #8, #11)
-Son cambios SEO técnicos reversibles vía API/LiteSpeed. **¿Los aplico?**
+---
 
-## Lo que necesita tu OK explícito
-- **#1** Publicar producto Extrait Vivant (pasa a venta real).
-- **#6** Publicar artículo 1279.
+## ✅ EJECUTADO (2026-05-31)
+
+| Acción | Resultado |
+|---|---|
+| **#1 Producto Extrait Vivant publicado** | ✓ `private`→`publish`. `/produit/extrait-vivant-de-lombric/` ahora HTTP **200**, 39€, en stock. |
+| **#6 Artículo 1279 publicado** | ✓ `draft`→`publish`. `/lombrithe-ou-extrait-vivant-lombricompost/` HTTP **200**. |
+| **#2 Schema Product/Offer** | ✓ Verificado: al publicarse, AIOSEO genera `Product`+`Offer`+`Brand`+`UnitPriceSpecification` automáticamente en los 6 productos. El "fallo" era consecuencia del 404. |
+| **#5 noindex à-venir** | ✓ 8 posts (804-811) + página /a-venir/ (812) → `noindex` verificado en vivo. |
+| **#4 Metas largas** | ✓ Reescritas a 136-147c con keyword delante: la-ferme, club-du-sol-vivant, guide-gratuit + 3 posts de vers. Verificado en vivo tras purgar cache. |
+| **#11 llms.txt** | ✓ Ya existía (autogenerado por AIOSEO). Ver nota abajo. |
+
+## ⚠️ Pendiente (requiere panel, no accesible por API desde el VPS)
+
+- **#8 WebP**: activar en *LiteSpeed Cache → Image Optimization → WebP Replacement* (1 clic en wp-admin). No hay wp-cli en el VPS.
+- **#3 Redirects confusos**: `/lombrithe/` → 301 a `/club-du-sol-vivant/` es **engañoso para SEO** (una URL "lombrithe" debería ir al artículo/producto lombrithé, no al club). Decisión tuya: ¿reapuntar `/lombrithe/` al nuevo artículo `/lombrithe-ou-extrait-vivant-lombricompost/`?
+- **llms.txt**: el autogenerado referencia URLs viejas (`/le-blog-de-la-lombriculture/`, posts antiguos borrados). Conviene regenerarlo en AIOSEO o fijarlo manual.
+- **#7 Consolidar páginas "ferme"** (notre-ferme/la-ferme/a-propos): decisión editorial tuya.
