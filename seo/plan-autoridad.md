@@ -28,7 +28,7 @@ Carencia #1. No necesitas cientos, necesitas **pocos y relevantes**.
 | Táctica | Detalle |
 |---|---|
 | Directorios de nicho | Producteurs bio/locaux, permaculture FR, annuaires de fermes |
-| **Prensa local** | Sud Ouest, France Bleu Périgord — historia "pareja deja la ciudad y monta ferme lombricole" (E-E-A-T perfecta) |
+| **Prensa local** | Sud Ouest, France Bleu Périgord — historia "confinés pendant le Covid, ils montent une ferme lombricole en Dordogne" (E-E-A-T perfecta) |
 | Guest content / colaboraciones | Blogs de jardinage, permaculture, pêche |
 | Partnerships | Tiendas de pesca (vers de pêche), jardineries, AMAP |
 | Contenido linkable | Guía definitiva "Lombrithé" que otros citen |
@@ -79,7 +79,7 @@ Encaja muy bien con tu producto visual y tu historia.
 | **Remarketing** | Reimpactar a quien visitó la web o el perfil (Pixel) | 3-5 €/día |
 
 - **Pre-requisito:** Meta Pixel + Conversions API en la web; catálogo de Meta sincronizado con WooCommerce (plugin oficial).
-- **Ángulo creativo:** la historia (Angel + África, 2022, sol vivant) > foto de producto sola. Lo emocional + educativo convierte mejor en este nicho.
+- **Ángulo creativo:** la historia (Angel + África, terrain en 2019, ferme née du confinement, sol vivant) > foto de producto sola. Lo emocional + educativo convierte mejor en este nicho.
 
 ### Secuencia Ads recomendada
 1. **Primero el tracking** (conversiones Google + Pixel Meta). Innegociable.
