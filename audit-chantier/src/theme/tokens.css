@@ -1,0 +1,32 @@
+/* ============================================================================
+   CHARTE GRAPHIQUE — D.I. ENVIRONNEMENT
+   ----------------------------------------------------------------------------
+   Le seul endroit où les couleurs sont définies. Pour appliquer la charte
+   officielle, remplacer les valeurs ci-dessous : toute l'application suit.
+   ========================================================================== */
+
+:root {
+  /* Couleurs de marque */
+  --di-red: #d62828;
+  --di-red-dark: #a91d1d;
+  --di-red-light: #fdeaea;
+
+  /* Neutres */
+  --paper: #ffffff;
+  --ink: #000000;
+  --muted: #5c5c5c;
+  --line: #d8d8d8;
+
+  /* Sémantique évaluation (Conforme / Améliorable / Non applicable) */
+  --ok: #1a7f37;
+  --ok-light: #e7f5ec;
+  --warn: #d62828;
+  --warn-light: #fdeaea;
+  --na: #6b6b6b;
+  --na-light: #f0f0f0;
+
+  /* Typographie — pile système : aucun fichier de police à embarquer,
+     ce qui garde le fichier HTML unique aussi léger que possible. */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+}

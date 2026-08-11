@@ -1,0 +1,68 @@
+@import './theme/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    /* Évite le zoom involontaire et le rebond sur mobile */
+    overscroll-behavior-y: none;
+  }
+
+  /* Les champs de saisie doivent faire >= 16px, sinon iOS zoome à chaque focus */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-di;
+  }
+}
+
+@layer components {
+  .di-label {
+    @apply block text-[13px] font-bold uppercase tracking-di text-ink;
+  }
+
+  .di-input {
+    @apply w-full rounded-none border-2 border-line bg-paper px-3 py-2.5 text-ink
+           outline-none transition-colors
+           focus:border-di focus:ring-0;
+  }
+
+  .di-btn {
+    @apply inline-flex items-center justify-center gap-2 border-2 px-4 py-3
+           text-sm font-bold uppercase tracking-di transition-colors
+           disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .di-btn-primary {
+    @apply di-btn border-di bg-di text-white active:bg-di-dark;
+  }
+
+  .di-btn-ghost {
+    @apply di-btn border-ink bg-paper text-ink active:bg-ink active:text-paper;
+  }
+}
+
+/* Le pavé de signature ne doit pas défiler la page pendant qu'on signe */
+.signature-canvas {
+  touch-action: none;
+}
+
+/* Masque les éléments interactifs à l'impression */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
